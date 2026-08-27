@@ -64,8 +64,19 @@ def _validate_input(customer_data: dict, features: list[str]) -> None:
         raise ValueError(f"Unknown prediction input fields: {unknown}")
 
 
-def _prepare_row(customer_data: dict, features: list[str], categorical_features: list[str]) -> pd.DataFrame:
-    row = pd.DataFrame([{feature: customer_data[feature] for feature in features}])
+def _prepare_row(
+    customer_data: dict,
+    features: list[str],
+    categorical_features: list[str],
+    numerical_features: list[str],
+) -> pd.DataFrame:
+    values = {
+        feature: np.nan if customer_data[feature] is None else customer_data[feature]
+        for feature in features
+    }
+    row = pd.DataFrame([values])
+    for feature in numerical_features:
+        row[feature] = pd.to_numeric(row[feature], errors="raise")
     for feature in categorical_features:
         row[feature] = row[feature].astype("category")
     return row
@@ -99,10 +110,11 @@ def predict_churn(customer_data: dict, threshold: float | None = None) -> dict:
     model, calibrator, metadata = _load_artifacts()
     features = metadata["features"]
     categorical_features = metadata["categorical_features"]
+    numerical_features = metadata["numerical_features"]
     threshold = float(metadata["threshold"] if threshold is None else threshold)
 
     _validate_input(customer_data, features)
-    row = _prepare_row(customer_data, features, categorical_features)
+    row = _prepare_row(customer_data, features, categorical_features, numerical_features)
 
     raw_probability = float(model.predict_proba(row)[0, 1])
     calibrated_probability = float(calibrator.predict([raw_probability])[0])
