@@ -1,0 +1,260 @@
+{
+  "split_summary": {
+    "train": {
+      "customers": 7000,
+      "rows": 37132,
+      "churn_rate": 0.06000215447592373
+    },
+    "validation": {
+      "customers": 1500,
+      "rows": 7987,
+      "churn_rate": 0.05984725178414924
+    },
+    "test": {
+      "customers": 1500,
+      "rows": 7921,
+      "churn_rate": 0.06021966923368262
+    }
+  },
+  "validation": {
+    "roc_auc": 0.8369627298009474,
+    "pr_auc": 0.48846698361482527,
+    "precision": 0.38089005235602097,
+    "recall": 0.608786610878661,
+    "confusion_matrix": [
+      [
+        7036,
+        473
+      ],
+      [
+        187,
+        291
+      ]
+    ],
+    "flagged_rows": 764
+  },
+  "test": {
+    "roc_auc": 0.8332305392493159,
+    "pr_auc": 0.44725167608114885,
+    "precision": 0.38430311231393777,
+    "recall": 0.5953878406708596,
+    "confusion_matrix": [
+      [
+        6989,
+        455
+      ],
+      [
+        193,
+        284
+      ]
+    ],
+    "flagged_rows": 739
+  },
+  "validation_threshold_sweep": [
+    {
+      "threshold": 0.03,
+      "flagged_rows": 2007,
+      "precision": 0.1818634778276034,
+      "recall": 0.7635983263598326
+    },
+    {
+      "threshold": 0.05,
+      "flagged_rows": 1399,
+      "precision": 0.2444603288062902,
+      "recall": 0.7154811715481172
+    },
+    {
+      "threshold": 0.06,
+      "flagged_rows": 1399,
+      "precision": 0.2444603288062902,
+      "recall": 0.7154811715481172
+    },
+    {
+      "threshold": 0.08,
+      "flagged_rows": 974,
+      "precision": 0.3193018480492813,
+      "recall": 0.6506276150627615
+    },
+    {
+      "threshold": 0.1,
+      "flagged_rows": 764,
+      "precision": 0.38089005235602097,
+      "recall": 0.608786610878661
+    },
+    {
+      "threshold": 0.12,
+      "flagged_rows": 727,
+      "precision": 0.3947730398899587,
+      "recall": 0.600418410041841
+    },
+    {
+      "threshold": 0.15,
+      "flagged_rows": 727,
+      "precision": 0.3947730398899587,
+      "recall": 0.600418410041841
+    },
+    {
+      "threshold": 0.2,
+      "flagged_rows": 465,
+      "precision": 0.5204301075268817,
+      "recall": 0.5062761506276151
+    },
+    {
+      "threshold": 0.25,
+      "flagged_rows": 436,
+      "precision": 0.5412844036697247,
+      "recall": 0.49372384937238495
+    },
+    {
+      "threshold": 0.3,
+      "flagged_rows": 424,
+      "precision": 0.5495283018867925,
+      "recall": 0.4874476987447699
+    }
+  ],
+  "test_calibration": {
+    "mean_predicted_probability": 0.056950684636831284,
+    "sum_predicted_probabilities": 451.10638427734375,
+    "true_churner_count": 477,
+    "test_rows": 7921,
+    "test_churn_rate": 0.06021966923368262
+  },
+  "permutation_importance_test": [
+    {
+      "feature": "balance_change_30d",
+      "importance_mean": 0.08832446225092568,
+      "importance_std": 0.00877287856133627
+    },
+    {
+      "feature": "avg_resolution_time_hrs",
+      "importance_mean": 0.047696181153711964,
+      "importance_std": 0.003975397862830085
+    },
+    {
+      "feature": "card_spend_change_30d",
+      "importance_mean": 0.04439568773966418,
+      "importance_std": 0.007267941853776722
+    },
+    {
+      "feature": "days_since_last_transaction",
+      "importance_mean": 0.028980459898707123,
+      "importance_std": 0.004540799623987644
+    },
+    {
+      "feature": "fd_maturing_in_30d",
+      "importance_mean": 0.027640960104227175,
+      "importance_std": 0.002231199937594189
+    },
+    {
+      "feature": "salary_missing_days",
+      "importance_mean": 0.018323543873397116,
+      "importance_std": 0.0018201755168609642
+    },
+    {
+      "feature": "failed_transactions_30d",
+      "importance_mean": 0.015528006230851744,
+      "importance_std": 0.0030623659475693082
+    },
+    {
+      "feature": "tenure_months",
+      "importance_mean": 0.013694437233121658,
+      "importance_std": 0.0028819625638976344
+    },
+    {
+      "feature": "complaints_30d",
+      "importance_mean": 0.011031875695285805,
+      "importance_std": 0.0029428478576023084
+    },
+    {
+      "feature": "unresolved_complaints",
+      "importance_mean": 0.0018798553800782256,
+      "importance_std": 0.000684892696007674
+    },
+    {
+      "feature": "app_login_change_30d",
+      "importance_mean": 0.0006283769940270897,
+      "importance_std": 0.0002746074102697389
+    },
+    {
+      "feature": "transaction_change_30d",
+      "importance_mean": 0.00031401461648811885,
+      "importance_std": 0.001157635270611348
+    },
+    {
+      "feature": "customer_segment",
+      "importance_mean": 0.00028692618368982015,
+      "importance_std": 0.0005086835169994452
+    },
+    {
+      "feature": "age",
+      "importance_mean": 0.00014327568738588953,
+      "importance_std": 0.00022964485803392677
+    },
+    {
+      "feature": "upi_share_of_spend",
+      "importance_mean": 1.7913782389106236e-05,
+      "importance_std": 0.00011829732402445926
+    },
+    {
+      "feature": "has_credit_card",
+      "importance_mean": -2.3325880303196045e-06,
+      "importance_std": 1.809679205270149e-05
+    },
+    {
+      "feature": "products_dropped_90d",
+      "importance_mean": -8.009441138788487e-06,
+      "importance_std": 2.5366828080064857e-05
+    },
+    {
+      "feature": "branch_code",
+      "importance_mean": -9.74680451999721e-06,
+      "importance_std": 0.0016053062483298913
+    },
+    {
+      "feature": "card_colour",
+      "importance_mean": -2.9417084481633826e-05,
+      "importance_std": 9.47684396469177e-05
+    },
+    {
+      "feature": "has_loan",
+      "importance_mean": -9.049027647079627e-05,
+      "importance_std": 7.018469895922869e-05
+    },
+    {
+      "feature": "products_count",
+      "importance_mean": -0.00010393579570337069,
+      "importance_std": 6.577957716893046e-05
+    },
+    {
+      "feature": "income_regularity",
+      "importance_mean": -0.0001350879515501502,
+      "importance_std": 0.00031416366567577173
+    },
+    {
+      "feature": "emi_bounce_30d",
+      "importance_mean": -0.00024775322373603303,
+      "importance_std": 0.00013902547297897094
+    },
+    {
+      "feature": "external_transfer_change_30d",
+      "importance_mean": -0.001639873559778765,
+      "importance_std": 0.001537437067098799
+    }
+  ],
+  "decoy_ranks": {
+    "branch_code": 18,
+    "card_colour": 19
+  },
+  "decoy_probability_sweeps": {
+    "branch_code": {
+      "min_probability": 0.01652892492711544,
+      "max_probability": 0.02247191034257412,
+      "range": 0.005942985415458679
+    },
+    "card_colour": {
+      "min_probability": 0.019566919654607773,
+      "max_probability": 0.019566919654607773,
+      "range": 0.0
+    }
+  }
+}

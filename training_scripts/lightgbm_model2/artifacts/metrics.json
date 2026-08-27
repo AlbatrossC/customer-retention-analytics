@@ -1,0 +1,406 @@
+{
+  "split_summary": {
+    "train": {
+      "customers": 7000,
+      "rows": 37132,
+      "churn_rate": 0.06000215447592373
+    },
+    "validation": {
+      "customers": 1500,
+      "rows": 7987,
+      "churn_rate": 0.05984725178414924
+    },
+    "test": {
+      "customers": 1500,
+      "rows": 7921,
+      "churn_rate": 0.06021966923368262
+    }
+  },
+  "tuning_history": [
+    {
+      "candidate": 1,
+      "validation_pr_auc_raw": 0.5004135049992539,
+      "validation_roc_auc_raw": 0.8315789532338043,
+      "best_iteration": 279,
+      "params": {
+        "objective": "binary",
+        "metric": "average_precision",
+        "n_estimators": 3000,
+        "random_state": 42,
+        "n_jobs": -1,
+        "verbose": -1,
+        "subsample_freq": 1,
+        "learning_rate": 0.015,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 80,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.2,
+        "reg_lambda": 5.0
+      }
+    },
+    {
+      "candidate": 2,
+      "validation_pr_auc_raw": 0.500943939940761,
+      "validation_roc_auc_raw": 0.8295022263381571,
+      "best_iteration": 331,
+      "params": {
+        "objective": "binary",
+        "metric": "average_precision",
+        "n_estimators": 3000,
+        "random_state": 42,
+        "n_jobs": -1,
+        "verbose": -1,
+        "subsample_freq": 1,
+        "learning_rate": 0.02,
+        "num_leaves": 18,
+        "max_depth": 4,
+        "min_child_samples": 70,
+        "subsample": 0.9,
+        "colsample_bytree": 0.9,
+        "reg_alpha": 0.1,
+        "reg_lambda": 4.0
+      }
+    },
+    {
+      "candidate": 3,
+      "validation_pr_auc_raw": 0.49811341000449044,
+      "validation_roc_auc_raw": 0.8316572414358001,
+      "best_iteration": 307,
+      "params": {
+        "objective": "binary",
+        "metric": "average_precision",
+        "n_estimators": 3000,
+        "random_state": 42,
+        "n_jobs": -1,
+        "verbose": -1,
+        "subsample_freq": 1,
+        "learning_rate": 0.015,
+        "num_leaves": 24,
+        "max_depth": 5,
+        "min_child_samples": 90,
+        "subsample": 0.85,
+        "colsample_bytree": 0.8,
+        "reg_alpha": 0.5,
+        "reg_lambda": 6.0
+      }
+    },
+    {
+      "candidate": 4,
+      "validation_pr_auc_raw": 0.5036506008134639,
+      "validation_roc_auc_raw": 0.8306144202967596,
+      "best_iteration": 239,
+      "params": {
+        "objective": "binary",
+        "metric": "average_precision",
+        "n_estimators": 3000,
+        "random_state": 42,
+        "n_jobs": -1,
+        "verbose": -1,
+        "subsample_freq": 1,
+        "learning_rate": 0.025,
+        "num_leaves": 12,
+        "max_depth": 3,
+        "min_child_samples": 60,
+        "subsample": 0.95,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.0,
+        "reg_lambda": 3.0
+      }
+    },
+    {
+      "candidate": 5,
+      "validation_pr_auc_raw": 0.49859613491541077,
+      "validation_roc_auc_raw": 0.8294986044640434,
+      "best_iteration": 247,
+      "params": {
+        "objective": "binary",
+        "metric": "average_precision",
+        "n_estimators": 3000,
+        "random_state": 42,
+        "n_jobs": -1,
+        "verbose": -1,
+        "subsample_freq": 1,
+        "learning_rate": 0.02,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 120,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "reg_alpha": 0.8,
+        "reg_lambda": 8.0
+      }
+    },
+    {
+      "candidate": 6,
+      "validation_pr_auc_raw": 0.5015542442872707,
+      "validation_roc_auc_raw": 0.8302995958545701,
+      "best_iteration": 589,
+      "params": {
+        "objective": "binary",
+        "metric": "average_precision",
+        "n_estimators": 3000,
+        "random_state": 42,
+        "n_jobs": -1,
+        "verbose": -1,
+        "subsample_freq": 1,
+        "learning_rate": 0.01,
+        "num_leaves": 20,
+        "max_depth": 4,
+        "min_child_samples": 50,
+        "subsample": 0.9,
+        "colsample_bytree": 0.75,
+        "reg_alpha": 0.3,
+        "reg_lambda": 4.0
+      }
+    }
+  ],
+  "validation": {
+    "roc_auc": 0.839847831138199,
+    "pr_auc": 0.4887468941035635,
+    "precision": 0.40308988764044945,
+    "recall": 0.600418410041841,
+    "confusion_matrix": [
+      [
+        7084,
+        425
+      ],
+      [
+        191,
+        287
+      ]
+    ],
+    "flagged_rows": 712
+  },
+  "test": {
+    "roc_auc": 0.8300601162333545,
+    "pr_auc": 0.44255725887442726,
+    "precision": 0.41021897810218977,
+    "recall": 0.589098532494759,
+    "confusion_matrix": [
+      [
+        7040,
+        404
+      ],
+      [
+        196,
+        281
+      ]
+    ],
+    "flagged_rows": 685
+  },
+  "validation_threshold_sweep": [
+    {
+      "threshold": 0.03,
+      "flagged_rows": 2038,
+      "precision": 0.1800785083415113,
+      "recall": 0.7677824267782427
+    },
+    {
+      "threshold": 0.05,
+      "flagged_rows": 1480,
+      "precision": 0.23445945945945945,
+      "recall": 0.7259414225941423
+    },
+    {
+      "threshold": 0.06,
+      "flagged_rows": 1480,
+      "precision": 0.23445945945945945,
+      "recall": 0.7259414225941423
+    },
+    {
+      "threshold": 0.08,
+      "flagged_rows": 1148,
+      "precision": 0.2813588850174216,
+      "recall": 0.6757322175732218
+    },
+    {
+      "threshold": 0.1,
+      "flagged_rows": 712,
+      "precision": 0.40308988764044945,
+      "recall": 0.600418410041841
+    },
+    {
+      "threshold": 0.12,
+      "flagged_rows": 712,
+      "precision": 0.40308988764044945,
+      "recall": 0.600418410041841
+    },
+    {
+      "threshold": 0.15,
+      "flagged_rows": 649,
+      "precision": 0.42989214175654855,
+      "recall": 0.5836820083682008
+    },
+    {
+      "threshold": 0.2,
+      "flagged_rows": 595,
+      "precision": 0.45210084033613446,
+      "recall": 0.5627615062761506
+    },
+    {
+      "threshold": 0.25,
+      "flagged_rows": 422,
+      "precision": 0.54739336492891,
+      "recall": 0.48326359832635984
+    },
+    {
+      "threshold": 0.3,
+      "flagged_rows": 422,
+      "precision": 0.54739336492891,
+      "recall": 0.48326359832635984
+    },
+    {
+      "threshold": 0.4,
+      "flagged_rows": 282,
+      "precision": 0.6382978723404256,
+      "recall": 0.37656903765690375
+    }
+  ],
+  "test_calibration": {
+    "mean_predicted_probability": 0.05709748907483692,
+    "sum_predicted_probabilities": 452.26921096178324,
+    "true_churner_count": 477,
+    "test_rows": 7921,
+    "test_churn_rate": 0.06021966923368262
+  },
+  "permutation_importance_test": [
+    {
+      "feature": "balance_change_30d",
+      "importance_mean": 0.09169031504756746,
+      "importance_std": 0.007687758592704067
+    },
+    {
+      "feature": "avg_resolution_time_hrs",
+      "importance_mean": 0.04788300964074218,
+      "importance_std": 0.0035819884004966414
+    },
+    {
+      "feature": "card_spend_change_30d",
+      "importance_mean": 0.04428645395610954,
+      "importance_std": 0.0067952551374350694
+    },
+    {
+      "feature": "days_since_last_transaction",
+      "importance_mean": 0.03240182784911545,
+      "importance_std": 0.004212672320741931
+    },
+    {
+      "feature": "fd_maturing_in_30d",
+      "importance_mean": 0.026024418319160646,
+      "importance_std": 0.003036079367590074
+    },
+    {
+      "feature": "salary_missing_days",
+      "importance_mean": 0.020930190982018686,
+      "importance_std": 0.002473966306532797
+    },
+    {
+      "feature": "failed_transactions_30d",
+      "importance_mean": 0.013795434214061176,
+      "importance_std": 0.004089637637083082
+    },
+    {
+      "feature": "tenure_months",
+      "importance_mean": 0.012633688355276267,
+      "importance_std": 0.002635973867098561
+    },
+    {
+      "feature": "complaints_30d",
+      "importance_mean": 0.012312579782823196,
+      "importance_std": 0.0025522648615244744
+    },
+    {
+      "feature": "unresolved_complaints",
+      "importance_mean": 0.0024524437999997096,
+      "importance_std": 0.0005182551801251108
+    },
+    {
+      "feature": "income_regularity",
+      "importance_mean": 0.0006470344250434634,
+      "importance_std": 0.00034769590929617413
+    },
+    {
+      "feature": "app_login_change_30d",
+      "importance_mean": 0.0003805288158773401,
+      "importance_std": 0.00014069573944098976
+    },
+    {
+      "feature": "upi_share_of_spend",
+      "importance_mean": 0.0002554960416974561,
+      "importance_std": 0.00013993588140922249
+    },
+    {
+      "feature": "external_transfer_change_30d",
+      "importance_mean": 0.00019109587837330412,
+      "importance_std": 0.0011669177397545477
+    },
+    {
+      "feature": "age",
+      "importance_mean": 8.755831542819892e-05,
+      "importance_std": 0.00016069507442979065
+    },
+    {
+      "feature": "branch_code",
+      "importance_mean": 8.700261731243719e-05,
+      "importance_std": 0.0017816965985185049
+    },
+    {
+      "feature": "customer_segment",
+      "importance_mean": 0.0,
+      "importance_std": 0.0
+    },
+    {
+      "feature": "has_credit_card",
+      "importance_mean": 0.0,
+      "importance_std": 0.0
+    },
+    {
+      "feature": "card_colour",
+      "importance_mean": 0.0,
+      "importance_std": 0.0
+    },
+    {
+      "feature": "products_count",
+      "importance_mean": -3.77293805996326e-05,
+      "importance_std": 4.778335848990574e-05
+    },
+    {
+      "feature": "has_loan",
+      "importance_mean": -5.607833789699202e-05,
+      "importance_std": 0.00016672326896254445
+    },
+    {
+      "feature": "products_dropped_90d",
+      "importance_mean": -7.379673892285443e-05,
+      "importance_std": 5.879184754065421e-05
+    },
+    {
+      "feature": "emi_bounce_30d",
+      "importance_mean": -0.00011236546406659942,
+      "importance_std": 0.0001198402370748852
+    },
+    {
+      "feature": "transaction_change_30d",
+      "importance_mean": -0.00027197711159674396,
+      "importance_std": 0.00107047909892766
+    }
+  ],
+  "decoy_ranks": {
+    "branch_code": 16,
+    "card_colour": 19
+  },
+  "decoy_probability_sweeps": {
+    "branch_code": {
+      "min_probability": 0.019087136929460582,
+      "max_probability": 0.019087136929460582,
+      "range": 0.0
+    },
+    "card_colour": {
+      "min_probability": 0.019087136929460582,
+      "max_probability": 0.019087136929460582,
+      "range": 0.0
+    }
+  }
+}

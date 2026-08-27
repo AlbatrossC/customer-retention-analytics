@@ -1,0 +1,122 @@
+{
+  "split_summary": {
+    "train": {
+      "customers": 7000,
+      "rows": 37132,
+      "churn_rate": 0.06000215447592373
+    },
+    "validation": {
+      "customers": 1500,
+      "rows": 7987,
+      "churn_rate": 0.05984725178414924
+    },
+    "test": {
+      "customers": 1500,
+      "rows": 7921,
+      "churn_rate": 0.06021966923368262
+    }
+  },
+  "validation_selected_threshold": 0.6561645865440369,
+  "threshold_selection_metric": "F2",
+  "validation": {
+    "roc_auc": 0.8305422614201871,
+    "pr_auc": 0.4910806420803942,
+    "precision": 0.34301675977653634,
+    "recall": 0.6422594142259415,
+    "f1": 0.4471959213401311,
+    "confusion_matrix": [
+      [
+        6921,
+        588
+      ],
+      [
+        171,
+        307
+      ]
+    ]
+  },
+  "test": {
+    "roc_auc": 0.8379311859789996,
+    "pr_auc": 0.4632501565267279,
+    "precision": 0.33983926521239954,
+    "recall": 0.6205450733752621,
+    "f1": 0.4391691394658754,
+    "confusion_matrix": [
+      [
+        6869,
+        575
+      ],
+      [
+        181,
+        296
+      ]
+    ]
+  },
+  "top_global_features": [
+    {
+      "feature": "balance_change_30d",
+      "gain": 123630.046875
+    },
+    {
+      "feature": "card_spend_change_30d",
+      "gain": 71152.40625
+    },
+    {
+      "feature": "avg_resolution_time_hrs",
+      "gain": 59366.50390625
+    },
+    {
+      "feature": "failed_transactions_30d",
+      "gain": 40235.109375
+    },
+    {
+      "feature": "days_since_last_transaction",
+      "gain": 39140.5625
+    },
+    {
+      "feature": "complaints_30d",
+      "gain": 26773.955078125
+    },
+    {
+      "feature": "unresolved_complaints",
+      "gain": 16604.328125
+    },
+    {
+      "feature": "salary_missing_days",
+      "gain": 13760.60546875
+    },
+    {
+      "feature": "tenure_months",
+      "gain": 9893.5859375
+    },
+    {
+      "feature": "fd_maturing_in_30d",
+      "gain": 9510.0849609375
+    },
+    {
+      "feature": "app_login_change_30d",
+      "gain": 5096.99853515625
+    },
+    {
+      "feature": "branch_code",
+      "gain": 3910.869920730591
+    },
+    {
+      "feature": "external_transfer_change_30d",
+      "gain": 3014.88720703125
+    },
+    {
+      "feature": "age",
+      "gain": 2460.034423828125
+    },
+    {
+      "feature": "transaction_change_30d",
+      "gain": 2194.944091796875
+    }
+  ],
+  "decoy_importance_share": {
+    "branch_code": 0.009078929602568486,
+    "card_colour": 0.000754721238673536
+  },
+  "decoy_warnings": []
+}
