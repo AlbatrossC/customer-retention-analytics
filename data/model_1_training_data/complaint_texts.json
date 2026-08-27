@@ -1,0 +1,3091 @@
+{
+  "upi_failure": [
+    {
+      "text": "UPI payment failed twice but amount was debited. No response yet.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Sir, my UPI is not working since two days. Kindly look into it.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Paisa cut gaya but shopkeeper ko nahi mila. Kya kar rahe ho aap log?",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Transaction pending since Monday. Rs 4,500 stuck. Please reverse it.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Every evening UPI shows server down. My whole day sale is affected.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Kindly refund the failed UPI of 12th. I have attached the screenshot.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "business"
+      ]
+    },
+    {
+      "text": "App keeps saying beneficiary bank not responding. Two weeks now.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Mera UPI PIN reset nahi ho raha. Branch me bhi koi help nahi mili.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Amount debited from account but merchant says payment not received.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "I am losing customers because your UPI QR fails at counter. Fix it.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Three failed transactions today. Other bank UPI works fine on same phone.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Respected sir, small amount 200 rupees failed but not returned yet.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "UPI limit is showing exceeded but I have not done any transaction.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Bahut pareshaan hoon. Har baar transaction fail ho raha hai.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Refund promised in 3 working days, it is now 11 days. No update.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please help, I could not pay my medicine bill because UPI declined.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Autopay mandate failed and my subscription got cancelled. Very poor.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Scan karke payment karta hoon to error aata hai. Please solve kariye.",
+      "tone": "mixed",
+      "segments": [
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Collect request keeps expiring before I can approve. Timing too short.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Sent money to wrong UPI id due to app lag. Need help urgently.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Your UPI is down more than it is up. I am moving to another app.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Kindly enable UPI on my account, it has been disabled without notice.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Payment failed but SMS says success. Statement bhi confusing hai.",
+      "tone": "mixed",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Mandi payment could not go through, buyer left without paying.",
+      "tone": "angry",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Two same payments went out for one bill. Please reverse the duplicate.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Sir please check, UPI id showing invalid but it is my own account.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Daily limit reduced without informing me. How am I supposed to trade?",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "App update ke baad UPI kaam hi nahi kar raha. Purana version chahiye.",
+      "tone": "mixed",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Failed transaction reversed only partially. Rs 60 still not credited.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "I have raised this three times. Nobody calls back. Extremely frustrating.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please guide, I am not able to link my account to the UPI app.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Fertiliser shop payment failed at last moment. Had to borrow cash.",
+      "tone": "neutral",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Bank server issue is daily matter now. Business kaise chalayein?",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Money debited, transaction failed, and helpline number is always busy.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly share the RRN for my failed payment so I can show the merchant.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "UPI working only on wifi, not on mobile data. Please check the app.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Pension aane ke baad bhi UPI se paisa nahi bhej pa raha hoon.",
+      "tone": "mixed",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Failure rate on your UPI is unacceptable for a business account.",
+      "tone": "angry",
+      "segments": [
+        "business"
+      ]
+    },
+    {
+      "text": "Please refund. I am a senior citizen and cannot visit branch again.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Transaction history not showing the failed entry at all. Very strange.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Roz roz fail ho raha hai. Ab main dusre bank ka app use karunga.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Rent payment failed on due date, landlord charged me late fee.",
+      "tone": "angry",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Kindly resolve, my customers are refusing to pay by UPI to my QR.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Amount stuck in pending for 6 days. Which department should I contact?",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Sir, mera number change hua hai aur ab UPI verify nahi ho raha.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Complaint number given but no follow up call. Poor service quality.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please activate UPI for my new account, it has been a week already.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Failed payment reversed after 9 days without any intimation to me.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Wholesale supplier payment bounced. My credit reputation is damaged.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Har mahine ek do transaction fail hota hi hai. Thoda dekhiye please.",
+      "tone": "mixed",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Unable to pay electricity bill through UPI, connection now disconnected.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly explain why my UPI was blocked. I received no message.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Same amount debited three times for one transaction. Please check urgently.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Payment to my son failed but he received a wrong credit notification.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "QR sticker se payment aata hai but account me credit late hota hai.",
+      "tone": "mixed",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "This is my fourth complaint about UPI failure. Nothing has improved.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting your help, the app shows technical error code every time.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Seed purchase payment failed during sowing week. Big loss for me.",
+      "tone": "angry",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "UPI se transfer karne par charges lag rahe hain? Pehle to nahi the.",
+      "tone": "mixed",
+      "segments": [
+        "vendor",
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Please confirm whether my failed UPI amount will be auto reversed.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "business"
+      ]
+    }
+  ],
+  "atm_card": [
+    {
+      "text": "ATM did not dispense cash but account was debited Rs 10,000.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "pension",
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "My debit card is not working at any ATM since last week. Please help.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Card swallow ho gaya machine me. Branch ne kaha 15 din lagenge.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "New card not delivered even after two months of applying. Very poor.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "ATM near my village is always out of cash. Have to travel 20 km.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly reissue my card, the chip has stopped reading at merchants.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Card blocked without warning while I was travelling. Total harassment.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "PIN change nahi ho raha hai ATM par. Error message aata hai har baar.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Cash withdrawal failed twice, amount debited, receipt not printed.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please note my card was retained by your ATM on 3rd. Need urgent replacement.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "I am 72 years old and had to stand 40 minutes at a broken ATM.",
+      "tone": "angry",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Debit card declined at hospital counter during emergency. Shameful.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "salary",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Kindly increase my daily ATM withdrawal limit for business needs.",
+      "tone": "polite",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Card ka expiry nikal gaya but naya card ka koi information nahi.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Wrong amount dispensed. Machine gave 4,000 but debited 5,000.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Requesting card replacement, it is damaged and no longer swiping.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "business"
+      ]
+    },
+    {
+      "text": "Your ATM printed slip saying transaction cancelled but money went out.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Card cloned and used at some other city. Why no SMS alert came?",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Every ATM of yours in this taluka is either down or empty. Useless.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Sir kripya card block kariye, mera wallet chori ho gaya hai.",
+      "tone": "mixed",
+      "segments": [
+        "vendor",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Contactless payment is not enabled on my card. Please activate it.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Two hundred rupees deducted as ATM decline charge. This is unfair.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Card kaam nahi kar raha, aur customer care wale phone nahi uthate.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please confirm status of my ATM dispute raised on 18th last month.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Machine hung mid transaction and card came out but no cash and no reversal.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "I requested a card upgrade, instead you sent the same basic card again.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Pension nikalne gaya tha, ATM band tha, aur branch me lambi line thi.",
+      "tone": "mixed",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Kindly waive the replacement fee, the card failure was not my fault.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Card declined at petrol pump even though balance was sufficient.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Naya card mila but PIN ka letter nahi aaya. Kya karein batayiye.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "ATM receipt shows balance different from passbook. Please clarify.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Third time this year my card has stopped working. Quality is bad.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please courier the card to my village address, not the old one.",
+      "tone": "polite",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Cash trapped in the machine shutter. Guard said complain to bank.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "International usage blocked without asking me. I travel for business.",
+      "tone": "angry",
+      "segments": [
+        "business"
+      ]
+    },
+    {
+      "text": "Card se paisa nikala nahi, phir bhi message aaya ki debit hua hai.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Kindly activate my card for online transactions, it keeps declining.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Your ATM ate my card and the branch was closed for two days after.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Requesting duplicate PIN as I have forgotten mine. Guide the process.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Withdrawal of 500 failed but annual card fee got deducted same day.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Machine me network problem likha aata hai poora din. Kabhi theek hoga?",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please share the CCTV timestamp for my disputed ATM transaction.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Card reissued but old card still active. This is a security risk.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "I am unable to read the small print on the new card. Very difficult.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Debit card EMI option promised at branch but not showing anywhere.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "ATM charged me for balance enquiry which was supposed to be free.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Card ka number galat print hua hai. Branch ne bola online complaint karo.",
+      "tone": "mixed",
+      "segments": [
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Please block card ending 4412 immediately, I suspect misuse.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Twice I got half the amount I asked for. Who audits these machines?",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly inform when the ATM at market road will be repaired.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "farmer",
+        "pension"
+      ]
+    },
+    {
+      "text": "Card swipe hone ke baad bill amount double aaya. Please check kariye.",
+      "tone": "mixed",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "My daily sales collection is stuck because card withdrawal keeps failing.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Please explain the ATM decline reason code shown on my slip.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Old card deactivated before new one arrived. Left without access for weeks.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting your kind help, my card is not accepted at ration shop.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Har ATM par jaake try kiya, kahin bhi card accept nahi ho raha.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Dispute closed as resolved but I never received the reversal amount.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly deliver the card to the branch, courier never finds my shop.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Card transaction alert SMS stopped coming. How do I track spending?",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Sunday ko ATM kaam nahi karta aapka. Emergency me kya karein?",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    }
+  ],
+  "loan_emi": [
+    {
+      "text": "EMI was deducted twice this month. Please reverse one immediately.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Crop failed this season, requesting EMI deferment for two months.",
+      "tone": "polite",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Loan ka EMI bounce ho gaya but account me paisa tha. Please check.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Bounce charges of Rs 590 levied though the fault was at bank side.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly share my loan closure statement, I want to prepay fully.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Interest rate increased without any intimation. EMI jumped suddenly.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting restructure of my loan, my shop income has dropped badly.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Recovery agent came to my house and spoke rudely in front of neighbours.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Tractor loan ka EMI date change karwana hai. Mandi payment late aata hai.",
+      "tone": "mixed",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "My EMI is debited on 5th but salary comes on 7th. Please shift the date.",
+      "tone": "neutral",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Gold loan renewal notice never reached me and now penalty is added.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Please confirm receipt of my EMI paid in cash at branch last week.",
+      "tone": "neutral",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Loan sanctioned but disbursement pending 20 days. Sowing season is going.",
+      "tone": "angry",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Kindly issue NOC, my loan was closed three months back.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "EMI bounce hua aur CIBIL kharab ho gaya. Bank ki galti thi.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting moratorium, my supplier payments are stuck this quarter.",
+      "tone": "polite",
+      "segments": [
+        "business"
+      ]
+    },
+    {
+      "text": "Statement shows extra EMI charged in March. Please correct the ledger.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Processing fee deducted twice on my working capital loan.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kisan credit card limit renew karne me bahut delay ho raha hai.",
+      "tone": "mixed",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "I have paid all EMIs on time for 4 years yet my rate is highest.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Please guide on part payment option, I received a bonus this month.",
+      "tone": "polite",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Auto debit mandate cancelled by bank without informing, EMI missed.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Loan amount kam mila than sanctioned. Koi explanation nahi diya gaya.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Insurance premium bundled with loan without my consent. Refund please.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "farmer",
+        "business"
+      ]
+    },
+    {
+      "text": "Requesting EMI holiday for one month due to medical expenses at home.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Two reminder calls a day even though EMI is not yet due. Please stop.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Kindly share amortisation schedule, the branch copy is unreadable.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Cheque bounce charge lagaya but cheque main ne diya hi nahi tha.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "business",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Loan against deposit was rejected without any reason being given.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "My EMI increased mid tenure. Nobody explained the reset clause to me.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Please update my mobile number, I am not receiving EMI reminders.",
+      "tone": "polite",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Fasal kharab hui hai, EMI abhi bharna mushkil hai. Thoda samay dijiye.",
+      "tone": "mixed",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Foreclosure charges are 4 percent, that is very high for a co-op bank.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting top up on existing loan for shop renovation. Please advise.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "EMI debited from wrong account. I had given a different mandate.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Penal interest charged despite the delay being due to your server issue.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Loan documents abhi tak wapas nahi mile closure ke baad.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Kindly reconsider my rate, another bank is offering 2 percent lower.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Guarantor was called repeatedly for one late EMI. Very embarrassing.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Please explain why my EMI receipt shows a different loan account number.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "business"
+      ]
+    },
+    {
+      "text": "Subsidy on my agriculture loan has not been credited for two years.",
+      "tone": "angry",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Requesting change of EMI mode from cheque to auto debit. Kindly help.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Bounce hone par 3 baar charge laga. Ek hi bounce tha sir.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "farmer",
+        "business"
+      ]
+    },
+    {
+      "text": "My education loan interest subsidy claim is pending since last year.",
+      "tone": "neutral",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Loan rejected after taking my documents and 3 weeks of my time.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "farmer",
+        "business"
+      ]
+    },
+    {
+      "text": "Kindly allow prepayment without penalty, I am a very old customer.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "salary",
+        "farmer"
+      ]
+    },
+    {
+      "text": "EMI ka SMS nahi aata, pata hi nahi chalta kab kata hai.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Overdue notice sent to my employer. That was completely unnecessary.",
+      "tone": "angry",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Please confirm my final EMI, the app and passbook show different amounts.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Dairy loan installment structure does not match my milk payment cycle.",
+      "tone": "neutral",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Charges deducted as legal fee but no legal action was ever taken.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Requesting a smaller EMI with longer tenure. My income has reduced.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "salary",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Aapke branch me loan file 2 mahine se pending padi hai. Koi sunta nahi.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Please stop the auto debit, I have already closed this loan.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly share interest certificate for tax filing before month end.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Collateral property papers are misplaced by the branch. Very worried.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "EMI bounced because pension credit was delayed. Not my mistake.",
+      "tone": "neutral",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Requesting waiver of one bounce charge as goodwill. Long relationship.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "farmer",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Har mahine EMI ke liye branch bulate ho, online option kyun nahi hai?",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Loan insurance claim rejected and yet premium keeps getting deducted.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "farmer",
+        "business"
+      ]
+    }
+  ],
+  "branch_service": [
+    {
+      "text": "Waited two hours at the branch and the counter closed for lunch.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "pension",
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Staff behaviour at the branch was very rude when I asked for passbook.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly open one more counter in the morning, the queue is very long.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Branch me koi seedha jawab nahi deta. Har baar kal aana bolte hain.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Passbook printing machine has been out of order for three weeks.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Manager was on leave and nobody else could authorise my request.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary",
+        "vendor"
+      ]
+    },
+    {
+      "text": "I am a senior citizen, please provide a chair and separate queue.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "KYC update took four visits. Every time a new document was demanded.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Cheque book request diya tha, ek mahina ho gaya, abhi tak nahi mila.",
+      "tone": "mixed",
+      "segments": [
+        "business",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Branch opens late almost daily. Customers wait outside in the sun.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Requesting doorstep banking, I am unable to walk to the branch now.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Nobody informed me my account became dormant. Found out at counter.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Please provide account statement in print, I do not use email.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Cash deposit machine down again. Daily collection cannot be deposited.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Staff told me to come after 3 pm and then said system is down.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Kindly train your staff, the new clerk did not know the FD process.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Signature verification me 5 din lag gaye. Business ka nuksan hua.",
+      "tone": "mixed",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Locker request pending since January with no update from the branch.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary",
+        "pension"
+      ]
+    },
+    {
+      "text": "Requesting a token system, currently people push into the queue.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "My nomination form has been lost twice by the branch. Unacceptable.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Branch staff refused to accept coins from my daily shop collection.",
+      "tone": "angry",
+      "segments": [
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please arrange Marathi speaking staff at the counter for old customers.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Account transfer to new branch is taking more than two months.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Form bharne me help maangi to bola khud padho. Bahut bura laga.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly extend working hours, I cannot come during office timings.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "The branch has no drinking water and the fan has not worked all summer.",
+      "tone": "neutral",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Cash withdrawal above 50,000 refused saying no cash in branch.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting update of my address, I have submitted proof three times.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Staff keeps promoting insurance instead of solving my actual problem.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Branch band tha bina notice ke. Poora din waste ho gaya mera.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please confirm whether Saturday banking is available at this branch.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "My deposit receipt was handwritten and is now being questioned.",
+      "tone": "neutral",
+      "segments": [
+        "farmer",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly assist, I need help operating the mobile app. Nobody guided me.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Complaint register was not given to me when I asked for it.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Account opening for my son took 5 visits. Private banks do it in a day.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Requesting cheque collection facility for my shop, I cannot leave counter.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Cashier counted wrong and blamed me. Very insulting experience.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Bank me network problem rehta hai hamesha. Kaam kabhi time par nahi hota.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Please inform in advance when the branch will be closed for audit.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Requesting a separate counter for farmers during mandi season.",
+      "tone": "polite",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Staff misplaced my FD receipt and now say I must give an indemnity.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Pension life certificate submission was refused for a minor typo.",
+      "tone": "angry",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Kindly provide interest certificate, I have asked twice already.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "business"
+      ]
+    },
+    {
+      "text": "Har baar naya document maangte ho. Pehle hi bata dete to accha hota.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Branch ATM and branch counter both were down on salary day.",
+      "tone": "angry",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Requesting SMS alert activation, staff said it is already done but no SMS.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "The relationship manager has changed four times in one year.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Please help me link Aadhaar, the branch keeps redirecting me to CSC.",
+      "tone": "polite",
+      "segments": [
+        "farmer",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "I was made to sign blank forms. This is not acceptable practice.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Deposit slip counter has no pen and no forms since many days.",
+      "tone": "neutral",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Kindly resolve, my joint account holder passed away and nobody guides me.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Bank walon ne bola system update hai, teen din se yehi sun raha hoon.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Requesting a business banking desk, retail queue takes too long.",
+      "tone": "polite",
+      "segments": [
+        "business"
+      ]
+    },
+    {
+      "text": "Money was deposited but not reflected in account for two days.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "business",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Please arrange a wheelchair ramp, my father cannot climb the steps.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Staff asked me to open a new account instead of fixing the old one.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Passbook me entry adhoori hai, purane transaction dikh hi nahi rahe.",
+      "tone": "mixed",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting call back from branch manager regarding my pending issue.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "I have banked here 20 years and today I was treated like a stranger.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Kindly issue a duplicate passbook, mine was damaged in the rains.",
+      "tone": "polite",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    }
+  ],
+  "fees_charges": [
+    {
+      "text": "Minimum balance penalty charged even though I maintained the balance.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer",
+        "pension"
+      ]
+    },
+    {
+      "text": "Kindly explain the Rs 250 service charge debited on 14th.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "SMS charge, card charge, AMC charge. Har mahine kuch na kuch kat ta hai.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Annual maintenance fee deducted without any prior intimation.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "pension",
+        "business"
+      ]
+    },
+    {
+      "text": "Please waive the non maintenance charge, my pension was credited late.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Cash handling charges on my own deposit? This is a cooperative bank.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "business",
+        "farmer"
+      ]
+    },
+    {
+      "text": "GST charged on a fee that itself should not have been levied.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Charges lagte rehte hain but kabhi statement me clear nahi likha hota.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Cheque return charge levied though the cheque was returned by their side.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Requesting reversal of duplicate debit card annual fee this year.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business",
+        "pension"
+      ]
+    },
+    {
+      "text": "Locker rent increased 40 percent with a one line notice. Too much.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "salary",
+        "pension"
+      ]
+    },
+    {
+      "text": "Please confirm the charge structure for NEFT above one lakh.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Aapne bina bataye charges badha diye. Yeh sahi baat nahi hai.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Kindly refund the ATM usage charges, I used your own bank ATM.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "My account went negative purely because of your charges. Very unfair.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Stop payment charge taken but the cheque was still cleared.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "salary",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting senior citizen exemption on account maintenance charges.",
+      "tone": "polite",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Statement request charge of Rs 100 is excessive for two pages.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "pension",
+        "business"
+      ]
+    },
+    {
+      "text": "Har transaction par charge lag raha hai, dusre bank me free hai.",
+      "tone": "angry",
+      "segments": [
+        "vendor",
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Please share the full tariff schedule, I cannot find it anywhere.",
+      "tone": "polite",
+      "segments": [
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Insurance premium debited from my account which I never authorised.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "farmer",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Charges deducted on the same day my balance dropped for one hour.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly reverse the late payment fee, the delay was on your system.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Quarterly average balance rule changed without informing customers.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Doorstep banking charge is more than the amount I withdraw.",
+      "tone": "neutral",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Mera pension account hai phir bhi minimum balance charge kyun?",
+      "tone": "mixed",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Requesting a fee free account variant, my income is seasonal.",
+      "tone": "polite",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Two different charges with the same narration on the same day.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Debit card fee charged for a card I never received. Please refund.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Charges khaate se kat gaye aur balance zero ho gaya. Bahut galat hai.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Please explain why my business account has retail charges applied.",
+      "tone": "neutral",
+      "segments": [
+        "business"
+      ]
+    },
+    {
+      "text": "Kindly waive the folio charges, I am closing this account anyway.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "You charge for passbook printing now? That was always free before.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Interest credited is less than the charges debited. What is the point?",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "salary",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Requesting refund of the RTGS charge, the transfer never completed.",
+      "tone": "polite",
+      "segments": [
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Charges deducted from my crop loan disbursement without explanation.",
+      "tone": "angry",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Please clarify the difference between service charge and processing fee.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "SMS alert charge lag raha hai but SMS to aata hi nahi hai.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Fee reversal promised by the branch manager never actually happened.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Kindly consider reducing charges for small vendor accounts like mine.",
+      "tone": "polite",
+      "segments": [
+        "vendor"
+      ]
+    },
+    {
+      "text": "I was charged for a chequebook I did not request or collect.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Please confirm if charges apply on inward remittance from my son.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Every quarter some new charge appears. I am losing trust in this bank.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting itemised list of all charges debited in the last one year.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Charge for cash deposit at non home branch is unreasonable for farmers.",
+      "tone": "angry",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Aapke charges ki wajah se main dusre bank me account khol raha hoon.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Kindly refund the penalty, my salary credit was delayed by employer.",
+      "tone": "polite",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Charges applied on a dormant account with zero transactions. Why?",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Foreclosure charge plus documentation charge plus GST. Too many layers.",
+      "tone": "angry",
+      "segments": [
+        "business",
+        "salary",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Please waive one charge as a goodwill gesture, I am a 15 year customer.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Nomination update charge? Such a basic service should be free.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "salary"
+      ]
+    },
+    {
+      "text": "Charges statement me alag alag naam se aate hain. Samajh nahi aata.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Requesting clarity on why my zero balance account has a fee.",
+      "tone": "neutral",
+      "segments": [
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "You deducted charges on the day my FD matured. Very poor timing.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Kindly reverse the mandate registration fee, the mandate failed anyway.",
+      "tone": "polite",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Charges have doubled but service has become worse. Explain that.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Please stop auto debit of insurance, I want to discontinue the policy.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "pension"
+      ]
+    },
+    {
+      "text": "Bina permission ke koi bhi charge kaise laga sakte ho aap log?",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requesting fee waiver for this quarter, my shop was shut for repairs.",
+      "tone": "polite",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Charges are deducted instantly but refunds take three weeks. Unfair.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    }
+  ],
+  "rm_notes": [
+    {
+      "text": "Customer says he is shifting salary account to a private bank next month.",
+      "tone": "neutral",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Spoke to customer, unhappy with repeated UPI failures. Wants callback.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Customer asked about FD rates at other banks. Comparing before renewal.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Visited shop. Owner says daily collection now going through a fintech app.",
+      "tone": "neutral",
+      "segments": [
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Customer very upset about charges. Threatened to close account today.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer",
+        "pension"
+      ]
+    },
+    {
+      "text": "Farmer says crop payment delayed, will not be able to service loan.",
+      "tone": "neutral",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Customer ne bola ki service pehle jaisi nahi rahi. Follow up needed.",
+      "tone": "mixed",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requested rate reduction, otherwise plans to transfer loan elsewhere.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business"
+      ]
+    },
+    {
+      "text": "Customer not reachable on registered number for the last three attempts.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor",
+        "farmer",
+        "business"
+      ]
+    },
+    {
+      "text": "Senior citizen, wants doorstep service. Currently dissatisfied with branch.",
+      "tone": "neutral",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Customer mentioned son has opened account elsewhere and advises the same.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Business owner unhappy with cash deposit limits. Exploring other banks.",
+      "tone": "neutral",
+      "segments": [
+        "business"
+      ]
+    },
+    {
+      "text": "Complaint pending 20 days. Customer says he will go to ombudsman.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Discussed FD renewal. Customer wants to withdraw and invest in mutual fund.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary",
+        "pension"
+      ]
+    },
+    {
+      "text": "Customer satisfied with loan process but complained about branch queue.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Vendor says QR failures cost him sales. Considering another provider.",
+      "tone": "neutral",
+      "segments": [
+        "vendor"
+      ]
+    },
+    {
+      "text": "Customer ki salary ab dusre account me aa rahi hai. Reason not shared.",
+      "tone": "mixed",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Long standing customer, no recent transactions. Called, no answer twice.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary"
+      ]
+    },
+    {
+      "text": "Customer requested fee waiver as retention gesture. Escalated to manager.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Met at home. Family says he now uses a payments app for everything.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Customer angry about EMI bounce charge. Says balance was sufficient.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "farmer",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Discussed KCC renewal. Customer hesitant, comparing with land development bank.",
+      "tone": "neutral",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Customer values relationship but says charges are pushing him away.",
+      "tone": "mixed",
+      "segments": [
+        "salary",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Account activity dropped sharply. Customer says business has shifted online.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Bola ki bank me har baar naya staff milta hai, koi pehchanta nahi.",
+      "tone": "mixed",
+      "segments": [
+        "pension",
+        "farmer",
+        "business"
+      ]
+    },
+    {
+      "text": "Customer wants overdraft facility. If not sanctioned, may move banking.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Pensioner unhappy that life certificate process was not explained properly.",
+      "tone": "neutral",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Customer reported two unresolved complaints. Both older than one month.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Requested branch visit but customer refused, said no point in coming.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Deposit maturing next month. Customer has not confirmed renewal intent.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Customer appreciated loan support but wants faster digital services.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Shop shifted to another market. Customer now banks near new location.",
+      "tone": "neutral",
+      "segments": [
+        "vendor"
+      ]
+    },
+    {
+      "text": "Customer says mobile app is difficult, prefers branch but branch is slow.",
+      "tone": "mixed",
+      "segments": [
+        "pension",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Told me a competitor RM visited his shop and offered better terms.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Customer ne complaint ki resolution se santusht nahi hai. Reopen karna hai.",
+      "tone": "mixed",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "No salary credit seen for two months. Customer says job changed.",
+      "tone": "neutral",
+      "segments": [
+        "salary"
+      ]
+    },
+    {
+      "text": "Customer interested in higher FD rate offer. Wants written confirmation.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "business"
+      ]
+    },
+    {
+      "text": "Repeated card issues. Customer says he has stopped carrying our card.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Farmer requested EMI deferment. Genuine case, sowing was delayed by rain.",
+      "tone": "neutral",
+      "segments": [
+        "farmer"
+      ]
+    },
+    {
+      "text": "Customer mentioned he received a call from another bank offering takeover.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Very loyal customer but frustrated. Says nobody listens to small depositors.",
+      "tone": "angry",
+      "segments": [
+        "pension",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Balance moved out in three large transfers last month. Reason unclear.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Customer asked for RM contact number, says he could never reach anyone.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Discussed retention offer. Customer said he will think about it.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "pension",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Bola ki agar complaint solve nahi hua to account band kar denge.",
+      "tone": "angry",
+      "segments": [
+        "farmer",
+        "vendor",
+        "salary"
+      ]
+    },
+    {
+      "text": "Customer complained about branch timings clashing with mandi hours.",
+      "tone": "neutral",
+      "segments": [
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Positive call. Customer only wants his pending charge reversal done.",
+      "tone": "polite",
+      "segments": [
+        "pension",
+        "salary",
+        "farmer"
+      ]
+    },
+    {
+      "text": "Vendor account almost inactive. Says he collects only in cash now.",
+      "tone": "neutral",
+      "segments": [
+        "vendor"
+      ]
+    },
+    {
+      "text": "Customer wants locker but waitlist is long. Considering another bank.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary",
+        "pension"
+      ]
+    },
+    {
+      "text": "Follow up done. Customer still waiting on ATM dispute from last quarter.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Customer says he trusts the bank but children handle his money now.",
+      "tone": "mixed",
+      "segments": [
+        "pension"
+      ]
+    },
+    {
+      "text": "Loan closed last month. Customer has not started any new relationship.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "business",
+        "farmer",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Requested visit to godown. Customer said he is busy, call after harvest.",
+      "tone": "neutral",
+      "segments": [
+        "farmer",
+        "business"
+      ]
+    },
+    {
+      "text": "Customer flagged that his complaint was closed without contacting him.",
+      "tone": "angry",
+      "segments": [
+        "salary",
+        "business",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "Discussed digital banking. Customer already using competitor app daily.",
+      "tone": "neutral",
+      "segments": [
+        "salary",
+        "vendor",
+        "business"
+      ]
+    },
+    {
+      "text": "Account dormant risk. No debit or credit in the last several weeks.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "farmer",
+        "salary",
+        "vendor"
+      ]
+    },
+    {
+      "text": "Customer ne kaha service accha hota to kabhi nahi jaata. Retention chance hai.",
+      "tone": "mixed",
+      "segments": [
+        "farmer",
+        "vendor",
+        "pension"
+      ]
+    },
+    {
+      "text": "High value customer, currently unhappy. Recommend manager level call.",
+      "tone": "neutral",
+      "segments": [
+        "business",
+        "salary"
+      ]
+    },
+    {
+      "text": "Customer said FD maturity amount will go to his daughter's account.",
+      "tone": "neutral",
+      "segments": [
+        "pension",
+        "business"
+      ]
+    },
+    {
+      "text": "Met customer at market. Warm response but no banking activity restarted.",
+      "tone": "mixed",
+      "segments": [
+        "vendor",
+        "farmer"
+      ]
+    }
+  ]
+}
