@@ -1,0 +1,8 @@
+# Registers the fine-tuned retention GGUF with Ollama so the API server can call
+# it over localhost HTTP instead of loading unsigned llama.cpp DLLs in-process.
+# Build with: ollama create retention-0.5b -f Modelfile
+# The Qwen2 chat template is read from the GGUF's tokenizer.chat_template metadata.
+FROM ./model2_retention_0.5b.gguf
+
+PARAMETER num_ctx 2048
+PARAMETER temperature 0.3
