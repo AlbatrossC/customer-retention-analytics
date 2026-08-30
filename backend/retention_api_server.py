@@ -43,6 +43,7 @@ MODEL1_PATH = MODEL1_ARTIFACT_DIR / "xgboost_model_v2.json"
 CALIBRATOR_PATH = MODEL1_ARTIFACT_DIR / "calibrator_v2.joblib"
 METADATA_PATH = MODEL1_ARTIFACT_DIR / "model_metadata_v2.json"
 MODEL2_PATH = ROOT / "model_2" / "model 2 demo" / "model2_retention_0.5bv2.gguf"
+MODEL2_RECOVERY_CONFIG_PATH = ROOT / "backend" / "model2_recovery_schemas.json"
 
 HOST = "127.0.0.1"
 PORT = 8000
@@ -52,6 +53,7 @@ MODEL2_N_THREADS = 4
 MODEL2_TEMPERATURE = 0.3
 MODEL2_TOP_P = 0.9
 MODEL2_REPEAT_PENALTY = 1.08
+MODEL2_MAX_RETRIES = 3
 
 # Windows Smart App Control blocks the unsigned llama.dll / ggml-*.dll shipped in
 # the llama-cpp-python wheel (WinError 4551). The "ollama" backend runs the same
@@ -125,6 +127,9 @@ model1 = None
 calibrator = None
 metadata = None
 model2 = None
+model2_recovery_config_cache: dict[str, Any] | None = None
+model2_recovery_config_mtime: float | None = None
+model2_recovery_config_error: str | None = None
 
 
 class Model1Request(BaseModel):
@@ -283,6 +288,7 @@ def model2_runtime_info() -> dict[str, Any]:
         "temperature": MODEL2_TEMPERATURE,
         "top_p": MODEL2_TOP_P,
         "repeat_penalty": MODEL2_REPEAT_PENALTY,
+        "max_retries": MODEL2_MAX_RETRIES,
         "n_ctx": MODEL2_N_CTX,
         "n_threads": MODEL2_N_THREADS if MODEL2_BACKEND != "ollama" else None,
     }
@@ -295,7 +301,30 @@ def model2_runtime_info() -> dict[str, Any]:
                 "ollama_runtime": ollama_runtime_info(),
             }
         )
+    info["recovery_config"] = model2_recovery_config_info()
     return info
+
+
+def model2_recovery_config_info() -> dict[str, Any]:
+    try:
+        config = load_model2_recovery_config()
+        return {
+            "path": str(MODEL2_RECOVERY_CONFIG_PATH),
+            "loaded": True,
+            "schema_count": len(config["recovery_schemas"]),
+            "modified_at": datetime.fromtimestamp(float(model2_recovery_config_mtime)).isoformat(timespec="seconds")
+            if model2_recovery_config_mtime is not None
+            else None,
+            "error": None,
+        }
+    except Exception as exc:
+        return {
+            "path": str(MODEL2_RECOVERY_CONFIG_PATH),
+            "loaded": False,
+            "schema_count": 0,
+            "modified_at": None,
+            "error": str(exc),
+        }
 
 
 def ollama_runtime_info() -> dict[str, Any]:
@@ -448,8 +477,12 @@ def ollama_chat(messages: list[dict[str, str]]) -> str:
         data=body,
         headers={"Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(request, timeout=MODEL2_TIMEOUT) as response:
-        output = json.loads(response.read())
+    try:
+        with urllib.request.urlopen(request, timeout=MODEL2_TIMEOUT) as response:
+            output = json.loads(response.read())
+    except urllib.error.HTTPError as exc:
+        details = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Ollama chat HTTP {exc.code}: {short_text(details, 500) or exc.reason}") from exc
     return output["choices"][0]["message"]["content"]
 
 
@@ -788,216 +821,6 @@ def trend_summary(trend: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def suggested_actions_for(customer: dict[str, Any], risk_level_value: str, complaint_text: str | None) -> list[str]:
-    actions = []
-    if risk_level_value == "Low":
-        actions.append("Monitor only with light-touch service check-in")
-    else:
-        actions.append("Relationship manager call")
-
-    if complaint_text or int(customer.get("complaints_30d") or 0) > 0 or int(customer.get("unresolved_complaints") or 0) > 0:
-        actions.append("Complaint follow-up")
-    if int(customer.get("failed_transactions_30d") or 0) > 0:
-        actions.append("Resolve failed transactions")
-    if int(customer.get("fd_maturing_in_30d") or 0) > 0:
-        actions.append("FD renewal or savings discussion")
-    if float(customer.get("app_login_change_30d") or 0) < -10:
-        actions.append("Digital support")
-    if float(customer.get("balance_change_30d") or 0) < -15 or float(customer.get("transaction_change_30d") or 0) < -15:
-        actions.append("Usage and relationship check-in")
-    if int(customer.get("emi_bounce_30d") or 0) > 0:
-        actions.append("Loan repayment support")
-
-    return list(dict.fromkeys(actions))[:6]
-
-
-def model2_response_format() -> dict[str, Any]:
-    return {
-        "type": "json_object",
-        "schema": {
-            "type": "object",
-            "properties": {
-                "why": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "minItems": 2,
-                    "maxItems": 4,
-                },
-                "next_actions": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "minItems": 2,
-                    "maxItems": 4,
-                },
-            },
-            "required": ["why", "next_actions"],
-            "additionalProperties": False,
-        },
-    }
-
-
-def parse_model2_response(text: str) -> dict[str, Any]:
-    parsed_markdown = parse_model2_markdown_response(text)
-    if parsed_markdown["valid"]:
-        return {
-            "why": parsed_markdown["why"],
-            "next_actions": parsed_markdown["next_actions"],
-        }
-
-    try:
-        result = json.loads(text)
-    except json.JSONDecodeError:
-        return {
-            "valid": False,
-            "why": [],
-            "next_actions": [],
-            "raw_text": text,
-            "error": "Model 2 did not return valid JSON.",
-        }
-
-    why = result.get("why")
-    next_actions = result.get("next_actions")
-    if not isinstance(why, list) or not isinstance(next_actions, list):
-        return {
-            "valid": False,
-            "why": [],
-            "next_actions": [],
-            "raw_text": text,
-            "error": "Model 2 JSON must contain why and next_actions as arrays.",
-        }
-    if not all(isinstance(item, str) and item.strip() for item in why):
-        return {
-            "valid": False,
-            "why": [],
-            "next_actions": [],
-            "raw_text": text,
-            "error": "Every why item must be a non-empty string.",
-        }
-    if not all(isinstance(item, str) and item.strip() for item in next_actions):
-        return {
-            "valid": False,
-            "why": [],
-            "next_actions": [],
-            "raw_text": text,
-            "error": "Every next_actions item must be a non-empty string.",
-        }
-
-    bad_markers = ["###", "{'why'", '"next_actions"', "'next_actions'", "```"]
-    joined = "\n".join(why + next_actions)
-    if any(marker in joined for marker in bad_markers):
-        return {
-            "valid": False,
-            "why": why,
-            "next_actions": next_actions,
-            "raw_text": text,
-            "error": "Model 2 returned markdown or nested JSON-like text.",
-        }
-    forbidden_terms = ["competitor", "operator", "campaign", "rate hunting", "rate shopping"]
-    if any(term in joined.lower() for term in forbidden_terms):
-        return {
-            "valid": False,
-            "why": why,
-            "next_actions": next_actions,
-            "raw_text": text,
-            "error": "Model 2 invented unsupported business context.",
-        }
-
-    return {
-        "why": [item.strip() for item in why],
-        "next_actions": [item.strip() for item in next_actions],
-    }
-
-
-def clean_model2_line(line: str) -> str:
-    line = line.strip()
-    line = re.sub(r"^[-*]\s+", "", line)
-    line = re.sub(r"^\d+[\.)]\s+", "", line)
-    line = line.strip().strip('"').strip("'").strip()
-    return line
-
-
-def split_inline_items(value: str) -> list[str]:
-    value = value.strip()
-    if not value:
-        return []
-    if ";" in value:
-        return [clean_model2_line(item) for item in value.split(";") if clean_model2_line(item)]
-    return [clean_model2_line(value)]
-
-
-def parse_model2_markdown_response(text: str) -> dict[str, Any]:
-    why = []
-    next_actions = []
-    current_section = None
-    normalized_text = re.sub(
-        r"\s+((?:\*\*)?\s*next[_\s-]*actions?\s*(?:\*\*)?\s*:)",
-        r"\n\1",
-        text.replace("\r\n", "\n"),
-        flags=re.IGNORECASE,
-    )
-
-    for raw_line in normalized_text.split("\n"):
-        line = raw_line.strip()
-        if not line:
-            continue
-
-        normalized = re.sub(r"^[#*\s]+|[*\s:]+$", "", line).lower().replace("_", " ")
-        if normalized in {"why", "analysis", "reason", "reasons"}:
-            current_section = "why"
-            continue
-        if normalized in {"next actions", "next action", "actions", "recommendations"}:
-            current_section = "next_actions"
-            continue
-
-        why_match = re.match(r"^(?:\*\*)?\s*why\s*(?:\*\*)?\s*:\s*(.+)$", line, flags=re.IGNORECASE)
-        if why_match:
-            why.extend(split_inline_items(why_match.group(1)))
-            current_section = "why"
-            continue
-
-        actions_match = re.match(
-            r"^(?:\*\*)?\s*next[_\s-]*actions?\s*(?:\*\*)?\s*:\s*(.+)$",
-            line,
-            flags=re.IGNORECASE,
-        )
-        if actions_match:
-            next_actions.extend(split_inline_items(actions_match.group(1)))
-            current_section = "next_actions"
-            continue
-
-        item = clean_model2_line(line)
-        if current_section == "why" and item:
-            why.append(item)
-        elif current_section == "next_actions" and item:
-            next_actions.append(item)
-
-    why = [item for item in why if item and not re.match(r"^next[_\s-]*actions?\s*:", item, flags=re.IGNORECASE)]
-    next_actions = [item for item in next_actions if item and not re.match(r"^why\s*:", item, flags=re.IGNORECASE)]
-    why = why[:4]
-    next_actions = next_actions[:4]
-
-    if why and next_actions:
-        joined = "\n".join(why + next_actions).lower()
-        forbidden_terms = ["competitor", "operator", "campaign", "rate hunting", "rate shopping"]
-        if any(term in joined for term in forbidden_terms):
-            return {
-                "valid": False,
-                "why": why,
-                "next_actions": next_actions,
-            }
-        return {
-            "valid": True,
-            "why": why,
-            "next_actions": next_actions,
-        }
-
-    return {
-        "valid": False,
-        "why": why,
-        "next_actions": next_actions,
-    }
-
-
 def short_text(value: str | None, limit: int = 120) -> str | None:
     if not value:
         return None
@@ -1007,131 +830,522 @@ def short_text(value: str | None, limit: int = 120) -> str | None:
     return value[: limit - 3].rstrip() + "..."
 
 
-def action_sentence(action: str, payload: dict[str, Any]) -> str:
-    complaint = short_text(payload.get("complaint"))
-    mapping = {
-        "Monitor only with light-touch service check-in": "Monitor the account and make only a light-touch service check-in.",
-        "Relationship manager call": "Ask a relationship manager to contact the customer and understand the concern.",
-        "Complaint follow-up": f"Follow up on the recent complaint: {complaint}" if complaint else "Follow up on recent complaints and confirm resolution.",
-        "Resolve failed transactions": "Review failed transactions and help the customer complete payments.",
-        "FD renewal or savings discussion": "Discuss FD renewal or a suitable savings option before maturity.",
-        "Digital support": "Offer digital support for app, UPI, or payment issues.",
-        "Usage and relationship check-in": "Check why account usage has declined and offer relevant support.",
-        "Loan repayment support": "Offer support for the recent EMI bounce.",
+def validate_model2_recovery_config(config: dict[str, Any]) -> None:
+    if not isinstance(config.get("system_prompt"), str) or not config["system_prompt"].strip():
+        raise ValueError("Model 2 recovery config requires a non-empty system_prompt.")
+    contract = config.get("output_contract")
+    if not isinstance(contract, dict):
+        raise ValueError("Model 2 recovery config requires output_contract.")
+    schemas = config.get("recovery_schemas")
+    if not isinstance(schemas, list) or not schemas:
+        raise ValueError("Model 2 recovery config requires at least one recovery schema.")
+
+    schema_ids = set()
+    action_ids = set()
+    for schema in schemas:
+        schema_id = schema.get("id")
+        if not isinstance(schema_id, str) or not schema_id.strip():
+            raise ValueError("Every recovery schema requires a non-empty id.")
+        if schema_id in schema_ids:
+            raise ValueError(f"Duplicate recovery schema id: {schema_id}")
+        schema_ids.add(schema_id)
+        if not isinstance(schema.get("use_when"), str) or not schema["use_when"].strip():
+            raise ValueError(f"Recovery schema {schema_id} requires use_when text.")
+        if not isinstance(schema.get("summary_reason"), str) or not schema["summary_reason"].strip():
+            raise ValueError(f"Recovery schema {schema_id} requires summary_reason.")
+        actions = schema.get("actions")
+        if not isinstance(actions, list) or not actions:
+            raise ValueError(f"Recovery schema {schema_id} requires at least one action.")
+        for action in actions:
+            action_id = action.get("id")
+            if not isinstance(action_id, str) or not action_id.strip():
+                raise ValueError(f"Every action in {schema_id} requires a non-empty id.")
+            if action_id in action_ids:
+                raise ValueError(f"Duplicate recovery action id: {action_id}")
+            action_ids.add(action_id)
+            for key in ["label", "priority", "reason"]:
+                if not isinstance(action.get(key), str) or not action[key].strip():
+                    raise ValueError(f"Action {action_id} requires {key}.")
+            if action["priority"] not in set(contract.get("priority_values", [])):
+                raise ValueError(f"Action {action_id} has unsupported priority {action['priority']}.")
+            if not isinstance(action.get("evidence_fields"), list) or not action["evidence_fields"]:
+                raise ValueError(f"Action {action_id} requires evidence_fields.")
+
+
+def load_model2_recovery_config(force: bool = False) -> dict[str, Any]:
+    global model2_recovery_config_cache, model2_recovery_config_mtime, model2_recovery_config_error
+    try:
+        stat = MODEL2_RECOVERY_CONFIG_PATH.stat()
+        if (
+            not force
+            and model2_recovery_config_cache is not None
+            and model2_recovery_config_mtime == stat.st_mtime
+        ):
+            return model2_recovery_config_cache
+        config = json.loads(MODEL2_RECOVERY_CONFIG_PATH.read_text(encoding="utf-8"))
+        validate_model2_recovery_config(config)
+        model2_recovery_config_cache = config
+        model2_recovery_config_mtime = stat.st_mtime
+        model2_recovery_config_error = None
+        return config
+    except Exception as exc:
+        model2_recovery_config_error = str(exc)
+        raise
+
+
+def recovery_schema_map(config: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {schema["id"]: schema for schema in config["recovery_schemas"]}
+
+
+def recovery_action_map(config: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        action["id"]: action
+        for schema in config["recovery_schemas"]
+        for action in schema["actions"]
     }
-    return mapping.get(action, action)
 
 
-def fallback_model2_response(payload: dict[str, Any]) -> dict[str, Any]:
-    risk = payload.get("risk", {})
-    risk_level_value = risk.get("risk_level", "Unknown")
-    probability = risk.get("churn_probability_percent")
-    main_signals = payload.get("main_signals") or []
+def compact_recovery_catalog(config: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {
+            "schema_id": schema["id"],
+            "use_when": schema["use_when"],
+            "actions": [
+                {
+                    "action_id": action["id"],
+                    "action_label": action["label"],
+                    "priority": action["priority"],
+                    "evidence_fields": action["evidence_fields"],
+                }
+                for action in schema["actions"]
+            ],
+        }
+        for schema in config["recovery_schemas"]
+    ]
 
-    why = []
+
+def build_model2_system_prompt(config: dict[str, Any]) -> str:
+    contract = config["output_contract"]
+    return (
+        f"{config['system_prompt'].strip()}\n\n"
+        "Output contract:\n"
+        "- Return only JSON with keys: primary_schema, selected_schemas, actions, summary_reason.\n"
+        "- primary_schema must be one selected schema_id.\n"
+        f"- selected_schemas must contain 1 to {contract['max_selected_schemas']} schema ids.\n"
+        "- Each action must contain action_id, action_label, reason, priority, evidence_fields.\n"
+        "- Every action_id must come from the selected schemas.\n"
+        f"- priority must be one of: {', '.join(contract['priority_values'])}.\n"
+        "- For Low risk with an active issue, selected action priority must be low.\n"
+        "- For Low risk without a meaningful active issue, select LOW_RISK_MONITOR only.\n"
+        "- No markdown, comments, explanations outside JSON, or copied catalog dumps.\n"
+        "The allowed recovery schemas and actions are provided in the user JSON."
+    )
+
+
+def model2_prompt_payload(payload: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+    prompt_payload = dict(payload)
+    prompt_payload["allowed_recovery_schemas"] = compact_recovery_catalog(config)
+    return prompt_payload
+
+
+def parse_model2_response(text: str, payload: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError:
+        return {
+            "valid": False,
+            "raw_text": text,
+            "error": "Model 2 did not return strict JSON.",
+        }
+    return validate_model2_response(result, payload, config, raw_text=text)
+
+
+def response_action_limits(payload: dict[str, Any], config: dict[str, Any]) -> tuple[int, int]:
+    contract = config["output_contract"]
+    risk_level_value = (payload.get("risk") or {}).get("risk_level")
     if risk_level_value == "Low":
-        if probability is not None:
-            why.append(f"Model 1 v2 shows low churn risk at {float(probability):.2f}%.")
-        for signal in main_signals:
-            message = signal.get("message")
-            if message and message not in why:
-                why.append(message)
-            if len(why) >= 2:
-                break
-    else:
-        if probability is not None:
-            why.append(f"Model 1 v2 places this customer in {risk_level_value} churn risk at {float(probability):.2f}%.")
-        for signal in main_signals:
-            message = signal.get("message")
-            if message and message not in why:
-                why.append(message)
-            if len(why) >= 4:
-                break
+        return int(contract["min_actions_low_risk"]), int(contract["max_actions_low_risk"])
+    return int(contract["min_actions_medium_high_risk"]), int(contract["max_actions_medium_high_risk"])
 
-    if not why:
-        why.append("Model 1 v2 did not find a strong recent churn signal.")
 
-    action_limit = 2 if risk_level_value == "Low" else 4
-    next_actions = []
-    for action in payload.get("suggested_actions") or []:
-        sentence = action_sentence(action, payload)
-        if sentence and sentence not in next_actions:
-            next_actions.append(sentence)
-        if len(next_actions) >= action_limit:
-            break
+def validate_model2_response(
+    result: Any,
+    payload: dict[str, Any],
+    config: dict[str, Any],
+    raw_text: str | None = None,
+) -> dict[str, Any]:
+    if not isinstance(result, dict):
+        return invalid_model2_response(raw_text, "Model 2 JSON must be an object.")
 
-    if not next_actions:
-        next_actions.append("Monitor the account and review again after the next activity update.")
+    required = set(config["output_contract"]["required_keys"])
+    if set(result) != required:
+        return invalid_model2_response(raw_text, "Model 2 JSON has unsupported or missing top-level keys.")
+
+    schemas_by_id = recovery_schema_map(config)
+    selected_schemas = result.get("selected_schemas")
+    primary_schema = result.get("primary_schema")
+    if not isinstance(primary_schema, str) or primary_schema not in schemas_by_id:
+        return invalid_model2_response(raw_text, "primary_schema must be a known recovery schema id.")
+    if not isinstance(selected_schemas, list) or not selected_schemas:
+        return invalid_model2_response(raw_text, "selected_schemas must be a non-empty array.")
+    max_schemas = int(config["output_contract"]["max_selected_schemas"])
+    if len(selected_schemas) > max_schemas:
+        return invalid_model2_response(raw_text, f"selected_schemas cannot exceed {max_schemas}.")
+    if primary_schema not in selected_schemas:
+        return invalid_model2_response(raw_text, "primary_schema must also appear in selected_schemas.")
+    if len(set(selected_schemas)) != len(selected_schemas):
+        return invalid_model2_response(raw_text, "selected_schemas cannot contain duplicates.")
+    if not all(isinstance(schema_id, str) and schema_id in schemas_by_id for schema_id in selected_schemas):
+        return invalid_model2_response(raw_text, "selected_schemas contains an unknown schema id.")
+
+    risk_level_value = (payload.get("risk") or {}).get("risk_level")
+    if risk_level_value == "Low":
+        active_issue_schemas = strong_active_issue_schema_ids(payload, config)
+        if active_issue_schemas and selected_schemas == ["LOW_RISK_MONITOR"]:
+            return invalid_model2_response(raw_text, "Low-risk customers with active issues should use the relevant recovery schema.")
+        if not active_issue_schemas and selected_schemas != ["LOW_RISK_MONITOR"]:
+            return invalid_model2_response(raw_text, "Low-risk customers without active issues must use LOW_RISK_MONITOR.")
+        if active_issue_schemas and not all(schema_id in active_issue_schemas for schema_id in selected_schemas):
+            return invalid_model2_response(raw_text, "Low-risk recovery schemas must match strong active issues.")
+
+    actions = result.get("actions")
+    min_actions, max_actions = response_action_limits(payload, config)
+    if not isinstance(actions, list) or not (min_actions <= len(actions) <= max_actions):
+        return invalid_model2_response(raw_text, f"actions must contain {min_actions} to {max_actions} items.")
+
+    allowed_actions = {
+        action["id"]: action
+        for schema_id in selected_schemas
+        for action in schemas_by_id[schema_id]["actions"]
+    }
+    priority_values = set(config["output_contract"]["priority_values"])
+    required_action_keys = set(config["output_contract"]["action_required_keys"])
+    seen_actions = set()
+    normalized_actions = []
+    for action in actions:
+        if not isinstance(action, dict) or set(action) != required_action_keys:
+            return invalid_model2_response(raw_text, "Every action must match the required action object shape.")
+        action_id = action.get("action_id")
+        if action_id not in allowed_actions:
+            return invalid_model2_response(raw_text, "Every action_id must come from the selected schemas.")
+        if action_id in seen_actions:
+            return invalid_model2_response(raw_text, "actions cannot contain duplicate action_id values.")
+        seen_actions.add(action_id)
+        reason = action.get("reason")
+        if not isinstance(reason, str) or not reason.strip():
+            return invalid_model2_response(raw_text, "Every action requires one non-empty reason.")
+        if contains_forbidden_model2_text(reason):
+            return invalid_model2_response(raw_text, "Model 2 invented unsupported business context.")
+        priority = action.get("priority")
+        if priority not in priority_values:
+            return invalid_model2_response(raw_text, "Every action priority must be supported.")
+        if risk_level_value == "Low" and priority != "low":
+            return invalid_model2_response(raw_text, "Low-risk customer actions must use low priority.")
+        evidence_fields = action.get("evidence_fields")
+        if not isinstance(evidence_fields, list) or not all(isinstance(item, str) and item for item in evidence_fields):
+            return invalid_model2_response(raw_text, "Every action requires evidence_fields as strings.")
+        catalog_action = allowed_actions[action_id]
+        normalized_actions.append(
+            {
+                "action_id": action_id,
+                "action_label": catalog_action["label"],
+                "reason": reason.strip(),
+                "priority": priority,
+                "evidence_fields": evidence_fields,
+            }
+        )
+
+    summary_reason = result.get("summary_reason")
+    if not isinstance(summary_reason, str) or not summary_reason.strip():
+        return invalid_model2_response(raw_text, "summary_reason must be a non-empty string.")
+    if contains_forbidden_model2_text(summary_reason):
+        return invalid_model2_response(raw_text, "Model 2 invented unsupported business context.")
 
     return {
-        "why": why[:4],
-        "next_actions": next_actions[:4],
+        "primary_schema": primary_schema,
+        "selected_schemas": selected_schemas,
+        "actions": normalized_actions,
+        "summary_reason": summary_reason.strip(),
     }
 
 
-def response_needs_fallback(result: dict[str, Any]) -> bool:
-    if sorted(result.keys()) != ["next_actions", "why"]:
-        return True
-    if not isinstance(result.get("why"), list) or not isinstance(result.get("next_actions"), list):
-        return True
-    if not result["why"] or not result["next_actions"]:
-        return True
-    if len(result["why"]) < 2 or len(result["next_actions"]) < 2:
-        return True
-    joined = "\n".join(result["why"] + result["next_actions"]).lower()
-    bad_markers = [
-        "[",
-        "]",
-        "copy ",
-        "source",
-        "main_signals",
-        "suggested_actions",
-        "example",
+def invalid_model2_response(raw_text: str | None, error: str) -> dict[str, Any]:
+    return {
+        "valid": False,
+        "raw_text": raw_text,
+        "error": error,
+    }
+
+
+def contains_forbidden_model2_text(value: str) -> bool:
+    forbidden_terms = [
+        "```",
+        "###",
         "competitor",
         "operator",
         "campaign",
-        "rate retention",
         "rate hunting",
         "rate shopping",
-        "service outage",
+        "branch quality",
+        "hidden fee",
         "funds movement",
+        "service outage",
     ]
-    return any(marker in joined for marker in bad_markers)
+    lowered = value.lower()
+    return any(term in lowered for term in forbidden_terms)
+
+
+def response_needs_fallback(result: dict[str, Any]) -> bool:
+    return result.get("valid") is False
+
+
+def as_number(value: Any) -> float | None:
+    if value is None:
+        return None
+    try:
+        if pd.isna(value):
+            return None
+    except Exception:
+        pass
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def customer_signal_value(payload: dict[str, Any], field: str) -> Any:
+    if field in {"risk_level", "churn_probability_percent"}:
+        return (payload.get("risk") or {}).get(field)
+    if field in {"complaint", "complaint_text"}:
+        return payload.get("complaint")
+    signals = payload.get("customer_signals") or {}
+    if field in signals:
+        return signals.get(field)
+    customer = payload.get("customer") or {}
+    if field in customer:
+        return customer.get(field)
+    for signal in payload.get("main_signals") or []:
+        if signal.get("field") == field:
+            return signal.get("value")
+    return None
+
+
+def complaint_mentions_transaction_failure(text: str | None) -> bool:
+    if not text:
+        return False
+    lowered = text.lower()
+    keywords = ["failed", "declined", "atm", "cash", "payment", "transaction", "not showing", "stuck"]
+    return any(keyword in lowered for keyword in keywords)
+
+
+def score_recovery_schema(schema_id: str, payload: dict[str, Any]) -> tuple[int, list[str]]:
+    evidence = []
+    risk = payload.get("risk") or {}
+    customer = payload.get("customer") or {}
+    complaint = payload.get("complaint")
+
+    def add_if(condition: bool, field: str, score: int = 1) -> int:
+        if condition:
+            if field not in evidence:
+                evidence.append(field)
+            return score
+        return 0
+
+    score = 0
+    if schema_id == "SERVICE_COMPLAINT":
+        score += add_if((as_number(customer_signal_value(payload, "complaints_30d")) or 0) > 0, "complaints_30d", 2)
+        score += add_if((as_number(customer_signal_value(payload, "unresolved_complaints")) or 0) > 0, "unresolved_complaints", 3)
+        score += add_if(bool(complaint), "complaint", 2)
+        score += add_if((as_number(customer_signal_value(payload, "avg_resolution_time_hrs")) or 0) >= 48, "avg_resolution_time_hrs", 2)
+    elif schema_id == "TRANSACTION_FAILURE":
+        score += add_if((as_number(customer_signal_value(payload, "failed_transactions_30d")) or 0) > 0, "failed_transactions_30d", 3)
+        score += add_if(complaint_mentions_transaction_failure(complaint), "complaint", 2)
+    elif schema_id == "ACTIVITY_DECLINE":
+        score += add_if((as_number(customer_signal_value(payload, "transaction_change_30d")) or 0) < -5, "transaction_change_30d", 2)
+        score += add_if((as_number(customer_signal_value(payload, "card_spend_change_30d")) or 0) < -5, "card_spend_change_30d", 2)
+        score += add_if((as_number(customer_signal_value(payload, "app_login_change_30d")) or 0) < -10, "app_login_change_30d", 1)
+        score += add_if((as_number(customer_signal_value(payload, "days_since_last_transaction")) or 0) >= 10, "days_since_last_transaction", 2)
+    elif schema_id == "BALANCE_OUTFLOW":
+        score += add_if((as_number(customer_signal_value(payload, "balance_change_30d")) or 0) < -15, "balance_change_30d", 3)
+        score += add_if((as_number(customer_signal_value(payload, "external_transfer_change_30d")) or 0) > 20, "external_transfer_change_30d", 2)
+    elif schema_id == "DIGITAL_DISENGAGEMENT":
+        score += add_if((as_number(customer_signal_value(payload, "app_login_change_30d")) or 0) < -10, "app_login_change_30d", 3)
+        if (as_number(customer_signal_value(payload, "failed_transactions_30d")) or 0) > 0:
+            score += add_if((as_number(customer_signal_value(payload, "upi_share_of_spend")) or 0) >= 0.65, "upi_share_of_spend", 1)
+    elif schema_id == "SALARY_OR_INCOME_BREAK":
+        score += add_if((as_number(customer_signal_value(payload, "salary_missing_days")) or 0) > 0, "salary_missing_days", 3)
+    elif schema_id == "FD_MATURITY":
+        score += add_if((as_number(customer_signal_value(payload, "fd_maturing_in_30d")) or 0) > 0, "fd_maturing_in_30d", 3)
+    elif schema_id == "PRODUCT_DROPOFF":
+        score += add_if((as_number(customer_signal_value(payload, "products_dropped_90d")) or 0) > 0, "products_dropped_90d", 3)
+    elif schema_id == "LOAN_REPAYMENT_STRESS":
+        score += add_if((as_number(customer_signal_value(payload, "emi_bounce_30d")) or 0) > 0, "emi_bounce_30d", 3)
+        score += add_if(bool(customer.get("has_loan")) and (as_number(customer_signal_value(payload, "emi_bounce_30d")) or 0) > 0, "has_loan", 1)
+    elif schema_id == "LOW_RISK_MONITOR":
+        score += add_if(risk.get("risk_level") == "Low", "risk_level", 2)
+
+    return score, evidence
+
+
+def strong_active_issue_schema_ids(payload: dict[str, Any], config: dict[str, Any]) -> list[str]:
+    checks = {
+        "SERVICE_COMPLAINT": (
+            (as_number(customer_signal_value(payload, "unresolved_complaints")) or 0) > 0
+            or (as_number(customer_signal_value(payload, "complaints_30d")) or 0) >= 2
+            or bool(payload.get("complaint"))
+            or (as_number(customer_signal_value(payload, "avg_resolution_time_hrs")) or 0) >= 24
+        ),
+        "TRANSACTION_FAILURE": (
+            (as_number(customer_signal_value(payload, "failed_transactions_30d")) or 0) >= 2
+            or complaint_mentions_transaction_failure(payload.get("complaint"))
+        ),
+        "ACTIVITY_DECLINE": (
+            (as_number(customer_signal_value(payload, "days_since_last_transaction")) or 0) >= 14
+            or (as_number(customer_signal_value(payload, "transaction_change_30d")) or 0) <= -20
+            or (as_number(customer_signal_value(payload, "card_spend_change_30d")) or 0) <= -20
+            or (as_number(customer_signal_value(payload, "app_login_change_30d")) or 0) <= -25
+        ),
+        "BALANCE_OUTFLOW": (
+            (as_number(customer_signal_value(payload, "balance_change_30d")) or 0) <= -20
+            or (as_number(customer_signal_value(payload, "external_transfer_change_30d")) or 0) >= 40
+        ),
+        "DIGITAL_DISENGAGEMENT": (
+            (as_number(customer_signal_value(payload, "app_login_change_30d")) or 0) <= -25
+            or (
+                (as_number(customer_signal_value(payload, "failed_transactions_30d")) or 0) >= 2
+                and (as_number(customer_signal_value(payload, "upi_share_of_spend")) or 0) >= 0.65
+            )
+        ),
+        "SALARY_OR_INCOME_BREAK": (as_number(customer_signal_value(payload, "salary_missing_days")) or 0) > 0,
+        "FD_MATURITY": (as_number(customer_signal_value(payload, "fd_maturing_in_30d")) or 0) > 0,
+        "PRODUCT_DROPOFF": (as_number(customer_signal_value(payload, "products_dropped_90d")) or 0) > 0,
+        "LOAN_REPAYMENT_STRESS": (as_number(customer_signal_value(payload, "emi_bounce_30d")) or 0) > 0,
+    }
+    schema_ids = {schema["id"] for schema in config["recovery_schemas"]}
+    return [schema["id"] for schema in config["recovery_schemas"] if schema["id"] in schema_ids and checks.get(schema["id"])]
+
+
+def deterministic_schema_selection(payload: dict[str, Any], config: dict[str, Any]) -> list[str]:
+    risk_level_value = (payload.get("risk") or {}).get("risk_level")
+    if risk_level_value == "Low":
+        active_issue_schemas = strong_active_issue_schema_ids(payload, config)
+        max_schemas = int(config["output_contract"]["max_selected_schemas"])
+        return active_issue_schemas[:max_schemas] if active_issue_schemas else ["LOW_RISK_MONITOR"]
+
+    scored = []
+    for index, schema in enumerate(config["recovery_schemas"]):
+        score, evidence = score_recovery_schema(schema["id"], payload)
+        if schema["id"] == "LOW_RISK_MONITOR":
+            continue
+        if score >= 2:
+            scored.append((schema["id"], score, len(evidence), index))
+
+    scored.sort(key=lambda item: (-item[1], -item[2], item[3]))
+    if not scored:
+        return ["ACTIVITY_DECLINE"] if risk_level_value in {"Medium", "High"} else ["LOW_RISK_MONITOR"]
+    return [schema_id for schema_id, _, _, _ in scored[:3]]
+
+
+def action_reason(action: dict[str, Any], payload: dict[str, Any]) -> str:
+    evidence_messages = []
+    evidence_fields = action.get("evidence_fields") or []
+    for signal in payload.get("main_signals") or []:
+        if signal.get("field") in evidence_fields and signal.get("message"):
+            evidence_messages.append(signal["message"])
+    if evidence_messages:
+        return evidence_messages[0]
+
+    action_id = action["id"]
+    complaint = short_text(payload.get("complaint"))
+    risk = payload.get("risk") or {}
+    probability = risk.get("churn_probability_percent")
+    if action_id in {"complaint_follow_up", "complaint_escalation", "service_recovery_call"} and complaint:
+        return f"Recent complaint needs follow-up: {complaint}"
+    if action_id == "charge_reversal_review" and complaint:
+        return f"Complaint text may involve a charge review: {complaint}"
+    if probability is not None and "risk_level" in evidence_fields:
+        return f"Model 1 v2 places this customer at {risk.get('risk_level', 'elevated')} risk with {float(probability):.2f}% churn probability."
+    return action["reason"]
+
+
+def fallback_model2_response(payload: dict[str, Any], config: dict[str, Any] | None = None) -> dict[str, Any]:
+    config = config or load_model2_recovery_config()
+    schemas_by_id = recovery_schema_map(config)
+    selected_schemas = deterministic_schema_selection(payload, config)
+    primary_schema = selected_schemas[0]
+    _, max_actions = response_action_limits(payload, config)
+    risk_level_value = (payload.get("risk") or {}).get("risk_level")
+    target_actions = 2 if risk_level_value == "Low" else min(max_actions, max(2, len(selected_schemas) + 1))
+
+    actions = []
+    used = set()
+    for schema_id in selected_schemas:
+        for action in schemas_by_id[schema_id]["actions"]:
+            if action["id"] in used:
+                continue
+            actions.append(
+                {
+                    "action_id": action["id"],
+                    "action_label": action["label"],
+                    "reason": action_reason(action, payload),
+                    "priority": "low" if risk_level_value == "Low" else action["priority"],
+                    "evidence_fields": action["evidence_fields"],
+                }
+            )
+            used.add(action["id"])
+            if len(actions) >= target_actions:
+                break
+        if len(actions) >= target_actions:
+            break
+
+    return {
+        "primary_schema": primary_schema,
+        "selected_schemas": selected_schemas,
+        "actions": actions,
+        "summary_reason": schemas_by_id[primary_schema]["summary_reason"],
+    }
 
 
 def predict_model2(payload: dict[str, Any]) -> dict[str, Any]:
     if model2 is None:
         raise RuntimeError("Model 2 is not loaded")
 
-    system_prompt = (
-        "You are a banking retention AI. Your job is to identify why this customer may churn "
-        "and suggest practical retention actions. Use only the facts in the user JSON. For Why, use "
-        "the messages inside main_signals and the risk object. For Next Actions, use suggested_actions "
-        "and make them short practical sentences. Do not invent competitors, rates, operators, campaigns, "
-        "products, fees, branch quality, repayment issues, or reasons for money movement. Do not mention "
-        "customer age, branch code, card colour, or field names. Do not use square brackets. For Low risk, "
-        "keep actions light: monitor, check service quality, and avoid urgent retention offers. For Medium "
-        "or High risk, include proactive contact and fixes linked to the strongest signals. Return only two "
-        "sections with bullet lines. The only section labels allowed are Why: and Next Actions:. Write 2 to "
-        "4 short bullets in each section."
-    )
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": json.dumps(payload)},
-    ]
+    recovery_config = load_model2_recovery_config()
+    system_prompt = build_model2_system_prompt(recovery_config)
+    prompt_payload = model2_prompt_payload(payload, recovery_config)
+    last_invalid = None
 
-    if MODEL2_BACKEND == "ollama":
-        text = ollama_chat(messages)
-    else:
-        output = model2.create_chat_completion(
-            messages=messages,
-            temperature=MODEL2_TEMPERATURE,
-        )
-        text = output["choices"][0]["message"]["content"]
-    parsed = parse_model2_response(text)
-    if response_needs_fallback(parsed):
-        return fallback_model2_response(payload)
-    return parsed
+    for attempt in range(1, MODEL2_MAX_RETRIES + 1):
+        attempt_payload = dict(prompt_payload)
+        if last_invalid is not None:
+            attempt_payload["previous_invalid_output"] = {
+                "attempt": attempt - 1,
+                "error": last_invalid.get("error"),
+                "instruction": "Return strict JSON only, with known schema ids and catalog action ids.",
+            }
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": json.dumps(attempt_payload, ensure_ascii=False)},
+        ]
+
+        try:
+            if MODEL2_BACKEND == "ollama":
+                text = ollama_chat(messages)
+            else:
+                output = model2.create_chat_completion(
+                    messages=messages,
+                    temperature=MODEL2_TEMPERATURE,
+                )
+                text = output["choices"][0]["message"]["content"]
+        except Exception as exc:
+            last_invalid = invalid_model2_response(None, str(exc))
+            continue
+        parsed = parse_model2_response(text, payload, recovery_config)
+        if not response_needs_fallback(parsed):
+            return parsed
+        last_invalid = parsed
+
+    return fallback_model2_response(payload, recovery_config)
 
 
 def build_model2_payload(
@@ -1146,8 +1360,14 @@ def build_model2_payload(
     profile = extra_context.get("customer_profile", {})
     complaint_text = extra_context.get("recent_complaint_text")
     risk_level_value = model1_output.get("risk_level", "Unknown")
+    customer_signals = {
+        feature: json_safe(customer.get(feature))
+        for feature in BEHAVIOR_FEATURES
+        if feature in customer
+    }
+    recovery_config = load_model2_recovery_config()
     return {
-        "task": "identify_retention_risk_and_actions",
+        "task": "select_recovery_schemas_and_actions",
         "customer_identity": {
             "customer_id": customer_id,
             "customer_name": customer_name,
@@ -1168,16 +1388,18 @@ def build_model2_payload(
             "has_credit_card": bool(profile.get("has_credit_card") or customer.get("has_credit_card")),
             "has_loan": bool(profile.get("has_loan") or customer.get("has_loan")),
         },
+        "customer_signals": customer_signals,
         "main_signals": build_main_signals(model1_output, customer),
         "trend_summary": trend_summary(extra_context.get("trend_last_3_months", {})),
         "complaint": complaint_text,
         "risk_group": extra_context.get("risk_group", "unknown"),
-        "suggested_actions": suggested_actions_for(customer, risk_level_value, complaint_text),
+        "allowed_recovery_schemas": compact_recovery_catalog(recovery_config),
     }
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    load_model2_recovery_config()
     if USE_MODEL1:
         load_model1()
     if USE_MODEL2:

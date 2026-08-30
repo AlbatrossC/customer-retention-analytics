@@ -357,27 +357,6 @@ def trend_summary(trend):
     return {"overall_direction": overall_direction, "messages": messages[:5]}
 
 
-def suggested_actions_for(customer, risk_level, complaint_text):
-    actions = []
-    if risk_level == "Low":
-        actions.append("Monitor only with light-touch service check-in")
-    else:
-        actions.append("Relationship manager call")
-    if complaint_text or int(customer.get("complaints_30d") or 0) > 0 or int(customer.get("unresolved_complaints") or 0) > 0:
-        actions.append("Complaint follow-up")
-    if int(customer.get("failed_transactions_30d") or 0) > 0:
-        actions.append("Resolve failed transactions")
-    if int(customer.get("fd_maturing_in_30d") or 0) > 0:
-        actions.append("FD renewal or savings discussion")
-    if float(customer.get("app_login_change_30d") or 0) < -10:
-        actions.append("Digital support")
-    if float(customer.get("balance_change_30d") or 0) < -15 or float(customer.get("transaction_change_30d") or 0) < -15:
-        actions.append("Usage and relationship check-in")
-    if int(customer.get("emi_bounce_30d") or 0) > 0:
-        actions.append("Loan repayment support")
-    return list(dict.fromkeys(actions))[:6]
-
-
 def build_model2_payload(customer_request, model1_output):
     customer = customer_request["customer"]
     extra_context = customer_request["extra_context"]
@@ -385,7 +364,7 @@ def build_model2_payload(customer_request, model1_output):
     complaint_text = extra_context.get("recent_complaint_text")
     risk_level = model1_output.get("risk_level", "Unknown")
     return {
-        "task": "identify_retention_risk_and_actions",
+        "task": "select_recovery_schemas_and_actions",
         "customer_identity": {
             "customer_id": customer_request["customer_id"],
             "customer_name": customer_request["customer_name"],
@@ -406,11 +385,15 @@ def build_model2_payload(customer_request, model1_output):
             "has_credit_card": bool(profile.get("has_credit_card") or customer.get("has_credit_card")),
             "has_loan": bool(profile.get("has_loan") or customer.get("has_loan")),
         },
+        "customer_signals": {
+            feature: clean_value(customer.get(feature))
+            for feature in MODEL1_V2_BEHAVIOR_FEATURES
+            if feature in customer
+        },
         "main_signals": build_main_signals(model1_output, customer),
         "trend_summary": trend_summary(extra_context.get("trend_last_3_months", {})),
         "complaint": complaint_text,
         "risk_group": extra_context.get("risk_group", "unknown"),
-        "suggested_actions": suggested_actions_for(customer, risk_level, complaint_text),
     }
 
 
@@ -423,10 +406,37 @@ def fenced_json(value):
     return "```json\n" + json.dumps(value, indent=2, ensure_ascii=False) + "\n```"
 
 
-def format_list(items):
-    if not items:
+def format_model2_actions(actions):
+    if not actions:
         return "- None"
-    return "\n".join(f"- {item}" for item in items)
+    lines = []
+    for action in actions:
+        if not isinstance(action, dict):
+            lines.append(f"- {action}")
+            continue
+        lines.append(
+            "- `{action_id}` ({priority}) - {label}: {reason}".format(
+                action_id=action.get("action_id", "unknown"),
+                priority=action.get("priority", "unknown"),
+                label=action.get("action_label", "Unknown action"),
+                reason=action.get("reason", "No reason returned."),
+            )
+        )
+    return "\n".join(lines)
+
+
+def health_summary(health):
+    model2 = health.get("model2") or {}
+    recovery_config = model2.get("recovery_config") or {}
+    return {
+        "ok": health.get("ok"),
+        "model1_loaded": health.get("model1_loaded"),
+        "model2_loaded": health.get("model2_loaded"),
+        "model2_backend": health.get("model2_backend"),
+        "model2_max_retries": model2.get("max_retries"),
+        "recovery_config_loaded": recovery_config.get("loaded"),
+        "recovery_schema_count": recovery_config.get("schema_count"),
+    }
 
 
 def write_markdown(output_path, api_url, health, results):
@@ -437,29 +447,31 @@ def write_markdown(output_path, api_url, health, results):
         f"- Created at: `{datetime.now().isoformat(timespec='seconds')}`",
         f"- Customers tested: `{len(results)}`",
         f"- Source CSV: `{CUSTOMERS_CSV}`",
-        f"- Health: `{json.dumps(health, ensure_ascii=False)}`",
+        f"- Health: `{json.dumps(health_summary(health), ensure_ascii=False)}`",
         "",
         "## Summary",
         "",
-        "| # | Customer | Model 1 v2 Risk | Prediction | Model 2 | Seconds |",
-        "|---:|---|---:|---|---|---:|",
+        "| # | Customer | Risk | Prediction | Primary schema | Model 2 | Seconds |",
+        "|---:|---|---:|---|---|---|---:|",
     ]
 
     for index, result in enumerate(results, start=1):
         model1_output = result.get("model1_output") or {}
+        model2_output = result.get("model2_output") or {}
         lines.append(
-            "| {index} | {name} (`{customer_id}`) | {risk} | {prediction} | {model2_status} | {seconds} |".format(
+            "| {index} | {name} (`{customer_id}`) | {risk} | {prediction} | {primary_schema} | {model2_status} | {seconds} |".format(
                 index=index,
                 name=result["customer_name"],
                 customer_id=result["customer_id"],
                 risk=model1_output.get("churn_probability", "NA"),
                 prediction=model1_output.get("churn_prediction", "NA"),
+                primary_schema=model2_output.get("primary_schema", "NA"),
                 model2_status="OK" if result.get("model2_ok") else "FAILED",
                 seconds=result.get("seconds", "NA"),
             )
         )
 
-    lines.extend(["", "## Customer Details", ""])
+    lines.extend(["", "## Details", ""])
     for index, result in enumerate(results, start=1):
         lines.extend(
             [
@@ -469,38 +481,38 @@ def write_markdown(output_path, api_url, health, results):
                 f"- Model 1 v2 status: `{'OK' if result.get('model1_ok') else 'FAILED'}`",
                 f"- Model 2 status: `{'OK' if result.get('model2_ok') else 'FAILED'}`",
                 "",
-                "#### Model 1 v2 Input",
+                "#### Input to Model 1 v2",
                 "",
                 fenced_json(result["model1_input"]),
                 "",
-                "#### Model 1 v2 Output",
+                "#### Output from Model 1 v2",
                 "",
                 fenced_json(result.get("model1_output") or {"error": result.get("model1_error")}),
             ]
         )
 
         if result.get("model2_input") is not None:
-            lines.extend(["", "#### Model 2 Input", "", fenced_json(result["model2_input"])])
+            lines.extend(["", "#### Input to Model 2", "", fenced_json(result["model2_input"])])
         if result.get("model2_output") is not None:
             model2_output = result["model2_output"]
             lines.extend(
                 [
                     "",
-                    "#### Model 2 Output",
+                    "#### Output from Model 2",
                     "",
-                    "Why:",
+                    f"- Primary schema: `{model2_output.get('primary_schema')}`",
+                    f"- Selected schemas: `{', '.join(model2_output.get('selected_schemas') or [])}`",
+                    f"- Summary reason: {model2_output.get('summary_reason')}",
                     "",
-                    format_list(model2_output.get("why")),
+                    "Actions:",
                     "",
-                    "Next actions:",
-                    "",
-                    format_list(model2_output.get("next_actions")),
+                    format_model2_actions(model2_output.get("actions")),
                     "",
                     fenced_json(model2_output),
                 ]
             )
         elif result.get("model2_error"):
-            lines.extend(["", "#### Model 2 Output", "", f"`{result['model2_error']}`"])
+            lines.extend(["", "#### Output from Model 2", "", f"`{result['model2_error']}`"])
         lines.append("")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

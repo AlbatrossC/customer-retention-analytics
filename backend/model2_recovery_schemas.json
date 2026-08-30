@@ -1,0 +1,471 @@
+{
+  "system_prompt": "You are Model 2, a banking customer-retention action selector.\n\nYour job is to select the most appropriate recovery schema and actions for THIS customer.\n\nUse only facts provided in the customer JSON and the recovery schema catalog.\n\nImportant:\n\n- Churn risk and customer problems are separate.\n- A Low-risk customer may still have an active service, payment, digital, or other customer issue.\n- Do NOT select LOW_RISK_MONITOR only because the customer is Low risk.\n- Select LOW_RISK_MONITOR only when there is no meaningful active issue that needs action.\n- Give more importance to unresolved or active customer problems than to generic risk-based monitoring.\n- Select the smallest set of schemas that explains the strongest customer-specific issues.\n- Prefer 1 primary schema and at most 1 secondary schema.\n- Do not select a schema only because one weak signal exists.\n- Use the strongest and most relevant evidence for the customer.\n\nFor every action:\n\n- Select only actions from the selected schemas.\n- Give exactly one short reason.\n- The reason must explain why this action is appropriate for THIS customer.\n- Prefer a reason based on the actual problem or signal being addressed.\n- Do not use churn probability alone as the reason for a recovery action.\n- Do not invent causes, competitors, campaigns, offers, fees, branch issues, or unsupported products.\n- Do not assume that irregular or seasonal income means an income break.\n- Do not assume that a customer with few products has dropped a product.\n- Do not treat a change in UPI share as a problem unless the provided evidence shows digital or payment friction.\n\nPriority guidance:\n\n- High risk + active issue: prioritize fixing the strongest issue.\n- High risk without a specific issue: prioritize proactive relationship contact.\n- Medium risk: prioritize the strongest customer issue and targeted follow-up.\n- Low risk + active issue: address the issue, but avoid aggressive retention actions.\n- Low risk + no meaningful issue: use LOW_RISK_MONITOR.\n\nReturn only valid JSON matching the required output contract.\nDo not return markdown or any text outside the JSON.",
+  "output_contract": {
+    "required_keys": [
+      "primary_schema",
+      "selected_schemas",
+      "actions",
+      "summary_reason"
+    ],
+    "action_required_keys": [
+      "action_id",
+      "action_label",
+      "reason",
+      "priority",
+      "evidence_fields"
+    ],
+    "priority_values": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "max_selected_schemas": 2,
+    "min_actions_low_risk": 1,
+    "max_actions_low_risk": 2,
+    "min_actions_medium_high_risk": 2,
+    "max_actions_medium_high_risk": 5
+  },
+  "recovery_schemas": [
+    {
+      "id": "SERVICE_COMPLAINT",
+      "use_when": "Use when complaints_30d > 0, unresolved_complaints > 0, complaint text exists, or avg_resolution_time_hrs is high.",
+      "summary_reason": "Churn risk is linked to recent service friction or unresolved complaint activity.",
+      "actions": [
+        {
+          "id": "complaint_follow_up",
+          "label": "Complaint follow-up",
+          "priority": "high",
+          "evidence_fields": [
+            "complaints_30d",
+            "unresolved_complaints",
+            "complaint"
+          ],
+          "reason": "Customer has recent complaint activity that needs direct follow-up."
+        },
+        {
+          "id": "complaint_escalation",
+          "label": "Complaint escalation",
+          "priority": "high",
+          "evidence_fields": [
+            "unresolved_complaints",
+            "avg_resolution_time_hrs"
+          ],
+          "reason": "The complaint appears unresolved or slow to resolve."
+        },
+        {
+          "id": "charge_reversal_review",
+          "label": "Charge reversal review",
+          "priority": "medium",
+          "evidence_fields": [
+            "complaint"
+          ],
+          "reason": "The complaint may involve charges that should be reviewed for possible reversal."
+        },
+        {
+          "id": "service_recovery_call",
+          "label": "Service recovery call",
+          "priority": "medium",
+          "evidence_fields": [
+            "complaints_30d",
+            "unresolved_complaints"
+          ],
+          "reason": "A service recovery call can confirm resolution and rebuild confidence."
+        }
+      ]
+    },
+    {
+      "id": "TRANSACTION_FAILURE",
+      "use_when": "Use when failed_transactions_30d > 0 or complaint text mentions failed payments, ATM cash issues, payment visibility, or transaction failure.",
+      "summary_reason": "Churn risk is linked to payment or transaction failure friction.",
+      "actions": [
+        {
+          "id": "failed_transaction_review",
+          "label": "Failed transaction review",
+          "priority": "high",
+          "evidence_fields": [
+            "failed_transactions_30d"
+          ],
+          "reason": "Customer has recent failed transactions that should be reviewed."
+        },
+        {
+          "id": "payment_completion_support",
+          "label": "Payment completion support",
+          "priority": "medium",
+          "evidence_fields": [
+            "failed_transactions_30d"
+          ],
+          "reason": "Support can help the customer complete payments successfully."
+        },
+        {
+          "id": "atm_or_channel_issue_check",
+          "label": "ATM or channel issue check",
+          "priority": "high",
+          "evidence_fields": [
+            "complaint",
+            "failed_transactions_30d"
+          ],
+          "reason": "The service issue may involve ATM or channel failure that needs investigation."
+        },
+        {
+          "id": "customer_confirmation_call",
+          "label": "Customer confirmation call",
+          "priority": "medium",
+          "evidence_fields": [
+            "failed_transactions_30d",
+            "complaint"
+          ],
+          "reason": "Confirming the transaction outcome can reduce uncertainty for the customer."
+        }
+      ]
+    },
+    {
+      "id": "ACTIVITY_DECLINE",
+      "use_when": "Use when transactions, card spend, or app usage fell meaningfully, or days_since_last_transaction is high.",
+      "summary_reason": "Churn risk is linked to declining account activity.",
+      "actions": [
+        {
+          "id": "relationship_manager_call",
+          "label": "Relationship manager call",
+          "priority": "high",
+          "evidence_fields": [
+            "risk_level",
+            "churn_probability_percent"
+          ],
+          "reason": "The customer needs proactive contact because churn risk is elevated."
+        },
+        {
+          "id": "usage_decline_check_in",
+          "label": "Usage decline check-in",
+          "priority": "medium",
+          "evidence_fields": [
+            "transaction_change_30d",
+            "card_spend_change_30d",
+            "days_since_last_transaction"
+          ],
+          "reason": "Customer activity has declined recently."
+        },
+        {
+          "id": "reactivation_support",
+          "label": "Reactivation support",
+          "priority": "medium",
+          "evidence_fields": [
+            "days_since_last_transaction",
+            "app_login_change_30d"
+          ],
+          "reason": "A reactivation step can help restore recent account usage."
+        },
+        {
+          "id": "needs_assessment_call",
+          "label": "Needs assessment call",
+          "priority": "medium",
+          "evidence_fields": [
+            "transaction_change_30d",
+            "products_count"
+          ],
+          "reason": "A needs review can identify why usage has reduced."
+        }
+      ]
+    },
+    {
+      "id": "BALANCE_OUTFLOW",
+      "use_when": "Use when balance_change_30d dropped sharply or external_transfer_change_30d increased.",
+      "summary_reason": "Churn risk is linked to balance decline or higher external transfers.",
+      "actions": [
+        {
+          "id": "balance_outflow_check_in",
+          "label": "Balance outflow check-in",
+          "priority": "high",
+          "evidence_fields": [
+            "balance_change_30d",
+            "external_transfer_change_30d"
+          ],
+          "reason": "Balance or transfer behavior shows possible relationship movement."
+        },
+        {
+          "id": "savings_plan_review",
+          "label": "Savings plan review",
+          "priority": "medium",
+          "evidence_fields": [
+            "balance_change_30d"
+          ],
+          "reason": "A savings review can address the recent balance decline."
+        },
+        {
+          "id": "relationship_value_review",
+          "label": "Relationship value review",
+          "priority": "medium",
+          "evidence_fields": [
+            "value_tier",
+            "balance_change_30d"
+          ],
+          "reason": "Reviewing the relationship can help retain value before more activity leaves."
+        },
+        {
+          "id": "retention_offer_review",
+          "label": "Retention offer review",
+          "priority": "medium",
+          "evidence_fields": [
+            "risk_level",
+            "value_tier"
+          ],
+          "reason": "A retention review is appropriate when risk and relationship value justify it."
+        }
+      ]
+    },
+    {
+      "id": "DIGITAL_DISENGAGEMENT",
+      "use_when": "Use when app_login_change_30d declined, UPI/payment activity changed, or digital friction is visible.",
+      "summary_reason": "Churn risk is linked to reduced digital engagement or digital friction.",
+      "actions": [
+        {
+          "id": "digital_support_call",
+          "label": "Digital support call",
+          "priority": "medium",
+          "evidence_fields": [
+            "app_login_change_30d",
+            "upi_share_of_spend"
+          ],
+          "reason": "Digital engagement has changed and may need support."
+        },
+        {
+          "id": "app_issue_diagnosis",
+          "label": "App issue diagnosis",
+          "priority": "medium",
+          "evidence_fields": [
+            "app_login_change_30d"
+          ],
+          "reason": "Lower app usage may reflect a digital experience issue."
+        },
+        {
+          "id": "upi_payment_support",
+          "label": "UPI payment support",
+          "priority": "medium",
+          "evidence_fields": [
+            "upi_share_of_spend",
+            "failed_transactions_30d"
+          ],
+          "reason": "Payment support can help if digital payment behavior is changing."
+        },
+        {
+          "id": "digital_reactivation_nudge",
+          "label": "Digital reactivation nudge",
+          "priority": "low",
+          "evidence_fields": [
+            "app_login_change_30d"
+          ],
+          "reason": "A light digital nudge can encourage renewed app usage."
+        }
+      ]
+    },
+    {
+      "id": "SALARY_OR_INCOME_BREAK",
+      "use_when": "Use when salary_missing_days > 0 or verified salary/pension delay exists. Treat income_regularity as context only, not a trigger.",
+      "summary_reason": "Churn risk is linked to income continuity or salary credit uncertainty.",
+      "actions": [
+        {
+          "id": "salary_credit_check",
+          "label": "Salary credit check",
+          "priority": "high",
+          "evidence_fields": [
+            "salary_missing_days"
+          ],
+          "reason": "Salary or pension credit appears delayed."
+        },
+        {
+          "id": "income_continuity_call",
+          "label": "Income continuity call",
+          "priority": "medium",
+          "evidence_fields": [
+            "salary_missing_days"
+          ],
+          "reason": "A continuity check can help confirm and resolve the salary or pension delay."
+        },
+        {
+          "id": "payroll_or_mandate_support",
+          "label": "Payroll or mandate support",
+          "priority": "medium",
+          "evidence_fields": [
+            "salary_missing_days"
+          ],
+          "reason": "Support can help confirm whether salary or mandate setup needs attention."
+        },
+        {
+          "id": "cashflow_support_review",
+          "label": "Cashflow support review",
+          "priority": "medium",
+          "evidence_fields": [
+            "salary_missing_days"
+          ],
+          "reason": "A cashflow review can help when salary or pension credit appears delayed."
+        }
+      ]
+    },
+    {
+      "id": "FD_MATURITY",
+      "use_when": "Use when fd_maturing_in_30d > 0.",
+      "summary_reason": "Churn risk is linked to an upcoming fixed deposit maturity.",
+      "actions": [
+        {
+          "id": "fd_renewal_discussion",
+          "label": "FD renewal discussion",
+          "priority": "high",
+          "evidence_fields": [
+            "fd_maturing_in_30d"
+          ],
+          "reason": "Fixed deposit maturity is coming up soon."
+        },
+        {
+          "id": "deposit_rate_review",
+          "label": "Deposit rate review",
+          "priority": "medium",
+          "evidence_fields": [
+            "fd_maturing_in_30d"
+          ],
+          "reason": "A deposit review can support renewal before maturity."
+        },
+        {
+          "id": "savings_alternative_review",
+          "label": "Savings alternative review",
+          "priority": "medium",
+          "evidence_fields": [
+            "fd_maturing_in_30d"
+          ],
+          "reason": "The customer may need a suitable savings alternative at maturity."
+        },
+        {
+          "id": "maturity_reminder_call",
+          "label": "Maturity reminder call",
+          "priority": "low",
+          "evidence_fields": [
+            "fd_maturing_in_30d"
+          ],
+          "reason": "A maturity reminder can prevent missed renewal action."
+        }
+      ]
+    },
+    {
+      "id": "PRODUCT_DROPOFF",
+      "use_when": "Use when products_dropped_90d > 0. Treat products_count as context only, not proof that a product was dropped.",
+      "summary_reason": "Churn risk is linked to reduced product relationship depth.",
+      "actions": [
+        {
+          "id": "product_drop_reason_call",
+          "label": "Product drop reason call",
+          "priority": "high",
+          "evidence_fields": [
+            "products_dropped_90d"
+          ],
+          "reason": "Customer has dropped product relationships recently."
+        },
+        {
+          "id": "product_reactivation_review",
+          "label": "Product reactivation review",
+          "priority": "medium",
+          "evidence_fields": [
+            "products_dropped_90d"
+          ],
+          "reason": "A reactivation review can recover a recently dropped relationship."
+        },
+        {
+          "id": "relationship_deepening_review",
+          "label": "Relationship deepening review",
+          "priority": "medium",
+          "evidence_fields": [
+            "products_count"
+          ],
+          "reason": "The customer has limited product depth."
+        },
+        {
+          "id": "bundle_fit_check",
+          "label": "Bundle fit check",
+          "priority": "low",
+          "evidence_fields": [
+            "products_count",
+            "customer_segment"
+          ],
+          "reason": "A bundle fit check can identify useful relationship additions."
+        }
+      ]
+    },
+    {
+      "id": "LOAN_REPAYMENT_STRESS",
+      "use_when": "Use when emi_bounce_30d > 0 or an active loan relationship has repayment stress.",
+      "summary_reason": "Churn risk is linked to loan repayment stress.",
+      "actions": [
+        {
+          "id": "loan_repayment_support",
+          "label": "Loan repayment support",
+          "priority": "high",
+          "evidence_fields": [
+            "emi_bounce_30d",
+            "has_loan"
+          ],
+          "reason": "Customer has a recent EMI bounce and may need repayment support."
+        },
+        {
+          "id": "emi_bounce_follow_up",
+          "label": "EMI bounce follow-up",
+          "priority": "high",
+          "evidence_fields": [
+            "emi_bounce_30d"
+          ],
+          "reason": "A recent EMI bounce needs timely follow-up."
+        },
+        {
+          "id": "repayment_schedule_review",
+          "label": "Repayment schedule review",
+          "priority": "medium",
+          "evidence_fields": [
+            "emi_bounce_30d",
+            "has_loan"
+          ],
+          "reason": "Reviewing repayment schedule can reduce future friction."
+        },
+        {
+          "id": "collections_sensitive_service_call",
+          "label": "Collections-sensitive service call",
+          "priority": "medium",
+          "evidence_fields": [
+            "emi_bounce_30d"
+          ],
+          "reason": "The customer needs a careful service call because repayment stress is visible."
+        }
+      ]
+    },
+    {
+      "id": "LOW_RISK_MONITOR",
+      "use_when": "Use when risk_level is Low and no strong service or friction trigger exists.",
+      "summary_reason": "Current churn risk is low and no urgent recovery trigger is visible.",
+      "actions": [
+        {
+          "id": "monitor_account",
+          "label": "Monitor account",
+          "priority": "low",
+          "evidence_fields": [
+            "risk_level",
+            "churn_probability_percent"
+          ],
+          "reason": "Model 1 v2 shows low churn risk."
+        },
+        {
+          "id": "light_touch_service_check",
+          "label": "Light-touch service check",
+          "priority": "low",
+          "evidence_fields": [
+            "risk_level"
+          ],
+          "reason": "A light check-in is enough for a low-risk customer."
+        },
+        {
+          "id": "next_cycle_review",
+          "label": "Next-cycle review",
+          "priority": "low",
+          "evidence_fields": [
+            "risk_level"
+          ],
+          "reason": "Review after the next activity update unless risk increases."
+        }
+      ]
+    }
+  ]
+}
