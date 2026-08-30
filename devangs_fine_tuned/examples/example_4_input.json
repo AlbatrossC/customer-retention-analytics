@@ -1,0 +1,57 @@
+{
+  "customer_context": {
+    "age": 44,
+    "tenure_months": 72,
+    "customer_segment": "salary",
+    "income_regularity": "regular",
+    "customer_yearly_value": 54000.0,
+    "products_count": 3,
+    "has_credit_card": 1,
+    "has_loan": 1
+  },
+  "behavior": {
+    "days_since_last_transaction": 16,
+    "balance_change_30d": -12.0,
+    "transaction_change_30d": -10.0,
+    "card_spend_change_30d": -14.0,
+    "app_login_change_30d": -25.0,
+    "salary_missing_days": 12,
+    "external_transfer_change_30d": 18.0,
+    "upi_share_of_spend": 0.45,
+    "fd_maturing_in_30d": 0,
+    "products_dropped_90d": 0,
+    "emi_bounce_30d": 1
+  },
+  "service_evidence": {
+    "complaints_30d": 0,
+    "unresolved_complaints": 0,
+    "failed_transactions_30d": 0,
+    "avg_resolution_time_hrs": 0.0,
+    "complaint_text": null
+  },
+  "model1": {
+    "churn_probability": 0.69,
+    "churn_prediction": "Yes",
+    "risk_level": "High",
+    "top_risk_factors": [
+      {
+        "factor": "salary_missing_days",
+        "value": 12
+      },
+      {
+        "factor": "emi_bounce_30d",
+        "value": 1
+      },
+      {
+        "factor": "app_login_change_30d",
+        "value": -25.0
+      }
+    ]
+  },
+  "eligible_actions": [
+    "FINANCIAL_GUIDANCE",
+    "LOAN_REVIEW",
+    "RM_CALLBACK",
+    "MONITOR"
+  ]
+}

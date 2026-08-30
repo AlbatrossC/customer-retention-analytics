@@ -1,0 +1,48 @@
+{
+  "customer_context": {
+    "age": 45,
+    "tenure_months": 60,
+    "customer_segment": "salary",
+    "income_regularity": "regular",
+    "customer_yearly_value": 48000.00,
+    "products_count": 3,
+    "has_credit_card": 1,
+    "has_loan": 0
+  },
+  "behavior": {
+    "days_since_last_transaction": 28,
+    "balance_change_30d": -45.1,
+    "transaction_change_30d": -30.5,
+    "card_spend_change_30d": -22.0,
+    "app_login_change_30d": -55.3,
+    "salary_missing_days": null,
+    "external_transfer_change_30d": 60.0,
+    "upi_share_of_spend": 0.65,
+    "fd_maturing_in_30d": 0,
+    "products_dropped_90d": 1,
+    "emi_bounce_30d": 0
+  },
+  "service_evidence": {
+    "complaints_30d": 3,
+    "unresolved_complaints": 2,
+    "failed_transactions_30d": 1,
+    "avg_resolution_time_hrs": 72.5,
+    "complaint_text": "Very unhappy with branch service, waited 2 hours"
+  },
+  "model1": {
+    "churn_probability": 0.72,
+    "churn_prediction": "Yes",
+    "risk_level": "High",
+    "top_risk_factors": [
+      {"factor": "balance_change_30d", "value": -45.1},
+      {"factor": "days_since_last_transaction", "value": 28},
+      {"factor": "complaints_30d", "value": 3}
+    ]
+  },
+  "eligible_actions": [
+    "SERVICE_RECOVERY",
+    "COMPLAINT_ESCALATION",
+    "RM_CALLBACK",
+    "MONITOR"
+  ]
+}

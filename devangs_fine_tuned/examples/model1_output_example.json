@@ -1,0 +1,11 @@
+{
+  "case_id": "FAKE-CUST-001",
+  "churn_probability": 0.72,
+  "churn_prediction": "Yes",
+  "risk_level": "High",
+  "top_risk_factors": [
+    {"factor": "balance_change_30d", "value": -45.1},
+    {"factor": "days_since_last_transaction", "value": 28},
+    {"factor": "complaints_30d", "value": 3}
+  ]
+}

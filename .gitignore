@@ -6,3 +6,9 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# Large model artifacts should stay local/Drive, not in GitHub.
+*.safetensors
+*.gguf
+devangs_fine_tuned/hf_cache/
+devangs_fine_tuned/merged_devang_model2/

@@ -1,0 +1,56 @@
+{
+  "customer_context": {
+    "age": 28,
+    "tenure_months": 18,
+    "customer_segment": "vendor",
+    "income_regularity": "seasonal",
+    "customer_yearly_value": 26000.0,
+    "products_count": 2,
+    "has_credit_card": 0,
+    "has_loan": 0
+  },
+  "behavior": {
+    "days_since_last_transaction": 4,
+    "balance_change_30d": 3.5,
+    "transaction_change_30d": 5.0,
+    "card_spend_change_30d": 0.0,
+    "app_login_change_30d": -2.0,
+    "salary_missing_days": null,
+    "external_transfer_change_30d": 4.0,
+    "upi_share_of_spend": 0.76,
+    "fd_maturing_in_30d": 0,
+    "products_dropped_90d": 0,
+    "emi_bounce_30d": 0
+  },
+  "service_evidence": {
+    "complaints_30d": 0,
+    "unresolved_complaints": 0,
+    "failed_transactions_30d": 0,
+    "avg_resolution_time_hrs": 0.0,
+    "complaint_text": null
+  },
+  "model1": {
+    "churn_probability": 0.18,
+    "churn_prediction": "No",
+    "risk_level": "Low",
+    "top_risk_factors": [
+      {
+        "factor": "products_count",
+        "value": 2
+      },
+      {
+        "factor": "customer_yearly_value",
+        "value": 26000.0
+      },
+      {
+        "factor": "app_login_change_30d",
+        "value": -2.0
+      }
+    ]
+  },
+  "eligible_actions": [
+    "MONITOR",
+    "RE_ENGAGEMENT",
+    "PRODUCT_REVIEW"
+  ]
+}

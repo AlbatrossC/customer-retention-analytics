@@ -1,0 +1,14 @@
+{
+  "primary_reason": "SERVICE_DISSATISFACTION",
+  "secondary_reasons": ["COMPETITOR_MIGRATION"],
+  "evidence": [
+    "complaints_30d=3",
+    "unresolved_complaints=2",
+    "avg_resolution_time_hrs=72.5",
+    "balance_change_30d=-45.1",
+    "app_login_change_30d=-55.3"
+  ],
+  "urgency": "HIGH",
+  "recommended_action": "COMPLAINT_ESCALATION",
+  "reasoning_summary": "The customer has filed 3 complaints in the last 30 days with 2 remaining unresolved and an average resolution time of 72.5 hours, indicating significant service dissatisfaction. Combined with a 45.1% balance decline and 55.3% drop in app logins, this suggests active disengagement. The high external transfer increase (60%) points to possible competitor migration as a secondary factor. Immediate complaint escalation is warranted given the HIGH churn probability (0.72) and the severity of unresolved service issues."
+}

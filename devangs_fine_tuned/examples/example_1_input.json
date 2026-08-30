@@ -1,0 +1,57 @@
+{
+  "customer_context": {
+    "age": 39,
+    "tenure_months": 48,
+    "customer_segment": "salary",
+    "income_regularity": "regular",
+    "customer_yearly_value": 62000.0,
+    "products_count": 4,
+    "has_credit_card": 1,
+    "has_loan": 0
+  },
+  "behavior": {
+    "days_since_last_transaction": 24,
+    "balance_change_30d": -38.5,
+    "transaction_change_30d": -28.0,
+    "card_spend_change_30d": -18.0,
+    "app_login_change_30d": -42.0,
+    "salary_missing_days": null,
+    "external_transfer_change_30d": 55.0,
+    "upi_share_of_spend": 0.58,
+    "fd_maturing_in_30d": 0,
+    "products_dropped_90d": 1,
+    "emi_bounce_30d": 0
+  },
+  "service_evidence": {
+    "complaints_30d": 2,
+    "unresolved_complaints": 1,
+    "failed_transactions_30d": 1,
+    "avg_resolution_time_hrs": 64.0,
+    "complaint_text": "Customer says complaint has not been resolved and branch follow-up was delayed"
+  },
+  "model1": {
+    "churn_probability": 0.78,
+    "churn_prediction": "Yes",
+    "risk_level": "High",
+    "top_risk_factors": [
+      {
+        "factor": "complaints_30d",
+        "value": 2
+      },
+      {
+        "factor": "balance_change_30d",
+        "value": -38.5
+      },
+      {
+        "factor": "days_since_last_transaction",
+        "value": 24
+      }
+    ]
+  },
+  "eligible_actions": [
+    "SERVICE_RECOVERY",
+    "COMPLAINT_ESCALATION",
+    "RM_CALLBACK",
+    "MONITOR"
+  ]
+}

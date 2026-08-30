@@ -1,0 +1,57 @@
+{
+  "customer_context": {
+    "age": 51,
+    "tenure_months": 96,
+    "customer_segment": "business",
+    "income_regularity": "irregular",
+    "customer_yearly_value": 114000.0,
+    "products_count": 5,
+    "has_credit_card": 1,
+    "has_loan": 1
+  },
+  "behavior": {
+    "days_since_last_transaction": 8,
+    "balance_change_30d": -22.0,
+    "transaction_change_30d": -6.5,
+    "card_spend_change_30d": -4.0,
+    "app_login_change_30d": -8.0,
+    "salary_missing_days": null,
+    "external_transfer_change_30d": 72.0,
+    "upi_share_of_spend": 0.32,
+    "fd_maturing_in_30d": 1,
+    "products_dropped_90d": 0,
+    "emi_bounce_30d": 0
+  },
+  "service_evidence": {
+    "complaints_30d": 0,
+    "unresolved_complaints": 0,
+    "failed_transactions_30d": 0,
+    "avg_resolution_time_hrs": 0.0,
+    "complaint_text": null
+  },
+  "model1": {
+    "churn_probability": 0.64,
+    "churn_prediction": "Yes",
+    "risk_level": "Medium",
+    "top_risk_factors": [
+      {
+        "factor": "external_transfer_change_30d",
+        "value": 72.0
+      },
+      {
+        "factor": "fd_maturing_in_30d",
+        "value": 1
+      },
+      {
+        "factor": "balance_change_30d",
+        "value": -22.0
+      }
+    ]
+  },
+  "eligible_actions": [
+    "RM_CALLBACK",
+    "PRODUCT_REVIEW",
+    "FINANCIAL_GUIDANCE",
+    "MONITOR"
+  ]
+}

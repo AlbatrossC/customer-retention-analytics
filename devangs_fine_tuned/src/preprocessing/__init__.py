@@ -1,0 +1,1 @@
+from src.preprocessing.build_input import build_model2_input
