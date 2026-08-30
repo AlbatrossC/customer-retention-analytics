@@ -1,0 +1,4 @@
+FROM "D:\customer-retention-analytics\model_2\model 2 demo\model2_retention_0.5bv2.gguf"
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
+PARAMETER repeat_penalty 1.08
