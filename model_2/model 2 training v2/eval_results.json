@@ -1,0 +1,851 @@
+{
+  "summary": {
+    "json_validity": 0.975,
+    "prefix_validity": 0.6196581196581197,
+    "grounding_rate": 0.9829059829059829,
+    "mean_latency_sec": 0.431702987353007,
+    "composite_score": 0.8699786324786325
+  },
+  "per_example": [
+    {
+      "raw_output": "{\"why\": \"Customer has shown signs of dissatisfaction through high failure rates and reactive complaints, indicating they are being targeted by a competitor's rate campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the exact fund movement and complaints are tracked and communicated.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.5697422027587891
+    },
+    {
+      "raw_output": "{\"why\": \"Customer meets the average capital flight threshold, indicating they are being targeted by a competitor's rate campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"churn_probability\": 0.7373}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.37982845306396484
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.44163966178894043
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has joined a new business or entity, indicating they are moving funds to a new account or entity, which suggests they are being targeted by a competitor's marketing campaign for a new product, service, or account.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"cc_to_self\": \"Have the customer's account manager contact the customer's primary financial officer or operations manager to coordinate the fund movement and discuss retention strategies.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.5519552230834961
+    },
+    {
+      "raw_output": "{\"why\": \"The customer is moving large sums externally without communicating with the operator, indicating a fund movement scam.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to explain the resolution and address any concerns personally.\", \"rm_email\": \"Send an email to the customer's designated operations or technology manager, providing detailed evidence and asking for the necessary investigations or refund procedures.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4055471420288086
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.44225096702575684
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are about to move funds to a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4927518367767334
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly with unexplained funds, indicating rapid fund movement may be a rate campaign or payment protection service (PPS), which requires immediate action.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"fee_waiver\": \"Reverse or explain the charges, explain the resolution, and rebuild trust before funds move to a competitor.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.48508358001708984
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor. High maturing FD funds should be monitored closely and targeted retention efforts initiated when there are immediate concerns.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until there are documented complaints or signs of rate shopping.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.49768996238708496
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"If there are no immediate retention concerns, this recommendation is not recommended until further action can be taken.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4144763946533203
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.29630303382873535
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating a failing transaction system.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.30170154571533203
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD being moved to a competitor's account, indicating they are being targeted by a rate campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"cc_to_self\": \"Have the customer's controller or operations team contact the customer promptly to communicate the intended fund movement and discuss retention strategies.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.44977784156799316
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer frustration with the bank's technical support team, leading to a high volume of complaints and low satisfaction scores.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4844508171081543
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer dissatisfaction with the provider's service, resulting in a high volume of complaints and failed transactions.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.47259998321533203
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"If communication does not resolve the issue, proceed to the next recommendation.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.390578031539917
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4374420642852783
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively churning because the salary segment is closing quickly, indicating rapid fund movement or hidden charges are being directed there.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"df_waiver\": \"Have the customer's fund account reviewed by a bank officer or operations team to identify the intended fund movement and determine the appropriate retention course.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4811282157897949
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"resolve_complaint_explanation\": \"Resolve the customer's complaint by communicating the correct rate or explaining the service's benefits clearly, creating a resolution ticket, and tracking it through the resolution process.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.33290624618530273
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"complaint_escalation_explanation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3385457992553711
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.46993279457092285
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is being charged too quickly, causing funds to move too rapidly through our system, which can cause stress and increase friction.\", \"next_actions\": {\"reduce_complaint_text\": \"Reply to the customer's complaint with clear, concise instructions on why the funds are moving too quickly and how it will resolve the issue.\", \"create_waiver_or_exemption\": \"Obtain the customer's signature waiver or explain the resolution in terms of a deferred payment or restricted fund withdrawal policy.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.5149312019348145
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4620378017425537
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly with unexplained funds, indicating a fund transfer scam.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to explain the intended fund movement and the intended retention course, or contact the police if it's considered a scam.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.33002257347106934
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains about fees, indicating they are being charged too much for the services they are using, possibly for unauthorized fees.\", \"next_actions\": {\"resolve_complaint_explanation\": \"Resolve the customer's complaint by providing accurate fee information, explaining the correct charges, and addressing any outstanding fees personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.33446526527404785
+    },
+    {
+      "raw_output": "{\"why\": \"The customer is moving large sums externally, indicating a money laundering or terrorism financing activity.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"dfw_explanation\": \"Provide detailed explanation for the fund movement, explain the resolution process, and communicate clearly with the customer.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.43152451515197754
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has been complaints-free for 0 periods and makes external transfers of $0, indicating stable engagement and low immediate churn risk.\", \"next_actions\": {\"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals point to stable engagement and low immediate churn risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3256213665008545
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates persistent technical chaos with high failure rates and collective complaints, suggesting a systemic outage affecting the customer base.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.5028529167175293
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.29772353172302246
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are becoming a competitor's customer.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4853787422180176
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4409000873565674
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating a failing transaction system.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.30039167404174805
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer dissatisfaction with the provider's technical support, leading to massive transaction failures and high complaint volumes.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the technical issue is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.46707749366760254
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4421119689941406
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly, indicating rapid fund movement or possible fraud.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"df_waiver\": \"Have the fund manager or operations team review the fund movement and reverse or waive eligible fees, then explain the resolution clearly to restore customer confidence and reduce further attrition risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.46906232833862305
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4429206848144531
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains about outstanding fees, indicating persistent rate scrutiny.\", \"next_actions\": {\"complaint_escalation_explanation\": \"Escalate the complaint to the relevant operations or technology team, create a resolution ticket, and monitor it through resolution or decline the ticket as per the team's policy.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.31534767150878906
+    },
+    {
+      "raw_output": "{\"why\": \"The customer is moving large sums externally without contacting the account holder, indicating fund movement fraud.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.29556965827941895
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.2964909076690674
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has been complaints-free for 30 days and is investing heavily in a single FD, indicating high fund management activity with limited liquidity risk.\", \"next_actions\": {\"reduce_complaint_trend\": \"Reduce the customer's complaints or initiate a resolution campaign to rebuild trust.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals suggest fund activity is prioritizing liquidity, with low immediate churn risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.44315266609191895
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are about to move funds to a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4987044334411621
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has shown signs of financial stress with high rates, indicating they are being targeted by a competitor's rate campaign, with frequent complaints and low patience sorting through funds.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the exact fund movement and customer complaints are identified.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.47124767303466797
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly, indicating rapid fund movement may be a rate scheme or hidden charge campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"fee_waiver\": \"Reverse or explain the charges, explain the resolution, and rebuild trust before funds move to a competitor.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.43063783645629883
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are about to move funds to a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4952366352081299
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.44826388359069824
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains frequently and provides detailed, actionable complaints, suggesting a proactive retention intervention is necessary.\", \"next_actions\": {\"complaint_waiver_explanation\": \"Complaint waiver is recommended because the customer's demands are preventing them from paying their bills promptly, indicating a persistent dispute that demands immediate resolution.\"}, \"complaint_waiver\": {\"complaint_escalation_path\": \"Have the manager or relevant team member contact the customer promptly to understand the exact complaint and communicate the resolution timeline.\", \"do_nothing_explanation\": \"Do not respond with a resolution until the customer's issues are resolved by the relevant department.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.628777027130127
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer dissatisfaction with the provider's website, causing large volume redirects and high failure rates.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the website issue is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.47049903869628906
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4463346004486084
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer frustration with the service provider, leading to numerous complaints and high transaction failures.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4629642963409424
+    },
+    {
+      "raw_output": "{\"why\": \"The customer is moving large sums externally without communicating with the operator, indicating hidden charges are being transferred to a third party.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"rm_waiver\": \"Have the relationship manager communicate the incident to the operations or technology team, who will then investigate the transaction and communicate the resolution or escalate the matter to the relevant operations or technology team.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.5229506492614746
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums externally without communicating with the bank, indicating a fund transfer fraud effort.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to explain the resolution and prevent further financial harm.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.26610374450683594
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"resolve_complaint_explanation\": \"Resolve the customer's complaint by communicating the rate change or explaining the proper fees associated with the service.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.2988603115081787
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.46598076820373535
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"complaint_waiver\": \"Complaint funds are returned, and the customer's fees are resolved without impacting future transactions.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals point to aggressive rate chasing, which can escalate quickly to a full rate dispute or permanent churn.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4721357822418213
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.45832061767578125
+    },
+    {
+      "raw_output": "{\"why\": \"The customer is moving large sums externally without communicating with the operator, indicating hidden charges or fraud.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"rm_explain\": \"Have the relationship manager contact the customer and explain the resolution process, the intended fund movement, and the potential consequences before resolving the complaint personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.47678685188293457
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are about to move funds to a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.541569709777832
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly, indicating rapid fund movement or possible fraud.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"df_waiver\": \"Have the customer's fund maturing in 30 days or earlier and explain the resolution clearly to reduce further attrition risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4356362819671631
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly, indicating rapid fund movement or hidden charges are being used for non-liquid investments.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"fc_wh\u0630\": \"Have the fund transfer operator contact the customer promptly to verify the intended fund movement and resolve the transaction or investigate the charges personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.46323442459106445
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer dissatisfaction with the provider's service, resulting in a high volume of complaints and failed transactions.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4765491485595703
+    },
+    {
+      "raw_output": "{\"why\": \"The customer's funds are moving in and out rapidly, indicating rapid rate changing or fraud.\", \"next_actions\": {\"rate_change_messaging\": \"Send a messaging alert or resolution email to the customer, explaining the rate change behavior and providing contact information.\", \"rate_change_review\": \"Have the customer's account reviewed by a bank officer or customer service, who will investigate the rate changes and communicate the results.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.42580699920654297
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly without creating records, indicating a fund movement scam.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"rm_email\": \"Have the relationship manager send an email to the customer explaining the resolution and reminding them of the retention obligations.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.40172600746154785
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.29789233207702637
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly, indicating rapid fund movement may be a fraud or hidden charge campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"dfw_waiver\": \"Have the customer's fund waiver policy or funds transfer limit reviewed, then explain the resolution clearly to restore confidence and reduce further attrition risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.48024463653564453
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4464256763458252
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"If there are no immediate retention concerns, monitor the customer's financial activity and communicate later when more information is available.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.43595004081726074
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are becoming volatile with their bank.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.49059009552001953
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively canceling transactions due to app crashes, with recent complaints indicating app instability.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the operations team, create a tracked resolution ticket, and monitor it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.29065537452697754
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer frustration with the bank's system, leading to numerous complaints and high transaction failures.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4658012390136719
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has shown signs of emotional detachment with the business, sending irrelevant complaints and failing to pay their fees, indicating they are being targeted by a competitor's aggressive rate campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"rm_message\": \"Write a clear, empathetic email to the customer explaining the rate change and providing assistance or resolution plans.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.487485408782959
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has shown signs of dissatisfaction through high failure rates and persistent complaints, indicating they are being targeted by a competitor's rate campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"cc_to_rms\": \"Have the customer's operations or technology department contact the relationship manager for further guidance or to report the incident to the relevant operations or technology team.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4893193244934082
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"complaint_escalation_explanation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3180568218231201
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains about high fees or requires a fund transfer, suggesting they are moving large sums quickly and are being monitored by the service provider.\", \"next_actions\": {\"complaint_explanation\": \"This indicates the customer is moving funds quickly for speculative investments or to meet immediate fees, indicating passive rate hunting with the provider.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.33402514457702637
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains frequently and app sessions are maturing quickly.\", \"next_actions\": {\"complaint_explanation\": \"Customer is complaining due to high external fees or unexpected charges, indicating aggressive rate hunting or fraudulent activities.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals point to rate hunting motivation, with high complaints and maturing funds suggesting the customer is moving quickly to avoid paying.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.42786502838134766
+    },
+    {
+      "raw_output": "{\"why\": \"The customer's outstanding balances are increasing rapidly, indicating aggressive rate hunting by a competitor.\", \"next_actions\": {\"reduce_complaint_text\": \"Create a tailored resolution ticket or communication message explaining the rate reduction policy and its intended impact, or escalate the complaint to the relevant operations or technology team.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.31664180755615234
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are about to move funds to a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.5075099468231201
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively churning because the salary segment is yielding low rates, indicating a rate race with competitors.\", \"next_actions\": {\"reduce_rate_waiver\": \"Review the rate policy and reverse or waive rate waivers for the customer's salary segment, then explain the resolution clearly to rebuild trust and reduce further attrition risk.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4917910099029541
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.30331897735595703
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer is communicated clearly why the fees are required.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals point to immediate fees as a complaint, and a resolution is easier and more effective when communicated promptly.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.46620917320251465
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly, indicating rapid fund movement may be a fraud or hidden charge campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"dfw_waiver\": \"Have the customer's fund winder or counterparty reverse or waive the charges, then explain the resolution clearly to restore customer confidence and reduce further attrition risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4888453483581543
+    },
+    {
+      "raw_output": "{\"why\": \"The customer is moving large sums externally without communicating with the operator, indicating a fund transfer scam.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to explain the resolution and address any concerns personally.\", \"rm_waiver_fund\": \"Have the relationship manager contact the fund operator or dispute resolution team to reverse the fund movement or resolve the dispute, then explain the resolution clearly to restore customer confidence and reduce further attrition risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4964020252227783
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3153829574584961
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains frequently and app sessions are maturing quickly.\", \"next_actions\": {\"complaint_explanation\": \"Customer is paying too quickly for a salary plan, indicating they are moving large sums quickly, which can trigger rate increases or early closures.\"}},",
+      "json_valid": false,
+      "prefix_validity": null,
+      "grounding_rate": null,
+      "latency": 0.28575634956359863
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer dissatisfaction with the provider's website loading speed, causing frequent 404 errors and high bounce rates.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the website loading issue is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 0.0,
+      "latency": 0.5130958557128906
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer is communicated clearly why the fees are required, preventing immediate churn.\"}}, {\"why\": \"Customer provides recent complaints about a competitor's unfair hidden charges, and there is evidence that the funds are being moved to the competitor's account.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer's account is communicated clearly to prevent immediate fund movement and reduce potential emotional friction.\"}}, {\"why\": \"Customer complains that the service is slow, and there is evidence that funds are being moved to a competitor's account.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer's account is communicated clearly to prevent immediate fund movement and reduce emotional friction.\"}}",
+      "json_valid": false,
+      "prefix_validity": null,
+      "grounding_rate": null,
+      "latency": 1.035529375076294
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3145730495452881
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating a problem with the payment gateway or system.\", \"next_actions\": {\"complaint_waiver\": \"Review the complaint and create a tracked resolution ticket. Explain the resolution clearly to the customer and monitor it thereafter.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3092780113220215
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer frustration with their account management or payment processing, with a high volume of complaints and failed transactions.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.48611927032470703
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are becoming a competitor's customer.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"cc_to_owner\": \"Have the customer's operations or operations manager contact the customer's account manager to coordinate the renewal or rate request with the operator.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4909801483154297
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating immediate technical frustration.\", \"next_actions\": {\"complaint_waiver\": \"Grant the customer a waiver or reduce the rate for resolving the complaint personally, as we are monitoring it through resolution.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.2953040599822998
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is moving large sums quickly with unexplained funds, indicating rapid fund movement with a competitor's scheme.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"df_waiver\": \"Have the fund account administrator reverse or waive the charges, then explain the resolution clearly to restore customer confidence and reduce further attrition risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.4671032428741455
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3006746768951416
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"If communication does not resolve the issue, do not initiate proactive retention outreach until the customer's funds move to a competitor.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.44172096252441406
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains about outstanding fees, indicating persistent rate scrutiny.\", \"next_actions\": {\"complaint_escalation_explanation\": \"Escalate the complaint to the relevant operations or technology team, create a resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.2717604637145996
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4484865665435791
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they are using.\", \"next_actions\": {\"complaint_escalation_explanation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.32669734954833984
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer dissatisfaction with the provider's website loading speed, causing frequent 404 errors and high abandonment rates.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the website loading issue is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 0.0,
+      "latency": 0.4932842254638672
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD with a competitor, indicating they are being targeted by a rate campaign, strongly suggesting they are becoming synchronized and are being charged by a competitor.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"do_nothing_explanation\": \"If no immediate action is needed, this customer is synchronized with a competitor's rate campaign, and further communication may delay resolution or increase costs.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.5394704341888428
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4473249912261963
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer is communicated clearly why the fees are required, preventing immediate churn.\"}}, {\"why\": \"Customer has recently made a large external transfer, suggesting they are moving large sums of money and may be being targeted by a competitor's ad campaign.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer is communicated why the fund movement is happening and how it's being tracked, preventing immediate churn.\"}}, {\"why\": \"Customer is complaining about unexplained charges or fees, indicating they are being charged for services they do not use.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer is communicated clearly why the charges are occurring and how the funds will be returned.\", \"explain_reason\": \"A explanation is provided explaining the intended fund movement and the intended retention outreach.\"}}",
+      "json_valid": false,
+      "prefix_validity": null,
+      "grounding_rate": null,
+      "latency": 1.0848677158355713
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating persistent network issues.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3048436641693115
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer dissatisfaction with the service provider's technical support, resulting in a high volume of complaints and failed transactions.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.49353623390197754
+    },
+    {
+      "raw_output": "{\"why\": \"The customer is moving large sums externally without communicating with the operator, indicating hidden charges or fraud.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.30227184295654297
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4526691436767578
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is being targeted by a phishing campaign, causing funds to be lost through failed transactions.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3049962520599365
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they are using.\", \"next_actions\": {\"complaint_escalation_explanation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3251352310180664
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has moved large sums externally without lodging complaints, suggesting passive rate shopping with a competitor.\", \"next_actions\": {\"rate_offer\": \"Offer a competitive rate or renewal incentive for the customer's maturing FD, prioritizing a tailored retention offer before funds move to a competitor.\", \"rm_call\": \"Have the relationship manager contact the customer personally to understand the intended fund movement, discuss retention options, and address any concerns personally.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.45195841789245605
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they need.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or refund offer is made, or the customer is referred to a manager for resolution.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals point to aggressive rate chasing, with high complaint volume.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4162423610687256
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains loudly about high fees, indicating they are being charged too much for the services they are using.\", \"next_actions\": {\"complaint_waiver\": \"A waiver or reduction of the disputed fee is possible, which would reverse the anticipated payment gap and reduce further friction risk.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals point to immediate fees as the primary complaint, and a resolution by the service provider is the recommended course of action.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.5077452659606934
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer frustration with a merchant's failure to respond promptly to their payments, leading to extensive transaction failures and high complaint volumes.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the underlying technical incident is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.5371286869049072
+    },
+    {
+      "raw_output": "{\"why\": \"The customer's outstanding balances are increasing rapidly, indicating aggressive rate hunting by the competitor.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.31653428077697754
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has a maturing FD being moved to a competitor's account, indicating they are being targeted by a rate campaign.\", \"next_actions\": {\"rm_call\": \"Have the relationship manager contact the customer promptly to understand the intended fund movement, discuss retention options, and address any concerns personally.\", \"cc_email\": \"Have the customer's account manager email the customer with details and ask them to review the funds or contact the relationship manager for further guidance.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.48961424827575684
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has made new FD transactions and is complaining about slow payments, indicating passive rate shopping with the competitor.\", \"next_actions\": {\"rate_complaint_explanation\": \"Provide detailed explanation and resolve the complaint by communicating with the competitor or the relevant department, creating a resolution ticket, and tracking it through the resolution process.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals point to passive rate shopping, with funds moving from the customer's account to the competitor's without increasing the customer's balance. This suggests the customer is being targeted by a competitor's rate campaign.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.6446154117584229
+    },
+    {
+      "raw_output": "{\"why\": \"Customer has made a recent complaint, suggesting funds are being withdrawn for non-essential expenses.\", \"next_actions\": {\"do_nothing_explanation\": \"No proactive retention intervention is recommended because the available signals indicate stable engagement and low immediate churn risk.\", \"do_complaint_waiver\": \"A complaint waiver is granted, as funds are being withdrawn for non-essential expenses, indicating a proactive fund movement may be a defensive strategy.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.4699728488922119
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains frequently and provides detailed, actionable complaints.\", \"next_actions\": {\"resolve_complaint_explanation\": \"Resolve the customer's complaint promptly by providing a resolution or returning the product/service fee. Maintain communication and keep the customer informed about the resolution or next actions.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3062705993652344
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is actively complaining about app crashes when scanning QR codes, indicating a failing transaction system.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.3101797103881836
+    },
+    {
+      "raw_output": "{\"why\": \"Customer composes frequent payment orders but pays late, indicating passive rate shopping with the provider.\", \"next_actions\": {\"rate_waiver_explanation\": \"A rate waiver or extension offer is offered, reducing the customer's immediate payment obligation.\", \"do_nothing_explanation\": \"No proactive retention intervention is recommended because the customer's rate shopping behavior is passive and does not indicate immediate churn risk.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.40987467765808105
+    },
+    {
+      "raw_output": "{\"why\": \"This cluster indicates customer frustration with service speed, with complaints about failed transactions and high average waits, suggesting they are looking for faster resolution or a refund.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the operations or technology team, create a tracked resolution ticket, and monitor it through closure.\", \"do_nothing_explanation\": \"Do not initiate proactive retention outreach until the service issue is resolved; monitor the cluster/customer and communicate once service stability returns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.5,
+      "grounding_rate": 1.0,
+      "latency": 0.50691819190979
+    },
+    {
+      "raw_output": "{\"why\": \"Customer complains about high fees or restrictive terms, suggesting they are being deceived.\", \"next_actions\": {\"complaint_explanation\": \"Provide clear resolution or refund for the customer's complaints, creating clarity and reducing future concerns.\"}}",
+      "json_valid": true,
+      "prefix_validity": 0.0,
+      "grounding_rate": 1.0,
+      "latency": 0.25183725357055664
+    },
+    {
+      "raw_output": "{\"why\": \"Customer is being targeted by a phishing campaign, causing funds to be moved to a fraudulent address.\", \"next_actions\": {\"complaint_escalation\": \"Escalate the complaint to the relevant operations or technology team, create a tracked resolution ticket, and monitor it through closure.\"}}",
+      "json_valid": true,
+      "prefix_validity": 1.0,
+      "grounding_rate": 1.0,
+      "latency": 0.30733346939086914
+    }
+  ]
+}
