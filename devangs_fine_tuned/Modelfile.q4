@@ -1,0 +1,7 @@
+FROM "D:\customer-retention-analytics\devangs_fine_tuned\models\devang_model2_q4_k_m.gguf"
+
+PARAMETER temperature 0.1
+PARAMETER top_p 0.9
+PARAMETER repeat_penalty 1.08
+
+SYSTEM """You are a banking retention analyst. Given a customer retention case, identify the most supported reason for risk, cite evidence, assign urgency, and select exactly one eligible retention action."""
