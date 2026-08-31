@@ -32,9 +32,9 @@ OLLAMA_TAGS_URL = f"{server.OLLAMA_HOST}/api/tags"
 EXPECTED_OLLAMA_MODEL = server.OLLAMA_MODEL
 
 DEFAULT_RISK_QUOTAS = {
-    "High": 1071,
-    "Medium": 487,
-    "Low": 3442,
+    "High": 1345,
+    "Medium": 2145,
+    "Low": 1510,
 }
 RISK_ORDER = ("High", "Medium", "Low")
 
@@ -187,6 +187,7 @@ def select_model1_records(
     model1_outputs: dict[str, dict[str, Any]],
     limit: int,
     include_low_risk: bool,
+    fill_shortfall: bool,
 ) -> list[dict[str, Any]]:
     quotas = quota_for_limit(limit)
     groups: dict[str, list[dict[str, Any]]] = {risk: [] for risk in RISK_ORDER}
@@ -200,6 +201,21 @@ def select_model1_records(
     for risk in selected_risks:
         records = sorted(groups[risk], key=lambda item: str(item["customer_id"]))
         selected.extend(records[: quotas[risk]])
+
+    if fill_shortfall and len(selected) < limit:
+        selected_ids = {str(record["customer_id"]) for record in selected}
+        fill_risks = ("Low", "Medium", "High") if include_low_risk else ("Medium", "High")
+        for risk in fill_risks:
+            if len(selected) >= limit:
+                break
+            for record in sorted(groups[risk], key=lambda item: str(item["customer_id"])):
+                if len(selected) >= limit:
+                    break
+                customer_id = str(record["customer_id"])
+                if customer_id in selected_ids:
+                    continue
+                selected.append(record)
+                selected_ids.add(customer_id)
 
     return sorted(selected, key=lambda item: str(item["customer_id"]))
 
@@ -456,8 +472,10 @@ def run_pipeline(
     input_csv: Path,
     model1_json: Path,
     output_json: Path,
+    resume_from_json: Path | None,
     limit: int,
     include_low_risk: bool,
+    fill_shortfall: bool,
     workers: int,
     resume: bool,
     checkpoint_every: int,
@@ -465,7 +483,7 @@ def run_pipeline(
     started_at = time.perf_counter()
     print(f"Loading Model 1 outputs from {model1_json}", flush=True)
     model1_outputs = load_model1_outputs(model1_json)
-    selected_records = select_model1_records(model1_outputs, limit, include_low_risk)
+    selected_records = select_model1_records(model1_outputs, limit, include_low_risk, fill_shortfall)
     selected_ids = [str(record["customer_id"]) for record in selected_records]
     selected_by_id = {str(record["customer_id"]): record for record in selected_records}
     selected_risk_counts = risk_summary(
@@ -473,16 +491,23 @@ def run_pipeline(
     )
 
     skipped_low_risk = quota_for_limit(limit)["Low"] if not include_low_risk else 0
-    existing_results = load_existing_results(output_json) if resume else {}
+    existing_path = resume_from_json or output_json
+    existing_results = load_existing_results(existing_path) if resume else {}
     ids_to_process = [customer_id for customer_id in selected_ids if customer_id not in existing_results]
     skipped_existing = len(selected_ids) - len(ids_to_process)
 
     print(f"Selected customers from Model 1 JSON: {len(selected_ids):,}", flush=True)
     print(f"Selected risk split: {selected_risk_counts}", flush=True)
+    if fill_shortfall and len(selected_ids) == limit:
+        print("Quota shortfall fill is enabled, so unavailable bucket counts are topped up from other selected risks.", flush=True)
     if not include_low_risk:
         print("Low-risk customers are skipped. Use --include-low-risk to process them later.", flush=True)
     if resume:
-        print(f"Resume enabled: skipping {skipped_existing:,} already processed customers.", flush=True)
+        print(
+            f"Resume enabled: loaded {len(existing_results):,} existing results from {existing_path} "
+            f"and will skip {skipped_existing:,} selected customers.",
+            flush=True,
+        )
 
     print(f"Reading CSV context from {input_csv}", flush=True)
     df = pd.read_csv(input_csv)
@@ -554,11 +579,22 @@ def main() -> None:
     parser.add_argument("--input", default=str(CUSTOMERS_CSV), help="Input customers CSV for raw customer context.")
     parser.add_argument("--model1-json", default=str(MODEL1_OUTPUT_JSON), help="Precomputed Model 1 v2 output JSON.")
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT), help="Output JSON path.")
+    parser.add_argument(
+        "--resume-from",
+        default=None,
+        help="Optional existing Devang output JSON to reuse while writing to --output.",
+    )
     parser.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="Recommended customer pool size.")
     parser.add_argument(
         "--include-low-risk",
         action="store_true",
         help="Also run Devang for the selected low-risk customers. Default processes High and Medium only.",
+    )
+    parser.add_argument(
+        "--fill-shortfall",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Top up from other selected risk levels if a requested risk quota has fewer available customers.",
     )
     parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS, help="Number of concurrent Devang workers.")
     parser.add_argument(
@@ -580,8 +616,10 @@ def main() -> None:
         input_csv=Path(args.input),
         model1_json=Path(args.model1_json),
         output_json=Path(args.output),
+        resume_from_json=Path(args.resume_from) if args.resume_from else None,
         limit=args.limit,
         include_low_risk=args.include_low_risk,
+        fill_shortfall=args.fill_shortfall,
         workers=args.workers,
         resume=args.resume,
         checkpoint_every=args.checkpoint_every,
