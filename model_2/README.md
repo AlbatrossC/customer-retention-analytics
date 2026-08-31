@@ -5,7 +5,7 @@ Simple steps to run the fine-tuned 0.5B retention model locally.
 ## 1. Go to the model folder
 
 ```powershell
-cd D:\customer-retention-analytics\model_2_kulkarni
+cd D:\customer-retention-analytics\model_2
 ```
 
 ## 2. Create and activate a uv environment
