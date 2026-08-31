@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinRetain Enterprise — Banking Customer Retention Console</title>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Top Executive Navbar -->
+        <header class="top-navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1>FinRetain <span class="brand-highlight">Enterprise</span></h1>
+                        <span class="brand-sub">Retail & Commercial Banking Customer Retention Console</span>
+                    </div>
+                </div>
+
+                <div class="header-status-strip">
+                    <div class="status-chip chip-active">
+                        <span class="pulse-indicator"></span>
+                        <span>AI Early Warning System Active</span>
+                    </div>
+                    <div class="status-chip chip-portfolio">
+                        <i class="fa-solid fa-users"></i>
+                        <span>10,000 Accounts Audited</span>
+                    </div>
+                </div>
+
+                <div class="nav-actions">
+                    <button class="btn-export" id="exportCsvBtn" title="Export Current Filtered Account List">
+                        <i class="fa-solid fa-file-export"></i>
+                        <span>Export Roster</span>
+                    </button>
+                    <button class="btn-refresh" id="refreshBtn" title="Synchronize Live Data">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Sync</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Viewport -->
+        <main class="dashboard-main">
+            <!-- Top Summary Section: 4 KPI Cards + Capital Exposure Banner -->
+            <section class="summary-section">
+                <!-- 4 Main Account Health Cards -->
+                <div class="kpi-quad-grid">
+                    <!-- 1. Total Active Accounts -->
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper bg-blue-subtle text-blue">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">Active Accounts</span>
+                            <div class="kpi-main-val" id="kpi-total-customers">10,000</div>
+                            <span class="kpi-sub-text"><i class="fa-solid fa-shield-halved"></i> 100% Portfolio Audited</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. High Risk Accounts -->
+                    <div class="kpi-card border-left-danger clickable-card" onclick="setRiskFilter('High')">
+                        <div class="kpi-icon-wrapper bg-red-subtle text-red">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <div class="kpi-header-row">
+                                <span class="kpi-title">High Risk Accounts</span>
+                                <span class="kpi-badge badge-high" id="kpi-high-pct">21.4%</span>
+                            </div>
+                            <div class="kpi-main-val text-red" id="kpi-high-risk">2,142</div>
+                            <span class="kpi-sub-text text-red-dark"><i class="fa-solid fa-bolt"></i> Immediate Action</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Watchlist Accounts -->
+                    <div class="kpi-card border-left-warning clickable-card" onclick="setRiskFilter('Medium')">
+                        <div class="kpi-icon-wrapper bg-amber-subtle text-amber">
+                            <i class="fa-solid fa-eye"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <div class="kpi-header-row">
+                                <span class="kpi-title">Watchlist Accounts</span>
+                                <span class="kpi-badge badge-medium" id="kpi-med-pct">9.7%</span>
+                            </div>
+                            <div class="kpi-main-val text-amber" id="kpi-med-risk">973</div>
+                            <span class="kpi-sub-text text-amber-dark"><i class="fa-solid fa-clock-rotate-left"></i> Relationship Nurture</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Healthy Accounts -->
+                    <div class="kpi-card border-left-success clickable-card" onclick="setRiskFilter('Low')">
+                        <div class="kpi-icon-wrapper bg-emerald-subtle text-emerald">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <div class="kpi-header-row">
+                                <span class="kpi-title">Healthy & Engaged</span>
+                                <span class="kpi-badge badge-low" id="kpi-low-pct">68.9%</span>
+                            </div>
+                            <div class="kpi-main-val text-emerald" id="kpi-low-risk">6,885</div>
+                            <span class="kpi-sub-text text-emerald-dark"><i class="fa-solid fa-arrow-trend-up"></i> Stable Retention</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Executive Capital & Revenue Exposure Banner -->
+                <div class="capital-banner">
+                    <div class="capital-item">
+                        <div class="capital-icon text-rose bg-rose-subtle">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                        </div>
+                        <div>
+                            <span class="capital-label">Annual Revenue at Risk</span>
+                            <div class="capital-value text-rose" id="kpi-revenue-risk">₹0.00M</div>
+                            <span class="capital-sub">High & Watchlist Portfolio Exposure</span>
+                        </div>
+                    </div>
+
+                    <div class="capital-divider"></div>
+
+                    <div class="capital-item">
+                        <div class="capital-icon text-slate bg-slate-subtle">
+                            <i class="fa-solid fa-vault"></i>
+                        </div>
+                        <div>
+                            <span class="capital-label">Total Portfolio Annual Value</span>
+                            <div class="capital-value" id="kpi-portfolio-val">₹0.00M</div>
+                            <span class="capital-sub">Total Bank Customer Annual Contribution</span>
+                        </div>
+                    </div>
+
+                    <div class="capital-divider"></div>
+
+                    <div class="capital-item capital-progress-item">
+                        <div class="capital-progress-header">
+                            <span class="capital-label">Portfolio Risk Exposure Ratio</span>
+                            <strong class="text-rose" id="capitalRiskRatio">0.0%</strong>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill bg-rose" id="capitalProgressBar" style="width: 0%;"></div>
+                        </div>
+                        <span class="capital-sub">Proportion of annual portfolio revenue under active churn risk</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 1: Core Risk Analytics (Donut Health Breakdown + Top Early Warning Triggers) -->
+            <section class="grid-2-col">
+                <!-- 1. Portfolio Churn Risk Breakdown -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <i class="fa-solid fa-chart-pie text-indigo"></i>
+                            <div>
+                                <h3>Portfolio Health & Risk Distribution</h3>
+                                <p class="panel-desc">Account volume and attrition risk tier classification</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-container-doughnut">
+                            <canvas id="riskDistChart"></canvas>
+                        </div>
+                        <div class="risk-stats-legend" id="riskStatsLegend">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Top Early Warning Triggers -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <i class="fa-solid fa-triangle-exclamation text-red"></i>
+                            <div>
+                                <h3>Key Early Warning Triggers (Portfolio Churn Drivers)</h3>
+                                <p class="panel-desc">Primary behavioral friction signals pushing accounts toward defection</p>
+                            </div>
+                        </div>
+                        <span class="panel-tag">50,000 Account Audits</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="top-factors-grid">
+                            <div class="factors-chart-wrap">
+                                <canvas id="topFactorsChart"></canvas>
+                            </div>
+                            <div class="factors-list-wrap" id="topFactorsList">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 2: Tactical Visualizations (RM Action Queue, Root Causes, Cross-Sell Depth) -->
+            <section class="grid-3-col">
+                <!-- 1. RM Priority Action Queue -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <i class="fa-solid fa-list-check text-blue"></i>
+                            <div>
+                                <h3>RM Priority Action Queue</h3>
+                                <p class="panel-desc">Targeted retention interventions to assign</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-container-standard">
+                            <canvas id="actionsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Root Causes of Friction -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <i class="fa-solid fa-magnifying-glass-chart text-amber"></i>
+                            <div>
+                                <h3>Root Causes of Friction</h3>
+                                <p class="panel-desc">Core customer pain points diagnosed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-container-standard">
+                            <canvas id="reasonsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Product Depth Impact -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <i class="fa-solid fa-layer-group text-emerald"></i>
+                            <div>
+                                <h3>Product Depth vs. Churn Rate</h3>
+                                <p class="panel-desc">Impact of product holding count on retention</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-container-standard">
+                            <canvas id="productDepthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 3: Customer Segment Vulnerability Cards -->
+            <section class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <i class="fa-solid fa-cubes text-slate"></i>
+                        <div>
+                            <h3>Customer Segment Vulnerability & Capital Exposure</h3>
+                            <p class="panel-desc">Click any segment to instantly filter the customer directory below</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="segment-cards-grid" id="segmentCardsGrid">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 4: Actionable Customer Intelligence Directory -->
+            <section class="dashboard-panel table-panel" id="customerDirectorySection">
+                <div class="panel-header table-panel-header">
+                    <div class="panel-title-group">
+                        <i class="fa-solid fa-address-book text-blue"></i>
+                        <div>
+                            <h3>Customer Account Directory & Retention Playbook</h3>
+                            <p class="panel-desc">Roster with individual risk scores, primary friction points, and targeted next best actions</p>
+                        </div>
+                    </div>
+                    <div class="directory-counter-badge" id="directoryCounter">
+                        Showing <strong id="currentShownCount">0</strong> of <strong id="totalMatchedCount">0</strong> accounts
+                    </div>
+                </div>
+
+                <!-- Filter & Search Toolbar -->
+                <div class="filter-toolbar">
+                    <!-- Risk Filter Tabs -->
+                    <div class="filter-tabs" id="riskFilterTabs">
+                        <button class="filter-tab active" data-risk="all">All Accounts <span class="tab-count" id="tab-count-all">10,000</span></button>
+                        <button class="filter-tab tab-high" data-risk="High"><i class="fa-solid fa-triangle-exclamation"></i> High Risk <span class="tab-count" id="tab-count-high">0</span></button>
+                        <button class="filter-tab tab-med" data-risk="Medium"><i class="fa-solid fa-eye"></i> Watchlist <span class="tab-count" id="tab-count-med">0</span></button>
+                        <button class="filter-tab tab-low" data-risk="Low"><i class="fa-solid fa-shield"></i> Healthy <span class="tab-count" id="tab-count-low">0</span></button>
+                    </div>
+
+                    <!-- Dropdowns & Search Controls -->
+                    <div class="filter-controls-row">
+                        <!-- Segment Filter -->
+                        <div class="control-group">
+                            <label><i class="fa-solid fa-users-viewfinder"></i> Segment:</label>
+                            <select id="filterSegment" class="filter-dropdown">
+                                <option value="all">All Segments</option>
+                                <option value="salary">Salary</option>
+                                <option value="pension">Pension</option>
+                                <option value="farmer">Farmer</option>
+                                <option value="vendor">Vendor</option>
+                                <option value="business">Business</option>
+                            </select>
+                        </div>
+
+                        <!-- Retention Play Filter -->
+                        <div class="control-group">
+                            <label><i class="fa-solid fa-handshake-angle"></i> Action Play:</label>
+                            <select id="filterAction" class="filter-dropdown">
+                                <option value="all">All Action Plays</option>
+                                <option value="RM_CALLBACK">RM Callback</option>
+                                <option value="COMPLAINT_ESCALATION">Complaint Escalation</option>
+                                <option value="SERVICE_RECOVERY">Service Recovery</option>
+                                <option value="FEE_WAIVER_REVIEW">Fee Waiver Review</option>
+                                <option value="FINANCIAL_GUIDANCE">Financial Guidance</option>
+                                <option value="LOAN_REVIEW">Loan Restructure Review</option>
+                                <option value="PRODUCT_REVIEW">Product Review</option>
+                                <option value="RE_ENGAGEMENT">Re-engagement</option>
+                                <option value="MONITOR">Monitor Account</option>
+                            </select>
+                        </div>
+
+                        <!-- Urgency Filter -->
+                        <div class="control-group">
+                            <label><i class="fa-solid fa-gauge-high"></i> Urgency:</label>
+                            <select id="filterUrgency" class="filter-dropdown">
+                                <option value="all">All Urgency Tiers</option>
+                                <option value="HIGH">High Priority</option>
+                                <option value="MEDIUM">Medium Priority</option>
+                                <option value="LOW">Routine / Low</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort By -->
+                        <div class="control-group">
+                            <label><i class="fa-solid fa-arrow-down-wide-short"></i> Sort:</label>
+                            <select id="filterSort" class="filter-dropdown">
+                                <option value="risk_score-desc">Highest Churn Risk</option>
+                                <option value="churn_probability-desc">Highest Churn %</option>
+                                <option value="customer_yearly_value-desc">Highest Annual Value</option>
+                                <option value="tenure_months-desc">Longest Tenure</option>
+                                <option value="customer_name-asc">Customer Name (A-Z)</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Box -->
+                        <div class="search-input-group">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="searchInput" placeholder="Search Account ID or Name..." class="search-field">
+                            <button id="clearSearchBtn" class="search-clear-btn" title="Clear Search" style="display:none;">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Table Container -->
+                <div class="table-container">
+                    <table class="data-table" id="customerTable">
+                        <thead>
+                            <tr>
+                                <th>Customer / Account</th>
+                                <th>Segment & Tier</th>
+                                <th>Annual Value</th>
+                                <th>Risk Tier</th>
+                                <th>Churn Probability</th>
+                                <th>Primary Pain Point</th>
+                                <th>Recommended Next Best Action</th>
+                                <th class="text-right">Account Audit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customerTableBody">
+                            <!-- Dynamic customer rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Footer -->
+                <div class="table-footer">
+                    <div class="pagination-summary">
+                        Page <span id="currentPageNum">1</span> of <span id="totalPagesNum">1</span>
+                    </div>
+                    <div class="pagination-actions">
+                        <button class="btn-paginate" id="prevPageBtn" disabled><i class="fa-solid fa-chevron-left"></i> Previous</button>
+                        <button class="btn-paginate" id="nextPageBtn">Next <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Executive Customer Account Diagnostic Modal -->
+    <div id="customerModal" class="modal-overlay">
+        <div class="modal-window">
+            <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+            <div id="modalContent">
+                <div class="modal-loading-state">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <p>Auditing account data & behavioral logs...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
