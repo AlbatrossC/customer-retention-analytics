@@ -220,6 +220,18 @@ def select_model1_records(
     return sorted(selected, key=lambda item: str(item["customer_id"]))
 
 
+def select_all_risk_records(
+    model1_outputs: dict[str, dict[str, Any]],
+    risk_levels: tuple[str, ...],
+) -> list[dict[str, Any]]:
+    selected = [
+        record
+        for record in model1_outputs.values()
+        if record["model1_output"].get("risk_level") in risk_levels
+    ]
+    return sorted(selected, key=lambda item: str(item["customer_id"]))
+
+
 def customer_histories(df: pd.DataFrame, selected_ids: list[str]) -> dict[str, pd.DataFrame]:
     df = df.copy()
     df["customer_id"] = df["customer_id"].astype(str)
@@ -476,6 +488,7 @@ def run_pipeline(
     limit: int,
     include_low_risk: bool,
     fill_shortfall: bool,
+    all_high_medium: bool,
     workers: int,
     resume: bool,
     checkpoint_every: int,
@@ -483,14 +496,17 @@ def run_pipeline(
     started_at = time.perf_counter()
     print(f"Loading Model 1 outputs from {model1_json}", flush=True)
     model1_outputs = load_model1_outputs(model1_json)
-    selected_records = select_model1_records(model1_outputs, limit, include_low_risk, fill_shortfall)
+    if all_high_medium:
+        selected_records = select_all_risk_records(model1_outputs, ("High", "Medium"))
+    else:
+        selected_records = select_model1_records(model1_outputs, limit, include_low_risk, fill_shortfall)
     selected_ids = [str(record["customer_id"]) for record in selected_records]
     selected_by_id = {str(record["customer_id"]): record for record in selected_records}
     selected_risk_counts = risk_summary(
         [{"risk_level": record["model1_output"].get("risk_level")} for record in selected_records]
     )
 
-    skipped_low_risk = quota_for_limit(limit)["Low"] if not include_low_risk else 0
+    skipped_low_risk = 0 if all_high_medium else quota_for_limit(limit)["Low"] if not include_low_risk else 0
     existing_path = resume_from_json or output_json
     existing_results = load_existing_results(existing_path) if resume else {}
     ids_to_process = [customer_id for customer_id in selected_ids if customer_id not in existing_results]
@@ -498,6 +514,8 @@ def run_pipeline(
 
     print(f"Selected customers from Model 1 JSON: {len(selected_ids):,}", flush=True)
     print(f"Selected risk split: {selected_risk_counts}", flush=True)
+    if all_high_medium:
+        print("All High and Medium customers are selected; Low customers are excluded.", flush=True)
     if fill_shortfall and len(selected_ids) == limit:
         print("Quota shortfall fill is enabled, so unavailable bucket counts are topped up from other selected risks.", flush=True)
     if not include_low_risk:
@@ -586,6 +604,11 @@ def main() -> None:
     )
     parser.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help="Recommended customer pool size.")
     parser.add_argument(
+        "--all-high-medium",
+        action="store_true",
+        help="Select every High and Medium customer from Model 1 JSON, ignoring quota limits and excluding Low.",
+    )
+    parser.add_argument(
         "--include-low-risk",
         action="store_true",
         help="Also run Devang for the selected low-risk customers. Default processes High and Medium only.",
@@ -620,6 +643,7 @@ def main() -> None:
         limit=args.limit,
         include_low_risk=args.include_low_risk,
         fill_shortfall=args.fill_shortfall,
+        all_high_medium=args.all_high_medium,
         workers=args.workers,
         resume=args.resume,
         checkpoint_every=args.checkpoint_every,
