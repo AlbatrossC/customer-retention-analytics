@@ -35,6 +35,7 @@ MAX_RETRIES = 3
 MIN_ELIGIBLE_ACTIONS = 3
 MAX_ELIGIBLE_ACTIONS = 5
 MAX_TOP_RISK_FACTORS = 3
+PRINT_PREDICTIONS = True
 
 # Model 1 emits a calibrated (sigmoid) probability that runs roughly 0.015-0.43.
 # Model 2 was fine-tuned on churn_probability in the 0.18-0.78 range, which matches
@@ -656,7 +657,8 @@ def predict_one(record: dict[str, Any]) -> dict[str, Any]:
         "latency_s": round(time.perf_counter() - started_at, 4),
     }
     output["simple_output"] = simple_output(output)
-    print(output["simple_output"])
+    if PRINT_PREDICTIONS:
+        print(output["simple_output"])
     return output
 
 
