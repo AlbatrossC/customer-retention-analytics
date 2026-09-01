@@ -24,13 +24,13 @@ from sklearn.preprocessing import StandardScaler
 ROOT = Path(__file__).resolve().parents[1]
 DB_DIR = ROOT / "database"
 DB_PATH = DB_DIR / "customer_retention.db"
-SAMPLE_DB_PATH = DB_DIR / "sample_customer_retention.db"
 SCHEMA_PATH = DB_DIR / "schema.sql"
 
 CUSTOMERS_CSV = ROOT / "model_1_v2" / "data" / "customers.csv"
 MODEL1_JSON = ROOT / "pre_processing" / "outputs" / "model_1_v2_customer_outputs.json"
 MODEL2_JSON = ROOT / "pre_processing" / "outputs" / "devang_model2_pipeline_outputs.json"
 MODEL2_REMAINING_JSON = ROOT / "pre_processing" / "outputs" / "remaining_high_medium_risk_customers.json"
+MODEL2_LOW_RISK_JSON = ROOT / "pre_processing" / "outputs" / "top_low_risk_customers.json"
 
 CLUSTERING_FEATURES = [
     "balance_change_30d",
@@ -81,7 +81,7 @@ def load_model1_json() -> list[dict]:
 
 
 def load_model2_json() -> list[dict]:
-    """Load Model 2 output from both JSON files, deduplicating by customer_id."""
+    """Load Model 2 output from all JSON files, deduplicating by customer_id."""
     with open(MODEL2_JSON, "r", encoding="utf-8") as f:
         data1 = json.load(f)
     customers1 = data1["customers"]
@@ -95,7 +95,21 @@ def load_model2_json() -> list[dict]:
     seen = set(c["customer_id"] for c in customers1)
     new_customers = [c for c in customers2 if c["customer_id"] not in seen]
     merged = customers1 + new_customers
-    print(f"  Merged: {len(merged):,} unique Model 2 customers ({len(customers2) - len(new_customers):,} duplicates skipped)")
+    print(f"  Merged (high+med): {len(merged):,} unique Model 2 customers ({len(customers2) - len(new_customers):,} duplicates skipped)")
+
+    # Add top low-risk customers with model2 output
+    if MODEL2_LOW_RISK_JSON.exists():
+        with open(MODEL2_LOW_RISK_JSON, "r", encoding="utf-8") as f:
+            data3 = json.load(f)
+        customers3 = data3["customers"]
+        print(f"  Loaded {len(customers3):,} customers from top_low_risk_customers.json")
+        seen = set(c["customer_id"] for c in merged)
+        new_low = [c for c in customers3 if c["customer_id"] not in seen]
+        merged = merged + new_low
+        print(f"  Final merged: {len(merged):,} unique Model 2 customers (+{len(new_low)} low-risk)")
+    else:
+        print(f"  (Skipping low-risk model2 — {MODEL2_LOW_RISK_JSON.name} not found)")
+
     return merged
 
 
@@ -425,16 +439,13 @@ def print_counts(conn: sqlite3.Connection) -> None:
 
 
 def main() -> None:
-    print("Building real customer_retention.db and sample_customer_retention.db...")
+    print("Building customer_retention.db from real processed source files...")
     print()
 
     # Delete existing DB
     if DB_PATH.exists():
         DB_PATH.unlink()
         print(f"  Deleted existing {DB_PATH.name}")
-    if SAMPLE_DB_PATH.exists():
-        SAMPLE_DB_PATH.unlink()
-        print(f"  Deleted existing {SAMPLE_DB_PATH.name}")
 
     # Load sources
     print("Loading source data...")
@@ -475,10 +486,6 @@ def main() -> None:
     conn.commit()
     print_counts(conn)
     conn.close()
-
-    # Copy identical database to sample_customer_retention.db
-    shutil.copyfile(DB_PATH, SAMPLE_DB_PATH)
-    print(f"  Copied real database to {SAMPLE_DB_PATH.name}")
 
     size_mb = DB_PATH.stat().st_size / (1024 * 1024)
     print(f"\nDone. Database: {DB_PATH} ({size_mb:.1f} MB)")

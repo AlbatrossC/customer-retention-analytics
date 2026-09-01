@@ -271,6 +271,24 @@ def dashboard_stats():
         'failed_txns': round(r['avg_fail'] or 0, 2)
     } for r in trend_rows]
 
+    # Model 2 AI coverage by risk level
+    m2_coverage_rows = conn.execute('''
+        SELECT m1.risk_level,
+               COUNT(*) as total,
+               SUM(CASE WHEN m2.customer_id IS NOT NULL THEN 1 ELSE 0 END) as analyzed
+        FROM model1_predictions m1
+        LEFT JOIN model2_predictions m2 ON m1.customer_id = m2.customer_id
+        GROUP BY m1.risk_level
+    ''').fetchall()
+    m2_coverage = {}
+    total_analyzed = 0
+    for r in m2_coverage_rows:
+        m2_coverage[r['risk_level']] = {
+            'total': r['total'],
+            'analyzed': r['analyzed'],
+        }
+        total_analyzed += r['analyzed']
+
     conn.close()
     return jsonify({
         'total_customers': total,
@@ -286,6 +304,8 @@ def dashboard_stats():
         'segment_clusters': segments,
         'product_depth_stats': product_depth,
         'monthly_trends': monthly_trends,
+        'model2_coverage': m2_coverage,
+        'total_analyzed': total_analyzed,
     })
 
 # ---------------------------------------------------------------------------

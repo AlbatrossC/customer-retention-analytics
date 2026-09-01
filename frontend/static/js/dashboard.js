@@ -234,6 +234,7 @@ async function loadDashboard() {
         state.dashData = data;
         
         try { renderKPIs(data); } catch (e) { console.error('Error in renderKPIs:', e); }
+        try { renderAICoverage(data); } catch (e) { console.error('Error in renderAICoverage:', e); }
         try { renderRiskChart(data); } catch (e) { console.error('Error in renderRiskChart:', e); }
         try { renderTopFactors(data); } catch (e) { console.error('Error in renderTopFactors:', e); }
         try { renderActionsChart(data); } catch (e) { console.error('Error in renderActionsChart:', e); }
@@ -274,6 +275,30 @@ function renderKPIs(d) {
     setText('kpi-risk-ratio', `${ratio}%`);
     const bar = document.getElementById('kpi-progress-bar');
     if (bar) bar.style.width = `${Math.min(100, parseFloat(ratio))}%`;
+}
+
+function renderAICoverage(d) {
+    const coverage = d.model2_coverage || {};
+    const totalAnalyzed = d.total_analyzed || 0;
+    const totalCustomers = d.total_customers || 10000;
+
+    setText('ai-total-analyzed', totalAnalyzed.toLocaleString());
+    setText('ai-total-customers', totalCustomers.toLocaleString());
+
+    const tiers = [
+        { key: 'High', barId: 'ai-bar-high', statId: 'ai-stat-high' },
+        { key: 'Medium', barId: 'ai-bar-med', statId: 'ai-stat-med' },
+        { key: 'Low', barId: 'ai-bar-low', statId: 'ai-stat-low' },
+    ];
+
+    for (const tier of tiers) {
+        const data = coverage[tier.key] || { total: 0, analyzed: 0 };
+        const pct = data.total > 0 ? ((data.analyzed / data.total) * 100).toFixed(1) : '0.0';
+        const bar = document.getElementById(tier.barId);
+        const stat = document.getElementById(tier.statId);
+        if (bar) bar.style.width = `${pct}%`;
+        if (stat) stat.textContent = `${data.analyzed.toLocaleString()} / ${data.total.toLocaleString()} (${pct}%)`;
+    }
 }
 
 function renderRiskChart(d) {
