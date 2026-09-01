@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.0">
 </head>
 <body>
     <div class="app-shell">
@@ -25,26 +25,26 @@
             </div>
 
             <nav class="sidebar-nav">
-                <button class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+                <a class="nav-item active" href="/" data-tab="dashboard" id="nav-dashboard">
                     <i class="fa-solid fa-chart-line"></i>
                     <span>Dashboard</span>
-                </button>
-                <button class="nav-item" data-tab="customers" id="nav-customers">
+                </a>
+                <a class="nav-item" href="/customer-directory" data-tab="customers" id="nav-customers">
                     <i class="fa-solid fa-address-book"></i>
                     <span>Customer Directory</span>
-                </button>
-                <button class="nav-item" data-tab="analysis" id="nav-analysis">
+                </a>
+                <a class="nav-item" href="/individual-analysis" data-tab="analysis" id="nav-analysis">
                     <i class="fa-solid fa-user-magnifying-glass"></i>
                     <span>Individual Analysis</span>
-                </button>
-                <button class="nav-item" data-tab="clusters" id="nav-clusters">
+                </a>
+                <a class="nav-item" href="/cluster-analysis" data-tab="clusters" id="nav-clusters">
                     <i class="fa-solid fa-object-group"></i>
                     <span>Cluster Analysis</span>
-                </button>
-                <button class="nav-item" data-tab="visualizations" id="nav-visualizations">
+                </a>
+                <a class="nav-item" href="/visualizations" data-tab="visualizations" id="nav-visualizations">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Visualizations</span>
-                </button>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -93,11 +93,11 @@
                         </div>
                     </div>
                     <div class="kpi-card border-warning clickable" onclick="window.setRiskFilter('Medium')">
-                        <div class="kpi-icon bg-amber-subtle"><i class="fa-solid fa-eye text-amber"></i></div>
+                        <div class="kpi-icon bg-amber-subtle"><i class="fa-solid fa-triangle-exclamation text-amber"></i></div>
                         <div class="kpi-body">
-                            <div class="kpi-header-row"><span class="kpi-label">Watchlist</span><span class="badge badge-med" id="kpi-med-pct">0%</span></div>
+                            <div class="kpi-header-row"><span class="kpi-label">Medium Risk</span><span class="badge badge-med" id="kpi-med-pct">0%</span></div>
                             <div class="kpi-value text-amber" id="kpi-med">0</div>
-                            <span class="kpi-sub text-amber"><i class="fa-solid fa-clock-rotate-left"></i> Nurture</span>
+                            <span class="kpi-sub text-amber"><i class="fa-solid fa-clock-rotate-left"></i> Proactive Nurture</span>
                         </div>
                     </div>
                     <div class="kpi-card border-success clickable" onclick="window.setRiskFilter('Low')">
@@ -133,27 +133,38 @@
                 <!-- Charts Row 1 -->
                 <div class="grid-2">
                     <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-chart-pie text-indigo"></i><div><h3>Risk Distribution</h3><p class="panel-desc">Account risk tier classification</p></div></div>
-                        <div class="panel-body"><div class="chart-wrap-donut"><canvas id="riskDistChart"></canvas></div><div id="riskLegend" class="risk-legend"></div></div>
+                        <div class="panel-header"><i class="fa-solid fa-chart-pie text-blue"></i><div><h3>Risk Distribution</h3><p class="panel-desc">Account risk tier classification & exposure</p></div></div>
+                        <div class="panel-body">
+                            <div class="chart-wrap-donut">
+                                <canvas id="riskDistChart"></canvas>
+                                <div class="donut-center-stat" id="donutCenterStat">
+                                    <span class="donut-center-val" id="donutCenterVal">10,000</span>
+                                    <span class="donut-center-sub">Audited Accounts</span>
+                                </div>
+                            </div>
+                            <div id="riskLegend" class="risk-legend"></div>
+                        </div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-triangle-exclamation text-red"></i><div><h3>Top Early Warning Triggers</h3><p class="panel-desc">Primary behavioral friction signals</p></div></div>
-                        <div class="panel-body"><div class="factors-grid"><div class="chart-wrap-bar"><canvas id="topFactorsChart"></canvas></div><div id="topFactorsList" class="factors-list"></div></div></div>
+                        <div class="panel-header"><i class="fa-solid fa-triangle-exclamation text-red"></i><div><h3>Top Early Warning Triggers</h3><p class="panel-desc">Primary behavioral friction signals & SHAP contribution</p></div></div>
+                        <div class="panel-body">
+                            <div class="chart-wrap-bar"><canvas id="topFactorsChart"></canvas></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Charts Row 2 -->
                 <div class="grid-3">
                     <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-list-check text-blue"></i><div><h3>RM Action Queue</h3><p class="panel-desc">Retention interventions</p></div></div>
+                        <div class="panel-header"><i class="fa-solid fa-list-check text-blue"></i><div><h3>Next Recommended Action</h3><p class="panel-desc">Prioritized retention workflows & interventions</p></div></div>
                         <div class="panel-body"><div class="chart-wrap-std"><canvas id="actionsChart"></canvas></div></div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart text-amber"></i><div><h3>Root Causes</h3><p class="panel-desc">Customer pain points</p></div></div>
+                        <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart text-amber"></i><div><h3>Primary Root Causes</h3><p class="panel-desc">AI-diagnosed customer friction & pain points</p></div></div>
                         <div class="panel-body"><div class="chart-wrap-std"><canvas id="reasonsChart"></canvas></div></div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-layer-group text-green"></i><div><h3>Product Depth Impact</h3><p class="panel-desc">Products vs. churn rate</p></div></div>
+                        <div class="panel-header"><i class="fa-solid fa-layer-group text-green"></i><div><h3>Product De-adoption Impact</h3><p class="panel-desc">Products dropped (90D) vs. churn risk escalation</p></div></div>
                         <div class="panel-body"><div class="chart-wrap-std"><canvas id="productDepthChart"></canvas></div></div>
                     </div>
                 </div>
@@ -164,10 +175,132 @@
                     <div class="panel-body"><div class="segment-grid" id="segmentGrid"></div></div>
                 </div>
 
-                <!-- Monthly Trends -->
-                <div class="panel">
-                    <div class="panel-header"><i class="fa-solid fa-timeline text-indigo"></i><div><h3>Monthly Portfolio Trends (6 Months)</h3><p class="panel-desc">Balance, transaction, and outflow deltas</p></div></div>
-                    <div class="panel-body"><div class="chart-wrap-wide"><canvas id="monthlyTrendsChart"></canvas></div></div>
+                <!-- Monthly Portfolio Trends (6 Months) -->
+                <div class="panel trends-panel">
+                    <div class="trends-header">
+                        <div class="trends-header-left">
+                            <div class="trends-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+                            <div>
+                                <div class="trends-title-row">
+                                    <h3>Monthly Portfolio Overview (Last 6 Months)</h3>
+                                </div>
+                                <p class="trends-desc">Track how your portfolio balance, transactions and outflows are changing over time.</p>
+                            </div>
+                        </div>
+                        <div class="trends-header-right">
+                            <div class="time-select-wrap">
+                                <i class="fa-regular fa-calendar time-select-icon"></i>
+                                <select id="trendTimeRange" class="time-select-dropdown">
+                                    <option value="6" selected>Last 6 Months</option>
+                                    <option value="3">Last 3 Months</option>
+                                    <option value="2">Last 2 Months</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down time-select-caret"></i>
+                            </div>
+                            <button class="trends-more-btn" id="trendsMoreBtn" title="More options"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="trends-body">
+                        <!-- Top 3 Metric Cards with Mini Sparklines -->
+                        <div class="trend-kpi-grid">
+                            <!-- Balance Card -->
+                            <div class="trend-kpi-card">
+                                <div class="trend-kpi-info">
+                                    <div class="trend-kpi-label">
+                                        <span>BALANCE Δ (CHANGE)</span>
+                                        <i class="fa-solid fa-circle-info" title="Month-over-month average balance change rate"></i>
+                                    </div>
+                                    <div class="trend-kpi-val text-blue" id="trend-bal-val">+3.6% <span class="trend-arrow">↗</span></div>
+                                    <div class="trend-kpi-sub" id="trend-bal-sub">from Jan to Jun 2026</div>
+                                </div>
+                                <div class="trend-spark-wrap"><canvas id="sparkBalance"></canvas></div>
+                            </div>
+
+                            <!-- Transaction Card -->
+                            <div class="trend-kpi-card">
+                                <div class="trend-kpi-info">
+                                    <div class="trend-kpi-label">
+                                        <span>TRANSACTION Δ (CHANGE)</span>
+                                        <i class="fa-solid fa-circle-info" title="Month-over-month average transaction frequency change rate"></i>
+                                    </div>
+                                    <div class="trend-kpi-val text-amber" id="trend-txn-val">+2.2% <span class="trend-arrow">↗</span></div>
+                                    <div class="trend-kpi-sub" id="trend-txn-sub">from Jan to Jun 2026</div>
+                                </div>
+                                <div class="trend-spark-wrap"><canvas id="sparkTransaction"></canvas></div>
+                            </div>
+
+                            <!-- Outflow Card -->
+                            <div class="trend-kpi-card">
+                                <div class="trend-kpi-info">
+                                    <div class="trend-kpi-label">
+                                        <span>OUTFLOW Δ (CHANGE)</span>
+                                        <i class="fa-solid fa-circle-info" title="Net change in external transfer outflows"></i>
+                                    </div>
+                                    <div class="trend-kpi-val text-rose" id="trend-ext-val">-3.0% <span class="trend-arrow">↘</span></div>
+                                    <div class="trend-kpi-sub" id="trend-ext-sub">from Jan to Jun 2026</div>
+                                </div>
+                                <div class="trend-spark-wrap"><canvas id="sparkOutflow"></canvas></div>
+                            </div>
+                        </div>
+
+                        <!-- Main Mixed Chart Container -->
+                        <div class="trend-main-chart-box">
+                            <div class="trend-chart-header">
+                                <div class="trend-chart-subtitle">Change Over Time (vs Previous Month)</div>
+                                <div class="trend-custom-legend">
+                                    <div class="trend-leg-item"><span class="trend-leg-bar"></span><span>Balance Change (%)</span></div>
+                                    <div class="trend-leg-item"><span class="trend-leg-dot dot-txn"></span><span>Transaction Change (%)</span></div>
+                                    <div class="trend-leg-item"><span class="trend-leg-dot dot-ext"></span><span>Outflow Change (%)</span></div>
+                                </div>
+                            </div>
+                            <div class="chart-wrap-mixed">
+                                <canvas id="monthlyTrendsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Insights Banner -->
+                        <div class="trend-bottom-banner">
+                            <div class="trend-banner-left">
+                                <div class="trend-star-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <div class="trend-bullets-wrap">
+                                    <div class="trend-bullets-title">What's happening?</div>
+                                    <div class="trend-bullets-row">
+                                        <div class="trend-bullet-item">
+                                            <span class="bullet-dot bg-indigo"></span>
+                                            <div>
+                                                <strong id="tb-bal-text">Balance improved by +3.6%</strong>
+                                                <span class="bullet-date" id="tb-bal-date">from Jan to Jun 2026</span>
+                                            </div>
+                                        </div>
+                                        <div class="trend-bullet-item">
+                                            <span class="bullet-dot bg-amber"></span>
+                                            <div>
+                                                <strong id="tb-txn-text">Transactions increased by +2.2%</strong>
+                                                <span class="bullet-date" id="tb-txn-date">from Jan to Jun 2026</span>
+                                            </div>
+                                        </div>
+                                        <div class="trend-bullet-item">
+                                            <span class="bullet-dot bg-rose"></span>
+                                            <div>
+                                                <strong id="tb-ext-text">Outflows decreased by -3.0%</strong>
+                                                <span class="bullet-date" id="tb-ext-date">from Jan to Jun 2026</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="trend-insight-card">
+                                <div class="insight-card-title"><i class="fa-regular fa-lightbulb"></i> Insight</div>
+                                <p class="insight-card-text" id="trend-insight-text">Your balance is growing while outflows are reducing — a healthy trend!</p>
+                            </div>
+                        </div>
+
+                        <div class="trend-footer-note">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>All changes are calculated as % change vs the previous month.</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -175,28 +308,93 @@
             <!-- TAB 2: CUSTOMER DIRECTORY -->
             <!-- ============================================================ -->
             <div class="tab-panel" id="tab-customers">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div><i class="fa-solid fa-address-book text-blue"></i><div><h3>Customer Account Directory</h3><p class="panel-desc">Search, filter, and drill into individual accounts</p></div></div>
-                        <div class="directory-counter">Showing <strong id="showCount">0</strong> of <strong id="totalCount">0</strong></div>
+                <div class="panel dir-panel">
+                    <!-- Directory Header -->
+                    <div class="dir-header">
+                        <div class="dir-header-left">
+                            <div class="dir-icon-box"><i class="fa-solid fa-address-book"></i></div>
+                            <div>
+                                <h3>Customer Account Directory</h3>
+                                <p class="panel-desc">Search, filter, and drill into individual accounts</p>
+                            </div>
+                        </div>
+                        <div class="dir-header-right">
+                            <div class="dir-count-chip">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Showing <strong id="showCount">0</strong>–<strong id="showCountEnd">0</strong> of <strong id="totalCount">0</strong></span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Filter Bar -->
                     <div class="filter-bar">
                         <div class="filter-tabs" id="riskTabs">
-                            <button class="ftab active" data-risk="all">All <span id="tc-all">0</span></button>
-                            <button class="ftab ftab-high" data-risk="High"><i class="fa-solid fa-triangle-exclamation"></i> High <span id="tc-high">0</span></button>
-                            <button class="ftab ftab-med" data-risk="Medium"><i class="fa-solid fa-eye"></i> Watch <span id="tc-med">0</span></button>
-                            <button class="ftab ftab-low" data-risk="Low"><i class="fa-solid fa-shield"></i> Healthy <span id="tc-low">0</span></button>
+                            <button class="ftab active" data-risk="all">
+                                <i class="fa-solid fa-layer-group"></i> All
+                                <span class="ftab-count" id="tc-all">0</span>
+                            </button>
+                            <button class="ftab ftab-high" data-risk="High">
+                                <i class="fa-solid fa-circle-exclamation"></i> High Risk
+                                <span class="ftab-count ftab-count-high" id="tc-high">0</span>
+                            </button>
+                            <button class="ftab ftab-med" data-risk="Medium">
+                                <i class="fa-solid fa-circle-half-stroke"></i> Medium Risk
+                                <span class="ftab-count ftab-count-med" id="tc-med">0</span>
+                            </button>
+                            <button class="ftab ftab-low" data-risk="Low">
+                                <i class="fa-solid fa-shield-check"></i> Healthy
+                                <span class="ftab-count ftab-count-low" id="tc-low">0</span>
+                            </button>
                         </div>
                         <div class="filter-controls">
-                            <select id="fSegment" class="filter-select"><option value="all">All Segments</option><option value="salary">Salary</option><option value="pension">Pension</option><option value="farmer">Farmer</option><option value="vendor">Vendor</option><option value="business">Business</option></select>
-                            <select id="fAction" class="filter-select"><option value="all">All Actions</option><option value="COMPLAINT_ESCALATION">Complaint Escalation</option><option value="FINANCIAL_GUIDANCE">Financial Guidance</option><option value="SERVICE_RECOVERY">Service Recovery</option><option value="RE_ENGAGEMENT">Re-engagement</option><option value="FEE_WAIVER_REVIEW">Fee Waiver</option><option value="PRODUCT_REVIEW">Product Review</option><option value="RM_CALLBACK">RM Callback</option><option value="LOAN_REVIEW">Loan Review</option><option value="CARD_REVIEW">Card Review</option><option value="MONITOR">Monitor</option></select>
-                            <select id="fUrgency" class="filter-select"><option value="all">All Urgency</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option><option value="LOW">Low</option></select>
-                            <select id="fSort" class="filter-select"><option value="risk_score-desc">Highest Risk</option><option value="churn_probability-desc">Highest Churn %</option><option value="customer_yearly_value-desc">Highest Value</option><option value="tenure_months-desc">Longest Tenure</option><option value="customer_name-asc">Name (A-Z)</option></select>
+                            <div class="filter-select-wrap">
+                                <i class="fa-solid fa-users-between-lines fsel-icon"></i>
+                                <select id="fSegment" class="filter-select">
+                                    <option value="all">All Segments</option>
+                                    <option value="salary">Salary</option>
+                                    <option value="pension">Pension</option>
+                                    <option value="farmer">Farmer</option>
+                                    <option value="vendor">Vendor</option>
+                                    <option value="business">Business</option>
+                                </select>
+                            </div>
+                            <div class="filter-select-wrap">
+                                <i class="fa-solid fa-bolt fsel-icon"></i>
+                                <select id="fAction" class="filter-select">
+                                    <option value="all">All Actions</option>
+                                    <option value="COMPLAINT_ESCALATION">Complaint Escalation</option>
+                                    <option value="FINANCIAL_GUIDANCE">Financial Guidance</option>
+                                    <option value="SERVICE_RECOVERY">Service Recovery</option>
+                                    <option value="RE_ENGAGEMENT">Re-engagement</option>
+                                    <option value="FEE_WAIVER_REVIEW">Fee Waiver</option>
+                                    <option value="PRODUCT_REVIEW">Product Review</option>
+                                    <option value="RM_CALLBACK">RM Callback</option>
+                                    <option value="LOAN_REVIEW">Loan Review</option>
+                                    <option value="CARD_REVIEW">Card Review</option>
+                                    <option value="MONITOR">Monitor</option>
+                                </select>
+                            </div>
+                            <div class="filter-select-wrap">
+                                <i class="fa-solid fa-fire-flame-curved fsel-icon"></i>
+                                <select id="fUrgency" class="filter-select">
+                                    <option value="all">All Urgency</option>
+                                    <option value="HIGH">High</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="LOW">Low</option>
+                                </select>
+                            </div>
+                            <div class="filter-select-wrap">
+                                <i class="fa-solid fa-arrow-up-wide-short fsel-icon"></i>
+                                <select id="fSort" class="filter-select">
+                                    <option value="risk_score-desc">Highest Risk Score</option>
+                                    <option value="customer_yearly_value-desc">Highest Value</option>
+                                    <option value="tenure_months-desc">Longest Tenure</option>
+                                    <option value="customer_name-asc">Name (A–Z)</option>
+                                </select>
+                            </div>
                             <div class="search-box">
                                 <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="searchInput" placeholder="Search ID or Name...">
+                                <input type="text" id="searchInput" placeholder="Search by name or ID…">
                                 <button id="clearSearch" class="search-clear" style="display:none">&times;</button>
                             </div>
                         </div>
@@ -206,8 +404,14 @@
                     <div class="table-scroll">
                         <table class="data-table" id="custTable">
                             <thead><tr>
-                                <th>Customer</th><th>Segment</th><th>Annual Value</th><th>Risk Tier</th>
-                                <th>Churn %</th><th>Pain Point</th><th>Next Action</th><th>Cluster</th><th class="text-right">Audit</th>
+                                <th style="min-width:200px">Account</th>
+                                <th>Segment</th>
+                                <th>Risk Tier</th>
+                                <th>Risk Score</th>
+                                <th>Friction Signal</th>
+                                <th>Next Action</th>
+                                <th>Urgency</th>
+                                <th class="text-right">Profile</th>
                             </tr></thead>
                             <tbody id="custBody"></tbody>
                         </table>
@@ -215,10 +419,16 @@
 
                     <!-- Pagination -->
                     <div class="table-footer">
-                        <span>Page <span id="pageNum">1</span> of <span id="totalPages">1</span></span>
+                        <div class="page-info">
+                            <span class="page-range">Page <strong id="pageNum">1</strong> of <strong id="totalPages">1</strong></span>
+                        </div>
                         <div class="page-btns">
-                            <button class="btn-page" id="prevBtn" disabled><i class="fa-solid fa-chevron-left"></i> Previous</button>
-                            <button class="btn-page" id="nextBtn">Next <i class="fa-solid fa-chevron-right"></i></button>
+                            <button class="btn-page" id="prevBtn" disabled>
+                                <i class="fa-solid fa-chevron-left"></i> Prev
+                            </button>
+                            <button class="btn-page" id="nextBtn">
+                                Next <i class="fa-solid fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -229,7 +439,7 @@
             <!-- ============================================================ -->
             <div class="tab-panel" id="tab-analysis">
                 <div class="panel">
-                    <div class="panel-header"><i class="fa-solid fa-user-magnifying-glass text-indigo"></i><div><h3>Individual Retention Analysis</h3><p class="panel-desc">Enter a customer ID to view detailed retention analysis</p></div></div>
+                    <div class="panel-header"><i class="fa-solid fa-user-magnifying-glass text-blue"></i><div><h3>Individual Retention Analysis</h3><p class="panel-desc">Enter a customer ID to view detailed retention analysis</p></div></div>
                     <div class="panel-body">
                         <div class="analysis-search-wrap">
                             <div class="analysis-search-box">
@@ -252,31 +462,120 @@
             <!-- TAB 4: CLUSTER ANALYSIS -->
             <!-- ============================================================ -->
             <div class="tab-panel" id="tab-clusters">
+                <!-- Explanatory Header Banner -->
+                <div class="cluster-hero-banner">
+                    <div class="cluster-hero-left">
+                        <div class="cluster-hero-icon"><i class="fa-solid fa-brain"></i></div>
+                        <div>
+                            <h2>AI Behavioral Customer Clusters (5 Cohorts)</h2>
+                            <p>Unsupervised K-Means clustering segments 10,000 accounts into 5 distinct behavioral profiles across balance deltas, transaction velocity, complaints, and capital outflows.</p>
+                        </div>
+                    </div>
+                    <div class="cluster-hero-badge">
+                        <i class="fa-solid fa-circle-check"></i> 100% Portfolio Clustered
+                    </div>
+                </div>
+
+                <!-- 5 Visual Cohort Cards Grid -->
                 <div class="panel">
-                    <div class="panel-header"><i class="fa-solid fa-object-group text-indigo"></i><div><h3>Customer Cluster Analysis</h3><p class="panel-desc">K-Means behavioral clustering based on top Model 1 v2 features</p></div></div>
+                    <div class="panel-header">
+                        <i class="fa-solid fa-users-viewfinder text-blue"></i>
+                        <div>
+                            <h3>Select a Cohort to Drill Down</h3>
+                            <p class="panel-desc">Click any persona card below to inspect its behavioral traits and account members</p>
+                        </div>
+                    </div>
                     <div class="panel-body">
                         <div id="clusterOverview" class="cluster-overview-grid"></div>
                     </div>
                 </div>
 
-                <!-- Radar Chart Comparison -->
-                <div class="panel" id="clusterRadarPanel" style="display:none">
-                    <div class="panel-header"><i class="fa-solid fa-chart-radar text-blue"></i><div><h3>Cluster Feature Comparison</h3><p class="panel-desc">Normalized feature profiles across clusters</p></div></div>
-                    <div class="panel-body"><div class="chart-wrap-wide"><canvas id="clusterRadarChart"></canvas></div></div>
+                <!-- Visual Comparison Section: Side-by-Side Dual Charts -->
+                <div class="grid-2">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <i class="fa-solid fa-chart-radar text-blue"></i>
+                            <div>
+                                <h3>Behavioral Fingerprint Radar</h3>
+                                <p class="panel-desc">Multi-dimensional comparison across all 5 cohorts</p>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="chart-wrap-tall"><canvas id="clusterRadarChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <i class="fa-solid fa-chart-column text-amber"></i>
+                            <div>
+                                <h3>Cohort Population & Risk Distribution</h3>
+                                <p class="panel-desc">High, medium, and healthy account split per cohort</p>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="chart-wrap-tall"><canvas id="clusterRiskBarChart"></canvas></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Cluster Drill-Down -->
-                <div class="panel" id="clusterDrillPanel" style="display:none">
-                    <div class="panel-header"><div><i class="fa-solid fa-users text-blue"></i><div><h3 id="clusterDrillTitle">Cluster Members</h3><p class="panel-desc">Top customers by risk score in this cluster</p></div></div></div>
-                    <div class="panel-body">
-                        <div class="grid-2">
-                            <div class="chart-wrap-std"><canvas id="clusterReasonChart"></canvas></div>
-                            <div id="clusterFeatureTable" class="cluster-feature-table"></div>
+                <!-- Selected Cohort Deep-Dive Studio -->
+                <div class="panel cluster-drill-panel" id="clusterDrillPanel">
+                    <div class="panel-header">
+                        <i class="fa-solid fa-microscope text-blue"></i>
+                        <div>
+                            <h3 id="clusterDrillTitle">Cohort Deep Dive</h3>
+                            <p class="panel-desc" id="clusterDrillDesc">Detailed diagnostics and member accounts</p>
                         </div>
-                        <div class="table-scroll" style="margin-top:1rem">
-                            <table class="data-table"><thead><tr>
-                                <th>Customer</th><th>Segment</th><th>Value</th><th>Risk</th><th>Churn %</th><th>Reason</th><th>Action</th>
-                            </tr></thead><tbody id="clusterCustBody"></tbody></table>
+                    </div>
+                    <div class="panel-body">
+                        <!-- Persona Narrative & Quick KPI Stat Strip -->
+                        <div class="cohort-persona-narrative" id="cohortNarrative"></div>
+
+                        <div class="grid-2" style="margin-top:20px">
+                            <div class="panel" style="background:#fafbfc;border:1px solid var(--border-light)">
+                                <div class="panel-header" style="padding:14px 18px">
+                                    <i class="fa-solid fa-triangle-exclamation text-red"></i>
+                                    <div><h4>Dominant Friction Points</h4></div>
+                                </div>
+                                <div class="panel-body" style="padding:14px 18px">
+                                    <div class="chart-wrap-std"><canvas id="clusterReasonChart"></canvas></div>
+                                </div>
+                            </div>
+                            <div class="panel" style="background:#fafbfc;border:1px solid var(--border-light)">
+                                <div class="panel-header" style="padding:14px 18px">
+                                    <i class="fa-solid fa-sliders text-blue"></i>
+                                    <div><h4>Behavioral Metric Averages</h4></div>
+                                </div>
+                                <div class="panel-body" style="padding:14px 18px">
+                                    <div id="clusterFeatureTable" class="cluster-feature-table"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Member Accounts Table -->
+                        <div class="cohort-members-wrap" style="margin-top:24px">
+                            <div class="cohort-members-header">
+                                <div>
+                                    <h4>Top At-Risk Accounts in this Cohort</h4>
+                                    <p class="panel-desc">Ranked by risk score with recommended retention interventions</p>
+                                </div>
+                            </div>
+                            <div class="table-scroll" style="margin-top:10px">
+                                <table class="data-table">
+                                    <thead><tr>
+                                        <th style="min-width:190px">Account</th>
+                                        <th>Segment</th>
+                                        <th>Risk Tier</th>
+                                        <th>Risk Score</th>
+                                        <th>Friction Signal</th>
+                                        <th>Recommended Action</th>
+                                        <th>Urgency</th>
+                                        <th class="text-right">Action</th>
+                                    </tr></thead>
+                                    <tbody id="clusterCustBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -288,7 +587,7 @@
             <div class="tab-panel" id="tab-visualizations">
                 <div class="grid-2">
                     <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-ranking-star text-indigo"></i><div><h3>Global Feature Importance</h3><p class="panel-desc">Top features driving churn predictions across all customers</p></div></div>
+                        <div class="panel-header"><i class="fa-solid fa-ranking-star text-blue"></i><div><h3>Global Feature Importance</h3><p class="panel-desc">Top features driving churn predictions across all customers</p></div></div>
                         <div class="panel-body"><div class="chart-wrap-tall"><canvas id="featureImpChart"></canvas></div></div>
                     </div>
                     <div class="panel">
@@ -324,6 +623,6 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=3.0"></script>
 </body>
 </html>

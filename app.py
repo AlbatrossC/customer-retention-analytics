@@ -3,6 +3,11 @@ import sqlite3
 from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
+app.config['JSON_SORT_KEYS'] = False
+try:
+    app.json.sort_keys = False
+except AttributeError:
+    pass
 DB_PATH = os.path.join(os.path.dirname(__file__), 'database', 'customer_retention.db')
 
 # ---------------------------------------------------------------------------
@@ -111,6 +116,10 @@ def format_factor_label(fn: str) -> str:
 # ---------------------------------------------------------------------------
 
 @app.route('/')
+@app.route('/customer-directory')
+@app.route('/individual-analysis')
+@app.route('/cluster-analysis')
+@app.route('/visualizations')
 def index():
     return render_template('index.html')
 
@@ -168,14 +177,14 @@ def dashboard_stats():
             'avg_value': round(r['avg_value'] or 0, 2),
         })
 
-    # Primary reasons (Model 2 LLM diagnoses for at-risk customers)
+    # Primary reasons (Model 2 LLM diagnoses for at-risk customers, ordered descending)
     reason_rows = conn.execute('''
         SELECT primary_reason, COUNT(*) as cnt FROM model2_predictions
         WHERE primary_reason IS NOT NULL GROUP BY primary_reason ORDER BY cnt DESC
     ''').fetchall()
     primary_reasons = {r['primary_reason']: r['cnt'] for r in reason_rows}
 
-    # Recommended actions matrix (Model 2 LLM recommendations by urgency)
+    # Recommended actions matrix (Model 2 LLM recommendations by urgency, ordered descending by total)
     action_rows = conn.execute('''
         SELECT recommended_action, urgency, COUNT(*) as cnt FROM model2_predictions
         WHERE recommended_action IS NOT NULL GROUP BY recommended_action, urgency ORDER BY cnt DESC
@@ -189,6 +198,8 @@ def dashboard_stats():
         actions_matrix[act][urg] = cnt
         actions_matrix[act]['total'] += cnt
         actions_totals[act] = actions_totals.get(act, 0) + cnt
+    # Sort actions_totals strictly descending by total count
+    actions_totals = dict(sorted(actions_totals.items(), key=lambda item: item[1], reverse=True))
 
     # Segments
     seg_rows = conn.execute('''
@@ -214,24 +225,35 @@ def dashboard_stats():
         'high_risk_pct': round((r['high_cnt'] / r['total']) * 100, 1) if r['total'] else 0,
     } for r in seg_rows]
 
-    # Product depth
-    prod_rows = conn.execute('''
-        SELECT CASE WHEN products_count=1 THEN '1 Product'
-                    WHEN products_count=2 THEN '2 Products'
-                    WHEN products_count=3 THEN '3 Products'
-                    ELSE '4+ Products' END as bracket,
-               COUNT(*) as total,
-               SUM(CASE WHEN m.risk_level='High' THEN 1 ELSE 0 END) as high_cnt,
-               AVG(m.churn_probability) as avg_cp
-        FROM customers c JOIN model1_predictions m ON c.customer_id = m.customer_id
-        GROUP BY bracket ORDER BY MIN(products_count)
+    # Product de-adoption impact (Products dropped in 90D vs Churn surge)
+    prod_drop_rows = conn.execute('''
+        SELECT 
+            CASE 
+                WHEN s.products_dropped_90d = 0 THEN '0 Dropped'
+                WHEN s.products_dropped_90d = 1 THEN '1 Dropped'
+                WHEN s.products_dropped_90d = 2 THEN '2 Dropped'
+                ELSE '3+ Dropped'
+            END as bracket,
+            COUNT(DISTINCT c.customer_id) as total,
+            SUM(CASE WHEN m.risk_level='High' THEN 1 ELSE 0 END) as high_cnt,
+            AVG(m.churn_probability) as avg_cp
+        FROM customers c 
+        JOIN model1_predictions m ON c.customer_id = m.customer_id
+        JOIN (
+            SELECT customer_id, products_dropped_90d 
+            FROM customer_snapshots 
+            WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM customer_snapshots)
+        ) s ON c.customer_id = s.customer_id
+        GROUP BY bracket 
+        ORDER BY MIN(s.products_dropped_90d)
     ''').fetchall()
     product_depth = [{
         'bracket': r['bracket'],
         'total_customers': r['total'],
         'high_risk_count': r['high_cnt'],
-        'avg_churn_prob': round(r['avg_cp'] or 0, 2)
-    } for r in prod_rows]
+        'avg_churn_prob': round(r['avg_cp'] or 0, 1),
+        'high_risk_pct': round((r['high_cnt'] / r['total']) * 100, 1) if r['total'] else 0
+    } for r in prod_drop_rows]
 
     # Monthly trends from real snapshots
     trend_rows = conn.execute('''

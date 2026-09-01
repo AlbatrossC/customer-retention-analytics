@@ -47,20 +47,53 @@ document.addEventListener('DOMContentLoaded', () => {
 // Tab Navigation
 // ---------------------------------------------------------------------------
 function setupTabs() {
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            const panel = document.getElementById(`tab-${tab}`);
-            if (panel) panel.classList.add('active');
-            document.getElementById('pageTitle').textContent = TAB_TITLES[tab] || '';
+    const TAB_URLS = {
+        dashboard: '/',
+        customers: '/customer-directory',
+        analysis: '/individual-analysis',
+        clusters: '/cluster-analysis',
+        visualizations: '/visualizations',
+    };
+    const URL_TABS = {
+        '/': 'dashboard',
+        '/customer-directory': 'customers',
+        '/individual-analysis': 'analysis',
+        '/cluster-analysis': 'clusters',
+        '/visualizations': 'visualizations',
+    };
 
-            // Lazy load tab data
-            if (tab === 'clusters' && !state.clusterData) loadClusters();
-            if (tab === 'visualizations') loadVisualizations();
+    function activateTab(tab, pushState = true) {
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        const navEl = document.getElementById(`nav-${tab}`);
+        if (navEl) navEl.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById(`tab-${tab}`);
+        if (panel) panel.classList.add('active');
+        document.getElementById('pageTitle').textContent = TAB_TITLES[tab] || '';
+        if (pushState) {
+            const url = TAB_URLS[tab] || '/';
+            history.pushState({ tab }, '', url);
+        }
+        // Lazy load
+        if (tab === 'clusters' && !state.clusterData) loadClusters();
+        if (tab === 'visualizations') loadVisualizations();
+    }
+
+    // Detect initial URL
+    const initTab = URL_TABS[window.location.pathname] || 'dashboard';
+    activateTab(initTab, false);
+
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tab = btn.dataset.tab;
+            activateTab(tab);
         });
+    });
+
+    window.addEventListener('popstate', (e) => {
+        const tab = (e.state && e.state.tab) || URL_TABS[window.location.pathname] || 'dashboard';
+        activateTab(tab, false);
     });
 
     // Sidebar toggle for mobile
@@ -137,6 +170,16 @@ function setupFilters() {
             state.search = '';
             state.page = 1;
             loadCustomers();
+        });
+    }
+
+    // Monthly Trends Time Range Filter
+    const trendTimeSelect = document.getElementById('trendTimeRange');
+    if (trendTimeSelect) {
+        trendTimeSelect.addEventListener('change', () => {
+            if (state.dashData) {
+                renderMonthlyTrends(state.dashData, parseInt(trendTimeSelect.value, 10) || 6);
+            }
         });
     }
 
@@ -240,59 +283,147 @@ function renderRiskChart(d) {
     const high = d.risk_distribution.High || 0;
     const med = d.risk_distribution.Medium || 0;
     const low = d.risk_distribution.Low || 0;
-    const total = high + med + low;
+    const total = high + med + low || 10000;
+
+    // Update center overlay values
+    const centerVal = document.getElementById('donutCenterVal');
+    if (centerVal) centerVal.textContent = total.toLocaleString();
 
     charts.riskDist = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['High Risk', 'Watchlist', 'Healthy'],
-            datasets: [{ data: [high, med, low], backgroundColor: ['#ef4444', '#f59e0b', '#10b981'], borderWidth: 2, borderColor: '#fff' }]
+            labels: ['High Risk', 'Medium Risk', 'Healthy'],
+            datasets: [{
+                data: [high, med, low],
+                backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                hoverBackgroundColor: ['#dc2626', '#d97706', '#059669'],
+                borderWidth: 3,
+                borderColor: '#ffffff',
+                borderRadius: 4,
+                spacing: 3
+            }]
         },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '74%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    titleFont: { size: 12, weight: '700' },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(ctx) {
+                            const val = ctx.raw || 0;
+                            const p = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                            return ` ${ctx.label}: ${val.toLocaleString()} (${p}%)`;
+                        }
+                    }
+                }
+            }
+        }
     });
 
     const legend = document.getElementById('riskLegend');
     if (legend) {
         legend.innerHTML = [
-            legendRow('High Risk', high, total, 'dot-high', 'High'),
-            legendRow('Watchlist', med, total, 'dot-med', 'Medium'),
-            legendRow('Healthy', low, total, 'dot-low', 'Low'),
+            legendRow('High Risk', high, total, 'dot-high', 'High', 'pill-high'),
+            legendRow('Medium Risk', med, total, 'dot-med', 'Medium', 'pill-med'),
+            legendRow('Healthy', low, total, 'dot-low', 'Low', 'pill-low'),
         ].join('');
     }
 }
 
-function legendRow(label, count, total, dotClass, riskVal) {
-    return `<div class="legend-row" onclick="setRiskFilter('${riskVal}')">
-        <span class="legend-label"><span class="legend-dot ${dotClass}"></span>${label}</span>
-        <span><strong>${count.toLocaleString()}</strong> (${pct(count, total)})</span>
+function legendRow(label, count, total, dotClass, riskVal, pillClass) {
+    const percentage = pct(count, total);
+    return `<div class="legend-row" onclick="setRiskFilter('${riskVal}')" title="Filter directory by ${label}">
+        <div class="legend-left">
+            <span class="legend-dot ${dotClass}"></span>
+            <span class="legend-label-text">${label}</span>
+        </div>
+        <div class="legend-right">
+            <span class="legend-count">${count.toLocaleString()}</span>
+            <span class="legend-pct-pill ${pillClass}">${percentage}</span>
+        </div>
     </div>`;
 }
 
 function renderTopFactors(d) {
     const factors = d.top_risk_factors || [];
+    const total = d.total_customers || 10000;
     const ctx = getCtx('topFactorsChart');
-    if (ctx) {
-        destroyChart('topFactors');
-        const top5 = factors.slice(0, 5);
-        charts.topFactors = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: top5.map(f => f.display_label), datasets: [{ label: 'Affected', data: top5.map(f => f.frequency), backgroundColor: 'rgba(239,68,68,0.85)', borderRadius: 4 }] },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } } } }
-        });
-    }
+    if (!ctx) return;
+    
+    destroyChart('topFactors');
+    const top7 = factors.slice(0, 7);
+    const colors = [
+        '#ef4444',
+        '#f43f5e',
+        '#f97316',
+        '#f59e0b',
+        '#2563eb',
+        '#0284c7',
+        '#0891b2'
+    ];
 
-    const list = document.getElementById('topFactorsList');
-    if (list) {
-        list.innerHTML = factors.map((f, i) => `
-            <div class="factor-card">
-                <div class="factor-card-header">
-                    <span class="factor-card-name">#${i + 1} ${f.display_label}</span>
-                    <span class="factor-card-impact">${f.frequency.toLocaleString()}</span>
-                </div>
-                <p class="factor-card-desc">${f.factor_message}</p>
-            </div>
-        `).join('');
-    }
+    charts.topFactors = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: top7.map(f => f.display_label.length > 40 ? f.display_label.substring(0, 38) + '…' : f.display_label),
+            datasets: [{
+                label: 'Affected Accounts',
+                data: top7.map(f => f.frequency),
+                backgroundColor: colors.slice(0, top7.length),
+                hoverBackgroundColor: colors.slice(0, top7.length).map(c => c),
+                borderRadius: 6,
+                barThickness: 20
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    cornerRadius: 8,
+                    titleFont: { size: 12, weight: '700' },
+                    bodyFont: { size: 11 },
+                    callbacks: {
+                        title: (items) => top7[items[0].dataIndex]?.display_label || '',
+                        label: (ctx) => {
+                            const f = top7[ctx.dataIndex];
+                            const p = total > 0 ? ((f.frequency / total) * 100).toFixed(1) : 0;
+                            return [
+                                ` Affected Accounts: ${f.frequency.toLocaleString()} (${p}% of portfolio)`,
+                                ` SHAP Churn Contribution: +${f.avg_contribution.toFixed(3)}`,
+                                ` Signal: "${f.factor_message}"`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                    ticks: {
+                        font: { size: 10, weight: '500' },
+                        callback: val => val.toLocaleString()
+                    },
+                    title: { display: true, text: 'Affected Accounts Count', font: { size: 10, weight: '600' } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: '600' } }
+                }
+            }
+        }
+    });
 }
 
 function renderActionsChart(d) {
@@ -300,12 +431,61 @@ function renderActionsChart(d) {
     if (!ctx) return;
     destroyChart('actions');
     const actions = d.recommended_actions || {};
-    const labels = Object.keys(actions).slice(0, 6).map(a => a.replace(/_/g, ' '));
-    const counts = Object.values(actions).slice(0, 6);
+    // Sort strictly descending by count
+    const sorted = Object.entries(actions)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6);
+    
+    const labels = sorted.map(([k]) => {
+        const clean = k.replace(/_/g, ' ').toLowerCase();
+        return clean.replace(/\b\w/g, l => l.toUpperCase());
+    });
+    const counts = sorted.map(([, v]) => v);
+    const totalActs = Object.values(actions).reduce((a, b) => a + b, 0) || 1;
+
     charts.actions = new Chart(ctx, {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Plays', data: counts, backgroundColor: '#6366f1', borderRadius: 4 }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } } } }
+        data: {
+            labels,
+            datasets: [{
+                label: 'Interventions',
+                data: counts,
+                backgroundColor: '#2563eb',
+                hoverBackgroundColor: '#1d4ed8',
+                borderRadius: 5,
+                barThickness: 18
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(ctx) {
+                            const val = ctx.raw || 0;
+                            const p = ((val / totalActs) * 100).toFixed(1);
+                            return ` Recommended: ${val.toLocaleString()} accounts (${p}%)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10, weight: '600' } }
+                }
+            }
+        }
     });
 }
 
@@ -314,12 +494,61 @@ function renderReasonsChart(d) {
     if (!ctx) return;
     destroyChart('reasons');
     const reasons = d.primary_reasons || {};
-    const labels = Object.keys(reasons).slice(0, 6).map(r => r.replace(/_/g, ' '));
-    const counts = Object.values(reasons).slice(0, 6);
+    // Sort strictly descending by count
+    const sorted = Object.entries(reasons)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6);
+
+    const labels = sorted.map(([k]) => {
+        const clean = k.replace(/_/g, ' ').toLowerCase();
+        return clean.replace(/\b\w/g, l => l.toUpperCase());
+    });
+    const counts = sorted.map(([, v]) => v);
+    const totalReasons = Object.values(reasons).reduce((a, b) => a + b, 0) || 1;
+
     charts.reasons = new Chart(ctx, {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Pain Points', data: counts, backgroundColor: '#f59e0b', borderRadius: 4 }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } } } }
+        data: {
+            labels,
+            datasets: [{
+                label: 'Pain Points',
+                data: counts,
+                backgroundColor: 'rgba(245, 158, 11, 0.85)',
+                hoverBackgroundColor: '#d97706',
+                borderRadius: 5,
+                barThickness: 18
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(ctx) {
+                            const val = ctx.raw || 0;
+                            const p = ((val / totalReasons) * 100).toFixed(1);
+                            return ` Diagnosed: ${val.toLocaleString()} accounts (${p}%)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10, weight: '600' } }
+                }
+            }
+        }
     });
 }
 
@@ -328,10 +557,63 @@ function renderProductDepthChart(d) {
     if (!ctx) return;
     destroyChart('productDepth');
     const stats = d.product_depth_stats || [];
+    
+    // Labels, churn probabilities, and affected account counts
+    const labels = stats.map(s => s.bracket);
+    const churnData = stats.map(s => s.avg_churn_prob);
+    const colors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
+    const hoverColors = ['#059669', '#d97706', '#ea580c', '#dc2626'];
+
     charts.productDepth = new Chart(ctx, {
         type: 'bar',
-        data: { labels: stats.map(s => s.bracket), datasets: [{ label: 'Avg Churn %', data: stats.map(s => s.avg_churn_prob), backgroundColor: ['#ef4444', '#f59e0b', '#10b981', '#059669'], borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { title: { display: true, text: 'Avg Churn %' }, grid: { display: false } } } }
+        data: {
+            labels,
+            datasets: [{
+                label: 'Avg Churn Risk %',
+                data: churnData,
+                backgroundColor: colors.slice(0, stats.length),
+                hoverBackgroundColor: hoverColors.slice(0, stats.length),
+                borderRadius: 6,
+                barThickness: 32
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        title: (items) => `Products Dropped: ${stats[items[0].dataIndex]?.bracket}`,
+                        label: (ctx) => {
+                            const s = stats[ctx.dataIndex];
+                            return [
+                                ` Avg Churn Risk: ${s.avg_churn_prob}%`,
+                                ` Total Customers: ${s.total_customers.toLocaleString()}`,
+                                ` High Risk Accounts: ${s.high_risk_count.toLocaleString()} (${s.high_risk_pct}%)`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: '600' } }
+                },
+                y: {
+                    title: { display: true, text: 'Avg Churn Risk %', font: { size: 11, weight: '600' } },
+                    grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                    ticks: {
+                        callback: val => `${val}%`
+                    },
+                    suggestedMax: 45
+                }
+            }
+        }
     });
 }
 
@@ -353,22 +635,238 @@ function renderSegments(d) {
     }).join('');
 }
 
-function renderMonthlyTrends(d) {
+function renderMonthlyTrends(d, limitMonths = 6) {
+    const rawTrends = d.monthly_trends || [];
+    if (!rawTrends.length) return;
+
+    const trends = rawTrends.slice(-limitMonths);
+    if (!trends.length) return;
+
+    const monthNames = { '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr', '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec' };
+    const monthLabels = trends.map(t => {
+        const parts = t.month.split('-');
+        const m = monthNames[parts[1]] || parts[1];
+        const y = parts[0] || '2026';
+        return `${m} ${y}`;
+    });
+
+    const balData = trends.map(t => +(t.balance_delta || 0).toFixed(1));
+    const txnData = trends.map(t => +(t.txn_delta || 0).toFixed(1));
+    const extData = trends.map(t => +(t.outflow_delta || 0).toFixed(1));
+
+    const firstMonth = monthLabels[0] ? monthLabels[0].split(' ')[0] : 'Jan';
+    const lastMonth = monthLabels[monthLabels.length - 1] || 'Jun 2026';
+    const dateRangeStr = `from ${firstMonth} to ${lastMonth}`;
+
+    const latestBal = balData[balData.length - 1];
+    const latestTxn = txnData[txnData.length - 1];
+    const firstExt = extData[0];
+    const latestExt = extData[extData.length - 1];
+    const netOutflowDelta = +(latestExt - firstExt).toFixed(1);
+
+    // Update Top Metric Cards text
+    setText('trend-bal-val', `${latestBal > 0 ? '+' : ''}${latestBal.toFixed(1)}% ${latestBal >= 0 ? '↗' : '↘'}`);
+    setText('trend-bal-sub', dateRangeStr);
+    setText('trend-txn-val', `${latestTxn > 0 ? '+' : ''}${latestTxn.toFixed(1)}% ${latestTxn >= 0 ? '↗' : '↘'}`);
+    setText('trend-txn-sub', dateRangeStr);
+    setText('trend-ext-val', `${netOutflowDelta > 0 ? '+' : ''}${netOutflowDelta.toFixed(1)}% ${netOutflowDelta <= 0 ? '↘' : '↗'}`);
+    setText('trend-ext-sub', dateRangeStr);
+
+    // Update Bottom Summary Bullets
+    setText('tb-bal-text', `Balance ${latestBal >= 0 ? 'improved by +' : 'declined by '}${latestBal.toFixed(1)}%`);
+    setText('tb-bal-date', dateRangeStr);
+    setText('tb-txn-text', `Transactions ${latestTxn >= 0 ? 'increased by +' : 'decreased by '}${latestTxn.toFixed(1)}%`);
+    setText('tb-txn-date', dateRangeStr);
+    setText('tb-ext-text', `Outflows ${netOutflowDelta <= 0 ? 'decreased by ' : 'increased by +'}${netOutflowDelta.toFixed(1)}%`);
+    setText('tb-ext-date', dateRangeStr);
+
+    if (latestBal > 0 && netOutflowDelta < 0) {
+        setText('trend-insight-text', 'Your balance is growing while outflows are reducing — a healthy trend!');
+    } else if (latestBal < 0 || netOutflowDelta > 0) {
+        setText('trend-insight-text', 'Outflows and balance contractions require targeted retention intervention.');
+    } else {
+        setText('trend-insight-text', 'Account activity remains stable across the 6-month observation window.');
+    }
+
+    // Render Sparklines
+    const balCtx = getCtx('sparkBalance');
+    if (balCtx) {
+        destroyChart('sparkBalance');
+        charts.sparkBalance = new Chart(balCtx, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    data: balData,
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    }
+
+    const txnCtx = getCtx('sparkTransaction');
+    if (txnCtx) {
+        destroyChart('sparkTransaction');
+        charts.sparkTransaction = new Chart(txnCtx, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    data: txnData,
+                    borderColor: '#f59e0b',
+                    borderWidth: 2,
+                    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    }
+
+    const extCtx = getCtx('sparkOutflow');
+    if (extCtx) {
+        destroyChart('sparkOutflow');
+        charts.sparkOutflow = new Chart(extCtx, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    data: extData,
+                    borderColor: '#ef4444',
+                    borderWidth: 2,
+                    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    }
+
+    // Render Main Mixed Chart
     const ctx = getCtx('monthlyTrendsChart');
     if (!ctx) return;
     destroyChart('monthlyTrends');
-    const trends = d.monthly_trends || [];
+
     charts.monthlyTrends = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: trends.map(t => t.month),
+            labels: monthLabels,
             datasets: [
-                { label: 'Balance Δ', data: trends.map(t => t.balance_delta), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.3 },
-                { label: 'Transaction Δ', data: trends.map(t => t.txn_delta), borderColor: '#f59e0b', borderDash: [5, 5], tension: 0.3 },
-                { label: 'Outflow Δ', data: trends.map(t => t.outflow_delta), borderColor: '#ef4444', borderDash: [3, 3], tension: 0.3 },
+                {
+                    type: 'bar',
+                    label: 'Balance Change (%)',
+                    data: balData,
+                    backgroundColor: '#2563eb',
+                    hoverBackgroundColor: '#1d4ed8',
+                    borderRadius: 4,
+                    barThickness: 28,
+                    order: 3
+                },
+                {
+                    type: 'line',
+                    label: 'Transaction Change (%)',
+                    data: txnData,
+                    borderColor: '#f59e0b',
+                    backgroundColor: '#f59e0b',
+                    borderWidth: 2.2,
+                    pointRadius: 4.5,
+                    pointHoverRadius: 6.5,
+                    pointBackgroundColor: '#f59e0b',
+                    tension: 0.35,
+                    order: 2
+                },
+                {
+                    type: 'line',
+                    label: 'Outflow Change (%)',
+                    data: extData,
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef4444',
+                    borderWidth: 2.2,
+                    pointRadius: 4.5,
+                    pointHoverRadius: 6.5,
+                    pointBackgroundColor: '#ef4444',
+                    tension: 0.35,
+                    order: 1
+                }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { grid: { display: false } }, y: { title: { display: true, text: '% Change' } } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    cornerRadius: 8,
+                    titleFont: { size: 12, weight: '700' },
+                    bodyFont: { size: 11 },
+                    callbacks: {
+                        label: function(ctx) {
+                            const val = ctx.raw !== undefined ? ctx.raw : 0;
+                            const sign = val > 0 ? '+' : '';
+                            return ` ${ctx.dataset.label}: ${sign}${val.toFixed(1)}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 11, weight: '600' },
+                        color: '#475569'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Change (%)',
+                        font: { size: 11, weight: '600' },
+                        color: '#64748b'
+                    },
+                    grid: {
+                        color: 'rgba(226, 232, 240, 0.6)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: { size: 10 },
+                        callback: val => (val > 0 ? `+${val}%` : `${val}%`)
+                    },
+                    suggestedMin: -2,
+                    suggestedMax: 6
+                }
+            }
+        }
     });
 }
 
@@ -399,27 +897,50 @@ function renderCustomerTable(customers) {
     if (!tbody) return;
 
     if (!customers.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:3rem;color:#94a3b8"><i class="fa-solid fa-folder-open" style="font-size:2rem;display:block;margin-bottom:0.5rem"></i>No accounts match current filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="dir-empty"><i class="fa-solid fa-folder-open"></i><br>No accounts match the current filters.</td></tr>`;
         return;
     }
 
     tbody.innerHTML = customers.map(c => {
-        const initials = c.customer_name ? c.customer_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'CU';
         const badgeClass = c.risk_level === 'High' ? 'badge-high' : c.risk_level === 'Medium' ? 'badge-med' : 'badge-low';
-        const probColor = c.risk_level === 'High' ? '#ef4444' : c.risk_level === 'Medium' ? '#f59e0b' : '#10b981';
-        const urgTag = c.urgency ? `<span class="urgency-tag urgency-${c.urgency.toLowerCase()}">${c.urgency}</span>` : '';
-        const clusterTag = c.cluster_label ? `<span class="cluster-badge">${c.cluster_label}</span>` : '<span style="color:#94a3b8">—</span>';
+        const probColor = c.risk_level === 'High' ? '#ef4444' : c.risk_level === 'Medium' ? '#b45309' : '#16a34a';
+        const scoreVal = Math.round(c.risk_score || 0);
+        const frictionRaw = c.primary_reason ? c.primary_reason.replace(/_/g, ' ') : null;
+        const frictionLabel = frictionRaw
+            ? frictionRaw.replace(/\b\w/g, l => l.toUpperCase())
+            : `<span class="dir-none">Stable</span>`;
+        const actionRaw = c.recommended_action ? c.recommended_action.replace(/_/g, ' ') : 'Monitor';
+        const actionLabel = actionRaw.replace(/\b\w/g, l => l.toUpperCase());
+        const urgency = c.urgency || '';
+        const urgClass = urgency === 'HIGH' ? 'urgency-high' : urgency === 'MEDIUM' ? 'urgency-med' : 'urgency-low';
+        const urgLabel = urgency ? `<span class="urgency-pill ${urgClass}">${urgency.charAt(0) + urgency.slice(1).toLowerCase()}</span>` : `<span class="dir-none">—</span>`;
+        const seg = c.customer_segment ? (c.customer_segment.charAt(0).toUpperCase() + c.customer_segment.slice(1).toLowerCase()) : '—';
 
-        return `<tr>
-            <td><div class="cust-cell"><div class="cust-avatar">${initials}</div><div><div class="cust-name">${c.customer_name}</div><div class="cust-id">${c.customer_id}</div></div></div></td>
-            <td style="text-transform:capitalize;font-weight:600">${c.customer_segment}</td>
-            <td><strong>₹${(c.customer_yearly_value || 0).toLocaleString()}</strong></td>
+        return `<tr onclick="openCustomerModal('${c.customer_id}')" class="dir-row">
+            <td>
+                <div class="acct-cell">
+                    <div class="acct-info">
+                        <div class="acct-name">${c.customer_name}</div>
+                        <div class="acct-id">${c.customer_id}</div>
+                    </div>
+                </div>
+            </td>
+            <td><span class="seg-tag">${seg}</span></td>
             <td><span class="badge ${badgeClass}">${c.risk_level}</span></td>
-            <td><div class="prob-cell"><div class="prob-bg"><div class="prob-fill" style="width:${Math.min(100, c.churn_probability * 1.5)}%;background:${probColor}"></div></div><strong>${(c.churn_probability || 0).toFixed(1)}%</strong></div></td>
-            <td>${c.primary_reason ? c.primary_reason.replace(/_/g, ' ') : '<span style="color:#94a3b8">Stable</span>'}</td>
-            <td><div style="display:flex;align-items:center;gap:4px">${c.recommended_action ? c.recommended_action.replace(/_/g, ' ') : 'Monitor'} ${urgTag}</div></td>
-            <td>${clusterTag}</td>
-            <td class="text-right"><button class="btn-audit" onclick="openCustomerModal('${c.customer_id}')"><i class="fa-solid fa-file-waveform"></i> Audit</button></td>
+            <td>
+                <div class="prob-cell" title="Risk Score: ${scoreVal}/100 (Model Churn Prob: ${(c.churn_probability || 0).toFixed(1)}%)">
+                    <div class="prob-track"><div class="prob-fill" style="width:${Math.min(100, Math.max(4, scoreVal))}%;background:${probColor}"></div></div>
+                    <strong style="color:${probColor}">${scoreVal}<span style="font-size:0.68rem;color:var(--text-muted);font-weight:600">/100</span></strong>
+                </div>
+            </td>
+            <td class="friction-cell">${frictionLabel}</td>
+            <td class="action-cell">${actionLabel}</td>
+            <td>${urgLabel}</td>
+            <td class="text-right">
+                <button class="btn-profile" onclick="event.stopPropagation();openCustomerModal('${c.customer_id}')">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> View
+                </button>
+            </td>
         </tr>`;
     }).join('');
 }
@@ -430,7 +951,8 @@ function renderPagination() {
     setText('totalPages', totalPages);
     const s = state.totalRecords === 0 ? 0 : (state.page - 1) * state.pageSize + 1;
     const e = Math.min(state.totalRecords, state.page * state.pageSize);
-    setText('showCount', `${s}-${e}`);
+    setText('showCount', s.toLocaleString());
+    setText('showCountEnd', e.toLocaleString());
     setText('totalCount', state.totalRecords.toLocaleString());
     const prev = document.getElementById('prevBtn');
     const next = document.getElementById('nextBtn');
@@ -479,8 +1001,8 @@ function renderModal(data, history) {
         : `<span style="color:#10b981;font-weight:600"><i class="fa-solid fa-shield-check"></i> Low Risk (Healthy Account)</span>`;
 
     const actionDisplay = p.recommended_action 
-        ? `<span style="color:#6366f1;font-weight:700">${p.recommended_action.replace(/_/g, ' ')}</span>`
-        : `<span style="color:#6366f1;font-weight:700">MONITOR</span>`;
+        ? `<span style="color:#2563eb;font-weight:700">${p.recommended_action.replace(/_/g, ' ')}</span>`
+        : `<span style="color:#2563eb;font-weight:700">MONITOR</span>`;
 
     const evidenceHtml = evidence.length 
         ? `<div class="evidence-section"><div class="evidence-section-title">Diagnostic Evidence</div><div class="evidence-pill-grid">${evidence.map(e => `<span class="evidence-pill">${e.evidence_text}</span>`).join('')}</div></div>`
@@ -506,8 +1028,8 @@ function renderModal(data, history) {
             <div class="profile-hero-metrics">
                 <div class="hero-metric-box">
                     <span class="badge ${badgeClass}" style="font-size:0.8rem;padding:4px 14px">${p.risk_level} Risk</span>
-                    <div class="hero-churn-val">${(p.churn_probability || 0).toFixed(1)}%</div>
-                    <span class="hero-score-sub">Risk Score: ${(p.risk_score || 0).toFixed(1)} / 100</span>
+                    <div class="hero-churn-val">${Math.round(p.risk_score || 0)}<span style="font-size:0.95rem;font-weight:600;opacity:0.8">/100</span></div>
+                    <span class="hero-score-sub">Model Churn Prob: ${(p.churn_probability || 0).toFixed(1)}%</span>
                 </div>
             </div>
         </div>
@@ -580,7 +1102,7 @@ function renderModal(data, history) {
             data: {
                 labels: sortedHistory.map(h => h.snapshot_date.substring(0, 7)),
                 datasets: [
-                    { label: 'Balance Δ %', data: sortedHistory.map(h => h.balance_change_30d || 0), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.3, pointRadius: 4 },
+                    { label: 'Balance Δ %', data: sortedHistory.map(h => h.balance_change_30d || 0), borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.08)', fill: true, tension: 0.3, pointRadius: 4 },
                     { label: 'Txn Δ %', data: sortedHistory.map(h => h.transaction_change_30d || 0), borderColor: '#f59e0b', borderDash: [5, 5], tension: 0.3, pointRadius: 4 },
                 ]
             },
@@ -628,8 +1150,8 @@ function renderAnalysis(data, container) {
         : `<span style="color:#10b981;font-weight:600"><i class="fa-solid fa-shield-check"></i> Low Risk (Healthy Account)</span>`;
 
     const actionDisplay = p.recommended_action 
-        ? `<span style="color:#6366f1;font-weight:700">${p.recommended_action.replace(/_/g, ' ')}</span>`
-        : `<span style="color:#6366f1;font-weight:700">MONITOR</span>`;
+        ? `<span style="color:#2563eb;font-weight:700">${p.recommended_action.replace(/_/g, ' ')}</span>`
+        : `<span style="color:#2563eb;font-weight:700">MONITOR</span>`;
 
     const evidenceHtml = evidence.length 
         ? `<div class="evidence-section"><div class="evidence-section-title">Diagnostic Evidence</div><div class="evidence-pill-grid">${evidence.map(e => `<span class="evidence-pill">${e.evidence_text}</span>`).join('')}</div></div>`
@@ -655,8 +1177,8 @@ function renderAnalysis(data, container) {
             <div class="profile-hero-metrics">
                 <div class="hero-metric-box">
                     <span class="badge ${badgeClass}" style="font-size:0.8rem;padding:4px 14px">${p.risk_level} Risk</span>
-                    <div class="hero-churn-val">${(p.churn_probability || 0).toFixed(1)}%</div>
-                    <span class="hero-score-sub">Risk Score: ${(p.risk_score || 0).toFixed(1)} / 100</span>
+                    <div class="hero-churn-val">${Math.round(p.risk_score || 0)}<span style="font-size:0.95rem;font-weight:600;opacity:0.8">/100</span></div>
+                    <span class="hero-score-sub">Model Churn Prob: ${(p.churn_probability || 0).toFixed(1)}%</span>
                 </div>
             </div>
         </div>
@@ -742,7 +1264,7 @@ function renderAnalysis(data, container) {
             data: {
                 labels: sortedHistory.map(h => h.snapshot_date.substring(0, 7)),
                 datasets: [
-                    { label: 'Balance Δ %', data: sortedHistory.map(h => h.balance_change_30d || 0), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.3, pointRadius: 4 },
+                    { label: 'Balance Δ %', data: sortedHistory.map(h => h.balance_change_30d || 0), borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.08)', fill: true, tension: 0.3, pointRadius: 4 },
                     { label: 'Txn Δ %', data: sortedHistory.map(h => h.transaction_change_30d || 0), borderColor: '#f59e0b', borderDash: [5, 5], tension: 0.3, pointRadius: 4 },
                     { label: 'Complaints', data: sortedHistory.map(h => h.complaints_30d || 0), borderColor: '#ef4444', tension: 0.3, yAxisID: 'y1', pointRadius: 4 },
                 ]
@@ -761,8 +1283,74 @@ function renderAnalysis(data, container) {
 }
 
 // ---------------------------------------------------------------------------
-// Cluster Analysis Tab
+// Cluster Analysis Tab — Executive AI Cohort Studio
 // ---------------------------------------------------------------------------
+
+const CLUSTER_METADATA = {
+    0: {
+        icon: 'fa-rocket',
+        color: '#10b981',
+        bg: '#f0fdf4',
+        border: '#bbf7d0',
+        title: 'High Engagement & Growing',
+        riskTier: 'Low Risk',
+        badgeClass: 'badge-low',
+        traits: ['+26.6% Balance Growth', '+24.0% Txn Surge', 'Low Outflow (-25.6%)', '0.4 Complaints/Mo'],
+        story: 'Expanding, loyal accounts with rapid balance accumulation and digital velocity. Represents the highest-value, lowest-churn pillar of the institution.',
+        strategy: 'Nurture with wealth advisory, premium credit tier upgrades, and priority relationship banking.',
+    },
+    1: {
+        icon: 'fa-triangle-exclamation',
+        color: '#ef4444',
+        bg: '#fef2f2',
+        border: '#fecaca',
+        title: 'Severe Capital Outflow & Attrition',
+        riskTier: 'High Risk',
+        badgeClass: 'badge-high',
+        traits: ['-42.2% Balance Drain', '+65.7% Outflow Flight', '-39.0% Txn Drop', '19.3 Days Inactivity'],
+        story: 'Critical flight risk accounts experiencing aggressive liquidity depletion and external fund transfers to competitors. Immediate intervention required.',
+        strategy: 'Proactive RM outreach, deposit retention rate matching, and fee waiver compensation.',
+    },
+    2: {
+        icon: 'fa-shield-halved',
+        color: '#2563eb',
+        bg: '#eff6ff',
+        border: '#bfdbfe',
+        title: 'Stable & Moderate Activity',
+        riskTier: 'Low Risk',
+        badgeClass: 'badge-low',
+        traits: ['-2.1% Stable Balances', 'Normal Transaction Usage', 'Low Inactivity (7.7d)', '0.5 Complaints/Mo'],
+        story: 'Core banking population representing 47.4% of total accounts. Low volatility, consistent monthly salary/vendor flows, and healthy baseline stability.',
+        strategy: 'Automated engagement campaigns, mobile app feature discovery, and recurring deposit cross-selling.',
+    },
+    3: {
+        icon: 'fa-headset',
+        color: '#ea580c',
+        bg: '#fff7ed',
+        border: '#fed7aa',
+        title: 'High Friction & Escalated Complaints',
+        riskTier: 'High Risk',
+        badgeClass: 'badge-high',
+        traits: ['5.1 Complaints/Month', '5.2 Failed Transactions', '4.3 Unresolved Issues', 'Service Dissatisfaction'],
+        story: 'Accounts experiencing acute operational and technical friction, leading to severe frustration despite moderate baseline financial balances.',
+        strategy: 'Immediate Service Recovery desk escalation, technical root-cause resolution, and apology waiver vouchers.',
+    },
+    4: {
+        icon: 'fa-credit-card',
+        color: '#d97706',
+        bg: '#fffbeb',
+        border: '#fde68a',
+        title: 'Loan Default & Financial Strain',
+        riskTier: 'Medium Risk',
+        badgeClass: 'badge-med',
+        traits: ['1.0 EMI Bounces/Month', '-14.6% Card Spend', '-14.7% Balance Drop', '11.6 Days Inactivity'],
+        story: 'Borrowers exhibiting signs of household financial distress with repeated EMI bounced payments and shrinking discretionary card spend.',
+        strategy: 'Debt restructuring, flexible repayment schedules, and credit counseling assistance.',
+    },
+};
+
+let activeClusterId = 1; // Default to most critical cluster
+
 async function loadClusters() {
     try {
         const res = await fetch('/api/clusters');
@@ -770,82 +1358,215 @@ async function loadClusters() {
         state.clusterData = data.clusters || [];
         renderClusterOverview(state.clusterData);
         renderClusterRadar(state.clusterData);
+        renderClusterRiskBar(state.clusterData);
+        drillCluster(activeClusterId);
     } catch (err) { console.error('Cluster load error:', err); }
 }
 
 function renderClusterOverview(clusters) {
     const grid = document.getElementById('clusterOverview');
     if (!grid) return;
-    grid.innerHTML = clusters.map(c => {
-        const total = c.customer_count;
-        const highPct = total > 0 ? ((c.high_risk_count / total) * 100).toFixed(1) : 0;
-        const medPct = total > 0 ? ((c.medium_risk_count / total) * 100).toFixed(1) : 0;
-        const lowPct = total > 0 ? ((c.low_risk_count / total) * 100).toFixed(1) : 0;
 
-        return `<div class="cluster-card" onclick="drillCluster(${c.cluster_id})">
-            <div class="cluster-card-header">
-                <div><div class="cluster-card-label">${c.cluster_label}</div><div class="cluster-card-id">Cluster ${c.cluster_id}</div></div>
-                <span class="cluster-card-count">${total.toLocaleString()} customers</span>
+    grid.innerHTML = clusters.map(c => {
+        const meta = CLUSTER_METADATA[c.cluster_id] || {
+            icon: 'fa-users', color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe',
+            title: c.cluster_label, riskTier: 'Medium Risk', badgeClass: 'badge-med',
+            traits: [], story: '', strategy: ''
+        };
+        const total = c.customer_count;
+        const portPct = ((total / 10000) * 100).toFixed(1);
+        const avgScore = Math.round(c.avg_risk_score || 0);
+        const isActive = c.cluster_id === activeClusterId;
+
+        return `
+        <div class="cluster-card ${isActive ? 'cluster-card-active' : ''}" 
+             id="cluster-card-${c.cluster_id}"
+             style="--cluster-color:${meta.color}" 
+             onclick="drillCluster(${c.cluster_id}, true)">
+            <div class="cluster-card-top">
+                <div class="cluster-persona-tag">
+                    <div class="cluster-icon-box" style="background:${meta.bg};color:${meta.color};border:1px solid ${meta.border}">
+                        <i class="fa-solid ${meta.icon}"></i>
+                    </div>
+                    <div>
+                        <div class="cluster-card-label">${c.cluster_label}</div>
+                        <div class="cluster-card-id-pill">Cohort ${c.cluster_id}</div>
+                    </div>
+                </div>
+                <span class="cluster-pop-pill">${total.toLocaleString()} (${portPct}%)</span>
             </div>
-            <div class="cluster-stats">
-                <div class="cluster-stat"><div class="cluster-stat-val">${c.avg_churn_probability.toFixed(1)}%</div><div class="cluster-stat-label">Avg Churn</div></div>
-                <div class="cluster-stat"><div class="cluster-stat-val">${c.avg_risk_score.toFixed(0)}</div><div class="cluster-stat-label">Avg Risk Score</div></div>
-                <div class="cluster-stat"><div class="cluster-stat-val">${c.dominant_primary_reason.replace(/_/g, ' ').substring(0, 18)}</div><div class="cluster-stat-label">Top Reason</div></div>
-                <div class="cluster-stat"><div class="cluster-stat-val">${c.dominant_recommended_action.replace(/_/g, ' ').substring(0, 18)}</div><div class="cluster-stat-label">Top Action</div></div>
+
+            <div class="cluster-card-metrics">
+                <div class="cluster-mini-metric">
+                    <div class="cm-val" style="color:${meta.color}">${avgScore}<span style="font-size:0.65rem;color:var(--text-muted)">/100</span></div>
+                    <div class="cm-label">Avg Risk Score</div>
+                </div>
+                <div class="cluster-mini-metric">
+                    <div class="cm-val" style="color:${c.avg_balance_change_30d < 0 ? '#ef4444' : '#10b981'}">
+                        ${c.avg_balance_change_30d > 0 ? '+' : ''}${c.avg_balance_change_30d.toFixed(1)}%
+                    </div>
+                    <div class="cm-label">Balance Δ</div>
+                </div>
             </div>
-            <div class="cluster-risk-bar">
-                <div style="width:${highPct}%;background:#ef4444"></div>
-                <div style="width:${medPct}%;background:#f59e0b"></div>
-                <div style="width:${lowPct}%;background:#10b981"></div>
+
+            <div class="cluster-traits-wrap">
+                ${meta.traits.slice(0, 3).map(t => `<span class="cluster-trait-chip">${t}</span>`).join('')}
+            </div>
+
+            <div class="cluster-card-footer">
+                <span class="badge ${meta.badgeClass}" style="font-size:0.7rem;padding:2px 8px">${meta.riskTier}</span>
+                <button class="btn-explore-cohort" onclick="event.stopPropagation();drillCluster(${c.cluster_id}, true)">
+                    Explore Cohort <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
         </div>`;
     }).join('');
 }
 
 function renderClusterRadar(clusters) {
-    const panel = document.getElementById('clusterRadarPanel');
-    if (panel) panel.style.display = 'block';
     const ctx = getCtx('clusterRadarChart');
     if (!ctx) return;
     destroyChart('clusterRadar');
 
-    const featureLabels = ['Balance Δ', 'Txn Δ', 'Inactivity', 'External Xfer', 'Complaints', 'App Login Δ', 'Card Spend Δ', 'Failed Txns', 'Unresolved', 'EMI Bounce'];
-    const featureKeys = [
-        'avg_balance_change_30d', 'avg_transaction_change_30d', 'avg_days_since_last_transaction',
-        'avg_external_transfer_change_30d', 'avg_complaints_30d', 'avg_app_login_change_30d',
-        'avg_card_spend_change_30d', 'avg_failed_transactions_30d', 'avg_unresolved_complaints', 'avg_emi_bounce_30d'
-    ];
+    const dimensions = ['Balance Trend', 'Transaction Activity', 'Digital Engagement', 'Capital Retention', 'Service Stability', 'Credit Repayment'];
 
-    // Normalize each feature across clusters to 0-100
-    const allValues = featureKeys.map(key => clusters.map(c => Math.abs(c[key] || 0)));
-    const maxValues = allValues.map(arr => Math.max(...arr, 0.01));
+    const datasets = clusters.map(c => {
+        const meta = CLUSTER_METADATA[c.cluster_id] || { color: '#2563eb' };
+        
+        const dBalance = Math.min(100, Math.max(10, 50 + (c.avg_balance_change_30d || 0)));
+        const dTxn = Math.min(100, Math.max(10, 50 + (c.avg_transaction_change_30d || 0)));
+        const dApp = Math.min(100, Math.max(10, 50 + (c.avg_app_login_change_30d || 0)));
+        const dRetention = Math.min(100, Math.max(10, 100 - (c.avg_external_transfer_change_30d || 0)));
+        const dService = Math.min(100, Math.max(10, 100 - (c.avg_complaints_30d || 0) * 16));
+        const dCredit = Math.min(100, Math.max(10, 100 - (c.avg_emi_bounce_30d || 0) * 80));
 
-    const colors = ['rgba(99,102,241,0.7)', 'rgba(239,68,68,0.7)', 'rgba(245,158,11,0.7)', 'rgba(16,185,129,0.7)', 'rgba(244,63,94,0.7)'];
-    const bgColors = ['rgba(99,102,241,0.1)', 'rgba(239,68,68,0.1)', 'rgba(245,158,11,0.1)', 'rgba(16,185,129,0.1)', 'rgba(244,63,94,0.1)'];
-
-    const datasets = clusters.map((c, i) => ({
-        label: c.cluster_label,
-        data: featureKeys.map((key, j) => (Math.abs(c[key] || 0) / maxValues[j]) * 100),
-        borderColor: colors[i % colors.length],
-        backgroundColor: bgColors[i % bgColors.length],
-        borderWidth: 2,
-        pointRadius: 3,
-    }));
+        return {
+            label: c.cluster_label,
+            data: [dBalance, dTxn, dApp, dRetention, dService, dCredit],
+            borderColor: meta.color,
+            backgroundColor: meta.color + '20',
+            borderWidth: 2,
+            pointBackgroundColor: meta.color,
+            pointRadius: 3.5,
+            pointHoverRadius: 6
+        };
+    });
 
     charts.clusterRadar = new Chart(ctx, {
         type: 'radar',
-        data: { labels: featureLabels, datasets },
+        data: { labels: dimensions, datasets },
         options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
-            scales: { r: { beginAtZero: true, max: 100, ticks: { display: false }, grid: { color: 'rgba(0,0,0,0.05)' } } }
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 10, padding: 10, font: { size: 10.5, weight: '600' } }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 10,
+                    cornerRadius: 8
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { display: false },
+                    grid: { color: 'rgba(0,0,0,0.06)' },
+                    pointLabels: { font: { size: 10, weight: '600' }, color: '#475569' }
+                }
+            }
         }
     });
 }
 
-window.drillCluster = async function(clusterId) {
-    const panel = document.getElementById('clusterDrillPanel');
-    if (panel) panel.style.display = 'block';
+function renderClusterRiskBar(clusters) {
+    const ctx = getCtx('clusterRiskBarChart');
+    if (!ctx) return;
+    destroyChart('clusterRiskBar');
+
+    const labels = clusters.map(c => `Cohort ${c.cluster_id}`);
+    const highCounts = clusters.map(c => c.high_risk_count || 0);
+    const medCounts = clusters.map(c => c.medium_risk_count || 0);
+    const lowCounts = clusters.map(c => c.low_risk_count || 0);
+
+    charts.clusterRiskBar = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'High Risk',
+                    data: highCounts,
+                    backgroundColor: '#ef4444',
+                    borderRadius: 3
+                },
+                {
+                    label: 'Medium Risk',
+                    data: medCounts,
+                    backgroundColor: '#f59e0b',
+                    borderRadius: 3
+                },
+                {
+                    label: 'Healthy',
+                    data: lowCounts,
+                    backgroundColor: '#10b981',
+                    borderRadius: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 10, padding: 10, font: { size: 10.5, weight: '600' } }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        title: (items) => {
+                            const c = clusters[items[0].dataIndex];
+                            return `${c.cluster_label} (Cohort ${c.cluster_id})`;
+                        },
+                        label: (ctx) => {
+                            const val = ctx.raw || 0;
+                            const c = clusters[ctx.dataIndex];
+                            const p = c.customer_count > 0 ? ((val / c.customer_count) * 100).toFixed(1) : 0;
+                            return ` ${ctx.dataset.label}: ${val.toLocaleString()} accounts (${p}%)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: '600' } }
+                },
+                y: {
+                    stacked: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: { callback: v => v.toLocaleString() },
+                    title: { display: true, text: 'Audited Accounts', font: { size: 10, weight: '600' } }
+                }
+            }
+        }
+    });
+}
+
+window.drillCluster = async function(clusterId, shouldScroll = false) {
+    activeClusterId = clusterId;
+    
+    // Update active highlight on cards
+    document.querySelectorAll('.cluster-card').forEach(card => card.classList.remove('cluster-card-active'));
+    const activeCard = document.getElementById(`cluster-card-${clusterId}`);
+    if (activeCard) activeCard.classList.add('cluster-card-active');
 
     try {
         const res = await fetch(`/api/cluster/${clusterId}`);
@@ -853,19 +1574,96 @@ window.drillCluster = async function(clusterId) {
         const profile = data.profile;
         const customers = data.customers || [];
         const reasons = data.reason_distribution || {};
+        const meta = CLUSTER_METADATA[clusterId] || {
+            icon: 'fa-users', color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe',
+            title: profile.cluster_label, riskTier: 'Medium Risk', badgeClass: 'badge-med',
+            traits: [], story: '', strategy: ''
+        };
 
-        setText('clusterDrillTitle', `${profile.cluster_label} — ${profile.customer_count.toLocaleString()} Customers`);
+        setText('clusterDrillTitle', `Cohort ${clusterId}: ${profile.cluster_label}`);
+        setText('clusterDrillDesc', `${profile.customer_count.toLocaleString()} Audited Accounts • ${((profile.customer_count/10000)*100).toFixed(1)}% of Portfolio • Avg Risk Score: ${Math.round(profile.avg_risk_score)}/100`);
 
-        // Reason chart
+        // Render Persona Story & KPI Tiles
+        const narrativeBox = document.getElementById('cohortNarrative');
+        if (narrativeBox) {
+            narrativeBox.innerHTML = `
+                <div class="cohort-story-top">
+                    <div class="cohort-story-main">
+                        <div class="cohort-story-icon" style="background:${meta.bg};color:${meta.color};border:1px solid ${meta.border}">
+                            <i class="fa-solid ${meta.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="cohort-story-title">${profile.cluster_label}</div>
+                            <p class="cohort-story-desc">${meta.story}</p>
+                        </div>
+                    </div>
+                    <div class="cohort-strategy-box">
+                        <div class="cohort-strategy-label"><i class="fa-solid fa-lightbulb"></i> Recommended Strategy</div>
+                        <div class="cohort-strategy-text">${meta.strategy}</div>
+                    </div>
+                </div>
+
+                <div class="cohort-kpi-row">
+                    <div class="cohort-kpi-tile">
+                        <div class="cohort-kpi-tile-val" style="color:${profile.avg_balance_change_30d < 0 ? '#ef4444' : '#10b981'}">
+                            ${profile.avg_balance_change_30d > 0 ? '+' : ''}${profile.avg_balance_change_30d.toFixed(1)}%
+                        </div>
+                        <div class="cohort-kpi-tile-label">Avg 30D Balance Δ</div>
+                    </div>
+                    <div class="cohort-kpi-tile">
+                        <div class="cohort-kpi-tile-val" style="color:${profile.avg_transaction_change_30d < 0 ? '#ef4444' : '#10b981'}">
+                            ${profile.avg_transaction_change_30d > 0 ? '+' : ''}${profile.avg_transaction_change_30d.toFixed(1)}%
+                        </div>
+                        <div class="cohort-kpi-tile-label">Avg 30D Txn Δ</div>
+                    </div>
+                    <div class="cohort-kpi-tile">
+                        <div class="cohort-kpi-tile-val" style="color:${profile.avg_external_transfer_change_30d > 20 ? '#ef4444' : '#2563eb'}">
+                            ${profile.avg_external_transfer_change_30d > 0 ? '+' : ''}${profile.avg_external_transfer_change_30d.toFixed(1)}%
+                        </div>
+                        <div class="cohort-kpi-tile-label">Avg Outflow Δ</div>
+                    </div>
+                    <div class="cohort-kpi-tile">
+                        <div class="cohort-kpi-tile-val" style="color:${profile.avg_complaints_30d > 2 ? '#ef4444' : '#10b981'}">
+                            ${profile.avg_complaints_30d.toFixed(1)} <span style="font-size:0.75rem;font-weight:500;color:var(--text-muted)">/mo</span>
+                        </div>
+                        <div class="cohort-kpi-tile-label">Avg Complaints</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Reason Chart
         const ctx = getCtx('clusterReasonChart');
         if (ctx) {
             destroyChart('clusterReason');
-            const labels = Object.keys(reasons).map(r => r.replace(/_/g, ' ')).slice(0, 6);
-            const counts = Object.values(reasons).slice(0, 6);
+            const labels = Object.keys(reasons).map(r => {
+                const clean = r.replace(/_/g, ' ').toLowerCase();
+                return clean.replace(/\b\w/g, l => l.toUpperCase());
+            }).slice(0, 5);
+            const counts = Object.values(reasons).slice(0, 5);
+
             charts.clusterReason = new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'Customers', data: counts, backgroundColor: '#6366f1', borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false }, ticks: { font: { size: 10 } } } } }
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Accounts',
+                        data: counts,
+                        backgroundColor: ['#ef4444', '#f43f5e', '#f97316', '#f59e0b', '#2563eb'],
+                        borderRadius: 4,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 } } },
+                        y: { grid: { display: false }, ticks: { font: { size: 10.5, weight: '600' } } }
+                    }
+                }
             });
         }
 
@@ -873,40 +1671,73 @@ window.drillCluster = async function(clusterId) {
         const featureTable = document.getElementById('clusterFeatureTable');
         if (featureTable) {
             const features = [
-                ['Avg Balance Δ', profile.avg_balance_change_30d],
-                ['Avg Txn Δ', profile.avg_transaction_change_30d],
-                ['Avg Inactivity (days)', profile.avg_days_since_last_transaction],
-                ['Avg External Xfer Δ', profile.avg_external_transfer_change_30d],
-                ['Avg Complaints', profile.avg_complaints_30d],
-                ['Avg App Login Δ', profile.avg_app_login_change_30d],
-                ['Avg Card Spend Δ', profile.avg_card_spend_change_30d],
-                ['Avg Failed Txns', profile.avg_failed_transactions_30d],
-                ['Avg Unresolved', profile.avg_unresolved_complaints],
-                ['Avg EMI Bounce', profile.avg_emi_bounce_30d],
+                ['30D Balance Delta', `${profile.avg_balance_change_30d > 0 ? '+' : ''}${profile.avg_balance_change_30d.toFixed(1)}%`, profile.avg_balance_change_30d < 0 ? '#ef4444' : '#10b981'],
+                ['30D Transaction Delta', `${profile.avg_transaction_change_30d > 0 ? '+' : ''}${profile.avg_transaction_change_30d.toFixed(1)}%`, profile.avg_transaction_change_30d < 0 ? '#ef4444' : '#10b981'],
+                ['Days Since Last Activity', `${profile.avg_days_since_last_transaction.toFixed(1)} days`, '#64748b'],
+                ['30D Outflow Flight Rate', `${profile.avg_external_transfer_change_30d > 0 ? '+' : ''}${profile.avg_external_transfer_change_30d.toFixed(1)}%`, profile.avg_external_transfer_change_30d > 20 ? '#ef4444' : '#64748b'],
+                ['Monthly Complaints', `${profile.avg_complaints_30d.toFixed(2)}`, profile.avg_complaints_30d > 2 ? '#ef4444' : '#64748b'],
+                ['Failed Transaction Rate', `${profile.avg_failed_transactions_30d.toFixed(2)}`, profile.avg_failed_transactions_30d > 2 ? '#ef4444' : '#64748b'],
+                ['Unresolved Issues Count', `${profile.avg_unresolved_complaints.toFixed(2)}`, profile.avg_unresolved_complaints > 1 ? '#ef4444' : '#64748b'],
+                ['Monthly EMI Default Rate', `${profile.avg_emi_bounce_30d.toFixed(2)}`, profile.avg_emi_bounce_30d > 0.5 ? '#ef4444' : '#10b981'],
             ];
-            featureTable.innerHTML = `<table><thead><tr><th>Feature</th><th>Cluster Average</th></tr></thead>
-                <tbody>${features.map(([name, val]) => `<tr><td>${name}</td><td style="font-weight:700;color:${val < 0 ? '#ef4444' : '#10b981'}">${(val || 0).toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+            featureTable.innerHTML = `<table>
+                <thead><tr><th>Behavioral Feature</th><th>Cohort Average</th></tr></thead>
+                <tbody>${features.map(([name, val, col]) => `<tr><td>${name}</td><td style="font-weight:700;color:${col}">${val}</td></tr>`).join('')}</tbody>
+            </table>`;
         }
 
         // Customer table
         const tbody = document.getElementById('clusterCustBody');
         if (tbody) {
-            tbody.innerHTML = customers.slice(0, 50).map(c => {
+            tbody.innerHTML = customers.slice(0, 30).map(c => {
                 const badge = c.risk_level === 'High' ? 'badge-high' : c.risk_level === 'Medium' ? 'badge-med' : 'badge-low';
-                return `<tr>
-                    <td><strong>${c.customer_name}</strong><br><span style="font-size:0.72rem;color:#94a3b8">${c.customer_id}</span></td>
-                    <td style="text-transform:capitalize">${c.customer_segment}</td>
-                    <td>₹${(c.customer_yearly_value || 0).toLocaleString()}</td>
+                const probColor = c.risk_level === 'High' ? '#ef4444' : c.risk_level === 'Medium' ? '#b45309' : '#16a34a';
+                const scoreVal = Math.round(c.risk_score || 0);
+                const frictionRaw = c.primary_reason ? c.primary_reason.replace(/_/g, ' ') : 'Stable';
+                const frictionLabel = frictionRaw.replace(/\b\w/g, l => l.toUpperCase());
+                const actionRaw = c.recommended_action ? c.recommended_action.replace(/_/g, ' ') : 'Monitor';
+                const actionLabel = actionRaw.replace(/\b\w/g, l => l.toUpperCase());
+                const urgency = c.urgency || '';
+                const urgClass = urgency === 'HIGH' ? 'urgency-high' : urgency === 'MEDIUM' ? 'urgency-med' : 'urgency-low';
+                const urgLabel = urgency ? `<span class="urgency-pill ${urgClass}">${urgency.charAt(0) + urgency.slice(1).toLowerCase()}</span>` : `<span class="dir-none">—</span>`;
+                const seg = c.customer_segment ? (c.customer_segment.charAt(0).toUpperCase() + c.customer_segment.slice(1).toLowerCase()) : '—';
+
+                return `<tr onclick="openCustomerModal('${c.customer_id}')" class="dir-row">
+                    <td>
+                        <div class="acct-cell">
+                            <div class="acct-info">
+                                <div class="acct-name">${c.customer_name}</div>
+                                <div class="acct-id">${c.customer_id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="seg-tag">${seg}</span></td>
                     <td><span class="badge ${badge}">${c.risk_level}</span></td>
-                    <td>${(c.churn_probability || 0).toFixed(1)}%</td>
-                    <td>${c.primary_reason ? c.primary_reason.replace(/_/g, ' ') : '—'}</td>
-                    <td>${c.recommended_action ? c.recommended_action.replace(/_/g, ' ') : 'Monitor'}</td>
+                    <td>
+                        <div class="prob-cell" title="Risk Score: ${scoreVal}/100 (Model Churn Prob: ${(c.churn_probability || 0).toFixed(1)}%)">
+                            <div class="prob-track"><div class="prob-fill" style="width:${Math.min(100, Math.max(4, scoreVal))}%;background:${probColor}"></div></div>
+                            <strong style="color:${probColor}">${scoreVal}<span style="font-size:0.68rem;color:var(--text-muted);font-weight:600">/100</span></strong>
+                        </div>
+                    </td>
+                    <td class="friction-cell">${frictionLabel}</td>
+                    <td class="action-cell">${actionLabel}</td>
+                    <td>${urgLabel}</td>
+                    <td class="text-right">
+                        <button class="btn-profile" onclick="event.stopPropagation();openCustomerModal('${c.customer_id}')">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Audit
+                        </button>
+                    </td>
                 </tr>`;
             }).join('');
         }
 
-        // Scroll to drill panel
-        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Smooth scroll to drilldown panel if explicitly triggered by user click
+        if (shouldScroll) {
+            const drillEl = document.getElementById('clusterDrillPanel');
+            if (drillEl) {
+                drillEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
     } catch (err) { console.error('Cluster drill error:', err); }
 };
 
@@ -950,7 +1781,7 @@ async function loadVisualizations() {
         charts.vizRisk = new Chart(rCtx, {
             type: 'pie',
             data: {
-                labels: ['High Risk', 'Watchlist', 'Healthy'],
+                labels: ['High Risk', 'Medium Risk', 'Healthy'],
                 datasets: [{ data: [dist.High || 0, dist.Medium || 0, dist.Low || 0], backgroundColor: ['#ef4444', '#f59e0b', '#10b981'] }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
@@ -965,7 +1796,7 @@ async function loadVisualizations() {
         const labels = Object.keys(reasons).map(r => r.replace(/_/g, ' '));
         charts.vizReasons = new Chart(rrCtx, {
             type: 'doughnut',
-            data: { labels, datasets: [{ data: Object.values(reasons), backgroundColor: ['#6366f1', '#ef4444', '#f59e0b', '#10b981', '#f43f5e', '#0ea5e9', '#8b5cf6', '#14b8a6', '#64748b', '#e11d48'] }] },
+            data: { labels, datasets: [{ data: Object.values(reasons), backgroundColor: ['#2563eb', '#ef4444', '#f59e0b', '#10b981', '#f43f5e', '#0ea5e9', '#0891b2', '#14b8a6', '#64748b', '#e11d48'] }] },
             options: { responsive: true, maintainAspectRatio: false, cutout: '50%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
         });
     }
@@ -1000,7 +1831,7 @@ async function loadVisualizations() {
             data: {
                 labels: trends.map(t => t.month),
                 datasets: [
-                    { label: 'Balance Δ', data: trends.map(t => t.balance_delta), borderColor: '#6366f1', fill: false, tension: 0.3, pointRadius: 5 },
+                    { label: 'Balance Δ', data: trends.map(t => t.balance_delta), borderColor: '#2563eb', fill: false, tension: 0.3, pointRadius: 5 },
                     { label: 'Transaction Δ', data: trends.map(t => t.txn_delta), borderColor: '#f59e0b', fill: false, tension: 0.3, pointRadius: 5 },
                     { label: 'Outflow Δ', data: trends.map(t => t.outflow_delta), borderColor: '#ef4444', fill: false, tension: 0.3, pointRadius: 5 },
                     { label: 'Failed Txns', data: trends.map(t => t.failed_txns), borderColor: '#64748b', fill: false, tension: 0.3, pointRadius: 5 },
