@@ -3,7 +3,7 @@ import sqlite3
 from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
-DB_PATH = os.path.join(os.path.dirname(__file__), 'database', 'sample_customer_retention.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'database', 'customer_retention.db')
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -14,39 +14,97 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Human-friendly labels for Model 1 v2 risk factor names
+# Comprehensive human-friendly labels for all 69 Model 1 v2 engineered features
 FACTOR_DISPLAY = {
+    'app_login_change_30d_trend_6m': 'Digital Engagement Trajectory (6M Trend)',
+    'avg_app_login_change_30d_3m': 'Avg App Login Delta (3-Month)',
+    'avg_app_login_change_30d_6m': 'Avg App Login Delta (6-Month)',
+    'avg_balance_change_30d_3m': 'Avg Balance Delta (3-Month)',
+    'avg_balance_change_30d_6m': 'Avg Balance Delta (6-Month)',
+    'avg_card_spend_change_30d_3m': 'Avg Card Spending Delta (3-Month)',
+    'avg_card_spend_change_30d_6m': 'Avg Card Spending Delta (6-Month)',
+    'avg_external_transfer_change_30d_3m': 'Avg External Outflow Delta (3-Month)',
+    'avg_external_transfer_change_30d_6m': 'Avg External Outflow Delta (6-Month)',
+    'avg_transaction_change_30d_3m': 'Avg Transaction Delta (3-Month)',
+    'avg_transaction_change_30d_6m': 'Avg Transaction Delta (6-Month)',
+    'avg_upi_share_of_spend_3m': 'Avg UPI Spend Share (3-Month)',
+    'avg_upi_share_of_spend_6m': 'Avg UPI Spend Share (6-Month)',
+    'balance_change_30d_trend_6m': 'Account Balance Trajectory (6M Trend)',
+    'card_spend_change_30d_trend_6m': 'Card Spend Trajectory (6M Trend)',
+    'complaints_30d_trend_6m': 'Service Complaints Trajectory (6M Trend)',
+    'count_app_login_drop_3m': 'Consecutive App Login Drops (3M)',
+    'count_app_login_drop_6m': 'Consecutive App Login Drops (6M)',
+    'count_balance_drop_3m': 'Consecutive Balance Drops (3M)',
+    'count_balance_drop_6m': 'Consecutive Balance Drops (6M)',
+    'count_card_spend_drop_3m': 'Consecutive Card Spend Drops (3M)',
+    'count_card_spend_drop_6m': 'Consecutive Card Spend Drops (6M)',
+    'count_emi_bounce_month_6m': 'Months with EMI Bounce (6M)',
+    'count_external_transfer_rise_3m': 'Months with Outflow Surge (3M)',
+    'count_external_transfer_rise_6m': 'Months with Outflow Surge (6M)',
+    'count_failed_transaction_month_3m': 'Months with Failed Txns (3M)',
+    'count_failed_transaction_month_6m': 'Months with Failed Txns (6M)',
+    'count_transaction_drop_3m': 'Consecutive Transaction Drops (3M)',
+    'count_transaction_drop_6m': 'Consecutive Transaction Drops (6M)',
+    'days_since_last_transaction_trend_6m': 'Account Inactivity Trajectory (6M Trend)',
+    'external_transfer_change_30d_trend_6m': 'External Outflow Surge (6M Trend)',
+    'latest_app_login_change_30d': 'Recent App Login Delta (30D)',
+    'latest_avg_resolution_time_hrs': 'Slow Complaint Resolution Time',
+    'latest_balance_change_30d': 'Severe Account Balance Drop (30D)',
+    'latest_card_spend_change_30d': 'Declining Card Spending (30D)',
+    'latest_complaints_30d': 'Recent Service Complaints (30D)',
+    'latest_days_since_last_transaction': 'Prolonged Account Inactivity (Days)',
+    'latest_external_transfer_change_30d': 'Funds Outflow to External Banks (30D)',
+    'latest_failed_transactions_30d': 'Recent Failed Transactions (30D)',
+    'latest_fd_maturing_in_30d': 'Fixed Deposit Maturing Soon',
+    'latest_products_dropped_90d': 'Banking Products Dropped (90D)',
+    'latest_salary_missing_days': 'Delayed Salary / Income Inflow',
+    'latest_transaction_change_30d': 'Declining Transaction Frequency (30D)',
+    'latest_upi_share_of_spend': 'High UPI Share of Spending',
+    'latest_vs_avg_app_login_change_30d_available_history': 'App Logins Lower than Historical Avg',
+    'latest_vs_avg_balance_change_30d_available_history': 'Balance Drop Worse than Historical Avg',
+    'latest_vs_avg_card_spend_change_30d_available_history': 'Card Spend Lower than Historical Avg',
+    'latest_vs_avg_external_transfer_change_30d_available_history': 'External Outflows Higher than Avg',
+    'latest_vs_avg_transaction_change_30d_available_history': 'Transactions Lower than Historical Avg',
     'latest_vs_avg_upi_share_of_spend_available_history': 'Shift to 3rd-Party UPI Apps',
-    'latest_days_since_last_transaction': 'Prolonged Account Inactivity',
-    'latest_transaction_change_30d': 'Declining Transaction Frequency',
-    'latest_salary_missing_days': 'Delayed Salary / Pension Credit',
-    'latest_upi_share_of_spend': 'High UPI Share of Spend',
-    'latest_balance_change_30d': 'Severe Account Balance Drop',
-    'latest_external_transfer_change_30d': 'Funds Outflow to External Banks',
-    'sum_failed_transactions_30d_3m': 'Persistent Transaction Failures',
-    'sum_complaints_30d_3m': 'Frequent Service Complaints',
-    'latest_unresolved_complaints': 'Unresolved Escalated Complaints',
-    'latest_card_spend_change_30d': 'Declining Card Spending',
-    'latest_app_login_change_30d': 'Reduced Digital Engagement',
-    'latest_complaints_30d': 'Recent Complaint Activity',
-    'latest_failed_transactions_30d': 'Failed Transactions',
-    'latest_emi_bounce_30d': 'EMI Payment Bounce',
-    'latest_avg_resolution_time_hrs': 'Slow Complaint Resolution',
-    'latest_fd_maturing_in_30d': 'FD Maturing Soon',
-    'latest_products_dropped_90d': 'Product Cancellations',
-    'avg_balance_change_30d_3m': 'Balance Decline (3-Month)',
-    'avg_balance_change_30d_6m': 'Balance Decline (6-Month)',
-    'avg_transaction_change_30d_3m': 'Transaction Decline (3-Month)',
-    'avg_transaction_change_30d_6m': 'Transaction Decline (6-Month)',
-    'sum_complaints_30d_6m': 'Complaint History (6-Month)',
-    'sum_failed_transactions_30d_6m': 'Failed Transactions (6-Month)',
-    'balance_change_30d_trend_6m': 'Balance Downward Trend',
-    'transaction_change_30d_trend_6m': 'Transaction Downward Trend',
-    'days_since_last_transaction_trend_6m': 'Growing Inactivity Trend',
-    'external_transfer_change_30d_trend_6m': 'Rising External Transfers',
-    'complaints_30d_trend_6m': 'Rising Complaint Trend',
-    'latest_vs_avg_balance_change_30d_available_history': 'Balance Below Historical Average',
+    'max_avg_resolution_time_hrs_3m': 'Peak Complaint Resolution Time (3M)',
+    'max_avg_resolution_time_hrs_6m': 'Peak Complaint Resolution Time (6M)',
+    'max_days_since_last_transaction_3m': 'Peak Inactivity Duration (3M)',
+    'max_days_since_last_transaction_6m': 'Peak Inactivity Duration (6M)',
+    'max_salary_missing_days_3m': 'Longest Salary Delay (3M)',
+    'max_salary_missing_days_6m': 'Longest Salary Delay (6M)',
+    'sum_complaints_30d_3m': 'Frequent Service Complaints (3M)',
+    'sum_complaints_30d_6m': 'Accumulated Service Complaints (6M)',
+    'sum_emi_bounce_30d_3m': 'Total EMI Payment Bounces (3M)',
+    'sum_emi_bounce_30d_6m': 'Accumulated EMI Bounces (6M)',
+    'sum_failed_transactions_30d_3m': 'Persistent Transaction Failures (3M)',
+    'sum_failed_transactions_30d_6m': 'Accumulated Failed Transactions (6M)',
+    'sum_fd_maturing_in_30d_3m': 'Maturing Fixed Deposits (3M Window)',
+    'sum_fd_maturing_in_30d_6m': 'Maturing Fixed Deposits (6M Window)',
+    'sum_products_dropped_90d_3m': 'Total Products Cancelled (3M)',
+    'sum_products_dropped_90d_6m': 'Total Products Cancelled (6M)',
+    'sum_unresolved_complaints_3m': 'Unresolved Escalated Complaints (3M)',
+    'sum_unresolved_complaints_6m': 'Unresolved Escalated Complaints (6M)',
+    'transaction_change_30d_trend_6m': 'Transaction Activity Trajectory (6M Trend)',
 }
+
+def format_factor_label(fn: str) -> str:
+    if not fn:
+        return ""
+    if fn in FACTOR_DISPLAY:
+        return FACTOR_DISPLAY[fn]
+    # Smart parsing fallback
+    clean_name = fn.replace('latest_vs_avg_', 'Recent vs Avg ')
+    clean_name = clean_name.replace('latest_', 'Recent ')
+    clean_name = clean_name.replace('avg_', 'Avg ')
+    clean_name = clean_name.replace('sum_', 'Total ')
+    clean_name = clean_name.replace('count_', 'Count ')
+    clean_name = clean_name.replace('_30d', '')
+    clean_name = clean_name.replace('_trend_6m', ' (6M Trend)')
+    clean_name = clean_name.replace('_6m', ' (6M)')
+    clean_name = clean_name.replace('_3m', ' (3M)')
+    clean_name = clean_name.replace('_available_history', ' (vs History)')
+    clean_name = clean_name.replace('_', ' ').strip()
+    return clean_name.title()
 
 # ---------------------------------------------------------------------------
 # Page routes
@@ -91,7 +149,7 @@ def dashboard_stats():
         rev_by_risk[r['risk_level']] = r['rev'] or 0
     rev_at_risk = rev_by_risk['High'] + rev_by_risk['Medium']
 
-    # Top risk factors (portfolio-wide)
+    # Top risk factors (portfolio-wide across all customers)
     factor_rows = conn.execute('''
         SELECT factor_name, factor_message, COUNT(*) as frequency,
                AVG(contribution) as avg_contribution, AVG(factor_value) as avg_value
@@ -101,24 +159,23 @@ def dashboard_stats():
     top_factors = []
     for r in factor_rows:
         fn = r['factor_name']
-        fallback = fn.replace('latest_', '').replace('_30d', '').replace('_', ' ').title()
         top_factors.append({
             'factor_name': fn,
-            'display_label': FACTOR_DISPLAY.get(fn, fallback),
+            'display_label': format_factor_label(fn),
             'factor_message': r['factor_message'],
             'frequency': r['frequency'],
             'avg_contribution': round(r['avg_contribution'] or 0, 3),
             'avg_value': round(r['avg_value'] or 0, 2),
         })
 
-    # Primary reasons
+    # Primary reasons (Model 2 LLM diagnoses for at-risk customers)
     reason_rows = conn.execute('''
         SELECT primary_reason, COUNT(*) as cnt FROM model2_predictions
         WHERE primary_reason IS NOT NULL GROUP BY primary_reason ORDER BY cnt DESC
     ''').fetchall()
     primary_reasons = {r['primary_reason']: r['cnt'] for r in reason_rows}
 
-    # Recommended actions
+    # Recommended actions matrix (Model 2 LLM recommendations by urgency)
     action_rows = conn.execute('''
         SELECT recommended_action, urgency, COUNT(*) as cnt FROM model2_predictions
         WHERE recommended_action IS NOT NULL GROUP BY recommended_action, urgency ORDER BY cnt DESC
@@ -169,10 +226,14 @@ def dashboard_stats():
         FROM customers c JOIN model1_predictions m ON c.customer_id = m.customer_id
         GROUP BY bracket ORDER BY MIN(products_count)
     ''').fetchall()
-    product_depth = [{'bracket': r['bracket'], 'total_customers': r['total'],
-                      'high_risk_count': r['high_cnt'], 'avg_churn_prob': round(r['avg_cp'] or 0, 2)} for r in prod_rows]
+    product_depth = [{
+        'bracket': r['bracket'],
+        'total_customers': r['total'],
+        'high_risk_count': r['high_cnt'],
+        'avg_churn_prob': round(r['avg_cp'] or 0, 2)
+    } for r in prod_rows]
 
-    # Monthly trends
+    # Monthly trends from real snapshots
     trend_rows = conn.execute('''
         SELECT snapshot_date, AVG(balance_change_30d) as avg_bal,
                AVG(transaction_change_30d) as avg_txn,
@@ -180,11 +241,13 @@ def dashboard_stats():
                AVG(failed_transactions_30d) as avg_fail
         FROM customer_snapshots GROUP BY snapshot_date ORDER BY snapshot_date
     ''').fetchall()
-    monthly_trends = [{'month': r['snapshot_date'][:7],
-                       'balance_delta': round(r['avg_bal'] or 0, 2),
-                       'txn_delta': round(r['avg_txn'] or 0, 2),
-                       'outflow_delta': round(r['avg_ext'] or 0, 2),
-                       'failed_txns': round(r['avg_fail'] or 0, 2)} for r in trend_rows]
+    monthly_trends = [{
+        'month': r['snapshot_date'][:7],
+        'balance_delta': round(r['avg_bal'] or 0, 2),
+        'txn_delta': round(r['avg_txn'] or 0, 2),
+        'outflow_delta': round(r['avg_ext'] or 0, 2),
+        'failed_txns': round(r['avg_fail'] or 0, 2)
+    } for r in trend_rows]
 
     conn.close()
     return jsonify({
@@ -224,15 +287,28 @@ def get_customers():
     wheres, params = [], []
 
     if risk_level and risk_level.lower() != 'all':
-        wheres.append("m1.risk_level = ?"); params.append(risk_level)
+        wheres.append("m1.risk_level = ?")
+        params.append(risk_level)
     if segment and segment.lower() != 'all':
-        wheres.append("c.customer_segment = ?"); params.append(segment)
+        wheres.append("c.customer_segment = ?")
+        params.append(segment)
     if action and action.lower() != 'all':
-        wheres.append("m2.recommended_action = ?"); params.append(action)
+        if action == 'MONITOR':
+            wheres.append("(m2.recommended_action = ? OR m2.recommended_action IS NULL)")
+            params.append(action)
+        else:
+            wheres.append("m2.recommended_action = ?")
+            params.append(action)
     if urgency and urgency.lower() != 'all':
-        wheres.append("m2.urgency = ?"); params.append(urgency)
+        if urgency == 'LOW':
+            wheres.append("(m2.urgency = ? OR m2.urgency IS NULL)")
+            params.append(urgency)
+        else:
+            wheres.append("m2.urgency = ?")
+            params.append(urgency)
     if cluster_id and cluster_id != '':
-        wheres.append("cc.cluster_id = ?"); params.append(int(cluster_id))
+        wheres.append("cc.cluster_id = ?")
+        params.append(int(cluster_id))
     if search:
         wheres.append("(c.customer_id LIKE ? OR c.customer_name LIKE ?)")
         params.extend([f"%{search}%", f"%{search}%"])
@@ -240,9 +316,12 @@ def get_customers():
     where_sql = ("WHERE " + " AND ".join(wheres)) if wheres else ""
 
     sort_map = {
-        'risk_score': 'm1.risk_score', 'churn_probability': 'm1.churn_probability',
-        'customer_yearly_value': 'c.customer_yearly_value', 'tenure_months': 'c.tenure_months',
-        'customer_name': 'c.customer_name', 'customer_id': 'c.customer_id',
+        'risk_score': 'm1.risk_score',
+        'churn_probability': 'm1.churn_probability',
+        'customer_yearly_value': 'c.customer_yearly_value',
+        'tenure_months': 'c.tenure_months',
+        'customer_name': 'c.customer_name',
+        'customer_id': 'c.customer_id',
     }
     col = sort_map.get(sort_by, 'm1.risk_score')
     direction = 'ASC' if sort_order == 'asc' else 'DESC'
@@ -270,7 +349,9 @@ def get_customers():
 
     conn.close()
     return jsonify({
-        'total_count': total, 'limit': limit, 'offset': offset,
+        'total_count': total,
+        'limit': limit,
+        'offset': offset,
         'customers': [dict(r) for r in data],
     })
 
@@ -309,9 +390,24 @@ def customer_detail(customer_id):
     ''', (customer_id,)).fetchall()
 
     conn.close()
+
+    p_dict = dict(profile)
+    # Default fallback for healthy accounts without LLM Model 2 records
+    if p_dict.get('primary_reason') is None:
+        p_dict['primary_reason'] = None
+        p_dict['recommended_action'] = p_dict.get('recommended_action') or 'MONITOR'
+        p_dict['urgency'] = p_dict.get('urgency') or 'LOW'
+        p_dict['reasoning_summary'] = p_dict.get('reasoning_summary') or 'Customer displays stable engagement metrics with low churn probability.'
+
+    factors_list = []
+    for r in factors:
+        f = dict(r)
+        f['display_label'] = format_factor_label(f['factor_name'])
+        factors_list.append(f)
+
     return jsonify({
-        'profile': dict(profile),
-        'risk_factors': [dict(r) for r in factors],
+        'profile': p_dict,
+        'risk_factors': factors_list,
         'evidence': [dict(r) for r in evidence],
     })
 
@@ -369,9 +465,16 @@ def customer_retention_analysis(customer_id):
         FROM customer_snapshots WHERE customer_id = ? ORDER BY snapshot_date
     ''', (customer_id,)).fetchall()
 
+    p = dict(profile)
+    # Default fallback for healthy accounts without LLM Model 2 records
+    if p.get('primary_reason') is None:
+        p['primary_reason'] = None
+        p['recommended_action'] = p.get('recommended_action') or 'MONITOR'
+        p['urgency'] = p.get('urgency') or 'LOW'
+        p['reasoning_summary'] = p.get('reasoning_summary') or 'Customer displays stable engagement metrics with low churn probability.'
+
     # Get cluster profile if assigned
     cluster_profile = None
-    p = dict(profile)
     if p.get('cluster_id') is not None:
         cluster_profile = conn.execute('''
             SELECT * FROM cluster_profiles WHERE cluster_id = ?
@@ -380,9 +483,16 @@ def customer_retention_analysis(customer_id):
             cluster_profile = dict(cluster_profile)
 
     conn.close()
+
+    factors_list = []
+    for r in factors:
+        f = dict(r)
+        f['display_label'] = format_factor_label(f['factor_name'])
+        factors_list.append(f)
+
     return jsonify({
         'profile': p,
-        'risk_factors': [dict(r) for r in factors],
+        'risk_factors': factors_list,
         'evidence': [dict(r) for r in evidence],
         'history': [dict(r) for r in history],
         'cluster_profile': cluster_profile,
@@ -484,10 +594,9 @@ def feature_importance():
     features = []
     for r in rows:
         fn = r['factor_name']
-        fallback = fn.replace('latest_', '').replace('_30d', '').replace('_', ' ').title()
         features.append({
             'feature_name': fn,
-            'display_label': FACTOR_DISPLAY.get(fn, fallback),
+            'display_label': format_factor_label(fn),
             'frequency': r['frequency'],
             'avg_contribution': round(r['avg_contribution'] or 0, 4),
             'avg_value': round(r['avg_value'] or 0, 2),

@@ -180,23 +180,27 @@ window.filterBySegment = function(seg) {
     loadCustomers();
 };
 
-// ---------------------------------------------------------------------------
-// Dashboard
-// ---------------------------------------------------------------------------
 async function loadDashboard() {
     try {
         const res = await fetch('/api/dashboard_stats');
+        if (!res.ok) {
+            console.error('Failed to fetch /api/dashboard_stats, status:', res.status);
+            return;
+        }
         const data = await res.json();
         state.dashData = data;
-        renderKPIs(data);
-        renderRiskChart(data);
-        renderTopFactors(data);
-        renderActionsChart(data);
-        renderReasonsChart(data);
-        renderProductDepthChart(data);
-        renderSegments(data);
-        renderMonthlyTrends(data);
-    } catch (err) { console.error('Dashboard load error:', err); }
+        
+        try { renderKPIs(data); } catch (e) { console.error('Error in renderKPIs:', e); }
+        try { renderRiskChart(data); } catch (e) { console.error('Error in renderRiskChart:', e); }
+        try { renderTopFactors(data); } catch (e) { console.error('Error in renderTopFactors:', e); }
+        try { renderActionsChart(data); } catch (e) { console.error('Error in renderActionsChart:', e); }
+        try { renderReasonsChart(data); } catch (e) { console.error('Error in renderReasonsChart:', e); }
+        try { renderProductDepthChart(data); } catch (e) { console.error('Error in renderProductDepthChart:', e); }
+        try { renderSegments(data); } catch (e) { console.error('Error in renderSegments:', e); }
+        try { renderMonthlyTrends(data); } catch (e) { console.error('Error in renderMonthlyTrends:', e); }
+    } catch (err) {
+        console.error('Dashboard load error:', err);
+    }
 }
 
 function renderKPIs(d) {
@@ -470,51 +474,97 @@ function renderModal(data, history) {
     const badgeClass = p.risk_level === 'High' ? 'badge-high' : p.risk_level === 'Medium' ? 'badge-med' : 'badge-low';
     const urgTag = p.urgency ? `<span class="urgency-tag urgency-${p.urgency.toLowerCase()}">${p.urgency} PRIORITY</span>` : '';
 
+    const reasonDisplay = p.primary_reason 
+        ? `<span style="color:#f59e0b;font-weight:700">${p.primary_reason.replace(/_/g, ' ')}</span>`
+        : `<span style="color:#10b981;font-weight:600"><i class="fa-solid fa-shield-check"></i> Low Risk (Healthy Account)</span>`;
+
+    const actionDisplay = p.recommended_action 
+        ? `<span style="color:#6366f1;font-weight:700">${p.recommended_action.replace(/_/g, ' ')}</span>`
+        : `<span style="color:#6366f1;font-weight:700">MONITOR</span>`;
+
+    const evidenceHtml = evidence.length 
+        ? `<div class="evidence-section"><div class="evidence-section-title">Diagnostic Evidence</div><div class="evidence-pill-grid">${evidence.map(e => `<span class="evidence-pill">${e.evidence_text}</span>`).join('')}</div></div>`
+        : `<div class="evidence-section"><div class="evidence-section-title">Account Diagnosis</div><div style="font-size:0.8rem;color:#10b981;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-circle-check"></i> Behavioral activity is within healthy thresholds. Standard monitoring active.</div></div>`;
+
+    const sortedHistory = [...history].sort((a, b) => a.snapshot_date.localeCompare(b.snapshot_date));
+
     content.innerHTML = `
-        <div class="modal-hero">
-            <div class="modal-hero-avatar">${initials}</div>
-            <div style="flex:1">
-                <h2>${p.customer_name} <span style="font-size:0.85rem;opacity:0.7;font-weight:400">(${p.customer_id})</span></h2>
-                <div class="modal-hero-badges">
-                    <span class="hero-badge"><i class="fa-solid fa-briefcase"></i> ${(p.customer_segment || '').toUpperCase()}</span>
-                    <span class="hero-badge"><i class="fa-solid fa-clock"></i> ${p.tenure_months}mo tenure</span>
-                    <span class="hero-badge"><i class="fa-solid fa-coins"></i> ₹${(p.customer_yearly_value || 0).toLocaleString()}</span>
-                    ${p.cluster_label ? `<span class="hero-badge"><i class="fa-solid fa-object-group"></i> ${p.cluster_label}</span>` : ''}
+        <div class="profile-hero">
+            <div class="profile-hero-left">
+                <div class="profile-avatar">${initials}</div>
+                <div class="profile-info">
+                    <h2>${p.customer_name} <span>(${p.customer_id})</span></h2>
+                    <div class="profile-chips">
+                        <span class="profile-chip"><i class="fa-solid fa-briefcase"></i> ${(p.customer_segment || '').toUpperCase()}</span>
+                        <span class="profile-chip"><i class="fa-solid fa-clock"></i> ${p.tenure_months}mo tenure</span>
+                        <span class="profile-chip"><i class="fa-solid fa-coins"></i> ₹${(p.customer_yearly_value || 0).toLocaleString()}</span>
+                        <span class="profile-chip"><i class="fa-solid fa-cubes"></i> ${p.products_count || 0} Products</span>
+                        ${p.cluster_label ? `<span class="profile-chip"><i class="fa-solid fa-object-group"></i> ${p.cluster_label}</span>` : ''}
+                    </div>
                 </div>
             </div>
-            <div style="text-align:right">
-                <span class="badge ${badgeClass}" style="font-size:0.85rem;padding:6px 16px">${p.risk_level} Risk</span>
-                <div style="font-size:1.8rem;font-weight:800;margin-top:4px">${(p.churn_probability || 0).toFixed(1)}%</div>
+            <div class="profile-hero-metrics">
+                <div class="hero-metric-box">
+                    <span class="badge ${badgeClass}" style="font-size:0.8rem;padding:4px 14px">${p.risk_level} Risk</span>
+                    <div class="hero-churn-val">${(p.churn_probability || 0).toFixed(1)}%</div>
+                    <span class="hero-score-sub">Risk Score: ${(p.risk_score || 0).toFixed(1)} / 100</span>
+                </div>
             </div>
         </div>
         <div class="modal-body">
-            <div class="modal-dual">
-                <div class="modal-section">
-                    <div class="modal-section-title"><i class="fa-solid fa-chart-line"></i><span>Key Risk Indicators</span><span style="margin-left:auto;font-size:0.72rem;color:#94a3b8">Score: ${(p.risk_score || 0).toFixed(1)}/100</span></div>
-                    ${factors.map(f => `<div class="shap-row"><div><div class="shap-name">#${f.factor_rank} ${f.factor_name.replace(/_/g, ' ')}</div><div class="shap-msg">${f.factor_message}</div></div><span class="shap-impact">+${(f.contribution || 0).toFixed(3)}</span></div>`).join('')}
+            <div class="profile-grid-2">
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <div class="profile-card-title"><i class="fa-solid fa-chart-line"></i>Key Risk Drivers (XGBoost SHAP)</div>
+                    </div>
+                    <div class="driver-list">
+                        ${factors.map((f, idx) => `
+                            <div class="driver-item">
+                                <div class="driver-item-header">
+                                    <span class="driver-name"><span style="color:var(--blue);font-weight:700;margin-right:4px">#${idx+1}</span> ${f.display_label || f.factor_name.replace(/_/g, ' ')}</span>
+                                    <span class="driver-contrib">+${(f.contribution || 0).toFixed(3)}</span>
+                                </div>
+                                <div class="driver-desc">${f.factor_message}</div>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-                <div class="modal-section">
-                    <div class="modal-section-title"><i class="fa-solid fa-headset"></i><span>AI Retention Plan</span>${urgTag}</div>
-                    <div style="margin-bottom:10px"><strong>Friction Point:</strong> <span style="color:#f59e0b;font-weight:700">${p.primary_reason ? p.primary_reason.replace(/_/g, ' ') : 'N/A'}</span></div>
-                    <div style="margin-bottom:10px"><strong>Recommended:</strong> <span style="color:#6366f1;font-weight:700">${p.recommended_action ? p.recommended_action.replace(/_/g, ' ') : 'MONITOR'}</span></div>
-                    <div class="reasoning-box">"${p.reasoning_summary || 'Standard retention profile.'}"</div>
-                    ${evidence.length ? `<div style="margin-top:12px"><strong style="font-size:0.75rem;color:#64748b;text-transform:uppercase">Evidence</strong><div class="evidence-tags" style="margin-top:6px">${evidence.map(e => `<span class="evidence-tag">${e.evidence_text}</span>`).join('')}</div></div>` : ''}
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <div class="profile-card-title"><i class="fa-solid fa-headset"></i>Retention Playbook (AI Strategy)</div>
+                        ${urgTag}
+                    </div>
+                    <div class="playbook-row">
+                        <span class="playbook-label">Diagnosis:</span>
+                        <span class="playbook-val">${reasonDisplay}</span>
+                    </div>
+                    <div class="playbook-row">
+                        <span class="playbook-label">Next Action:</span>
+                        <span class="playbook-val">${actionDisplay}</span>
+                    </div>
+                    <div class="playbook-reasoning">"${p.reasoning_summary || 'Customer exhibits stable engagement metrics with low churn probability.'}"</div>
+                    ${evidenceHtml}
                 </div>
             </div>
-            <div class="modal-history">
-                <div class="modal-history-title"><i class="fa-solid fa-timeline text-slate"></i><span>6-Month Account Trajectory</span></div>
-                <div class="modal-chart-wrap"><canvas id="modalHistChart"></canvas></div>
-                <div style="overflow-x:auto;margin-top:12px">
-                    <table class="mini-table"><thead><tr><th>Month</th><th>Balance Δ</th><th>Txn Δ</th><th>App Δ</th><th>Complaints</th><th>Failed Txns</th><th>Complaint Note</th></tr></thead>
-                    <tbody>${history.map(h => `<tr>
-                        <td><strong>${h.snapshot_date.substring(0, 7)}</strong></td>
-                        <td style="color:${(h.balance_change_30d || 0) < 0 ? '#ef4444' : '#10b981'}">${(h.balance_change_30d || 0).toFixed(1)}%</td>
-                        <td style="color:${(h.transaction_change_30d || 0) < 0 ? '#ef4444' : '#10b981'}">${(h.transaction_change_30d || 0).toFixed(1)}%</td>
-                        <td>${(h.app_login_change_30d || 0).toFixed(1)}%</td>
-                        <td>${h.complaints_30d || 0}</td>
-                        <td>${h.failed_transactions_30d || 0}</td>
-                        <td>${h.complaint_text ? `<em style="color:#64748b">"${h.complaint_text}"</em>` : '<span style="color:#cbd5e1">—</span>'}</td>
-                    </tr>`).join('')}</tbody></table>
+
+            <div class="trajectory-panel">
+                <div class="trajectory-header">
+                    <div class="profile-card-title"><i class="fa-solid fa-timeline"></i>6-Month Account Trajectory</div>
+                </div>
+                <div class="trajectory-chart-wrap"><canvas id="modalHistChart"></canvas></div>
+                <div class="monthly-strip">
+                    ${sortedHistory.map(h => {
+                        const balColor = (h.balance_change_30d || 0) < 0 ? 'var(--risk-high)' : 'var(--risk-low)';
+                        const txnColor = (h.transaction_change_30d || 0) < 0 ? 'var(--risk-high)' : 'var(--risk-low)';
+                        return `
+                        <div class="month-card">
+                            <div class="month-card-title">${h.snapshot_date.substring(0, 7)}</div>
+                            <div class="month-card-stat"><span>Balance Δ</span><span style="color:${balColor}">${(h.balance_change_30d || 0).toFixed(1)}%</span></div>
+                            <div class="month-card-stat"><span>Txn Δ</span><span style="color:${txnColor}">${(h.transaction_change_30d || 0).toFixed(1)}%</span></div>
+                            <div class="month-card-stat"><span>Complaints</span><span>${h.complaints_30d || 0}</span></div>
+                            ${h.complaint_text ? `<div class="month-card-note" title="${h.complaint_text}">"${h.complaint_text}"</div>` : ''}
+                        </div>`;
+                    }).join('')}
                 </div>
             </div>
         </div>
@@ -525,14 +575,13 @@ function renderModal(data, history) {
         const ctx = getCtx('modalHistChart');
         if (!ctx) return;
         destroyChart('modalHist');
-        const sorted = [...history].sort((a, b) => a.snapshot_date.localeCompare(b.snapshot_date));
         charts.modalHist = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: sorted.map(h => h.snapshot_date.substring(0, 7)),
+                labels: sortedHistory.map(h => h.snapshot_date.substring(0, 7)),
                 datasets: [
-                    { label: 'Balance Δ %', data: sorted.map(h => h.balance_change_30d || 0), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.3 },
-                    { label: 'Txn Δ %', data: sorted.map(h => h.transaction_change_30d || 0), borderColor: '#f59e0b', borderDash: [5, 5], tension: 0.3 },
+                    { label: 'Balance Δ %', data: sortedHistory.map(h => h.balance_change_30d || 0), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.3, pointRadius: 4 },
+                    { label: 'Txn Δ %', data: sortedHistory.map(h => h.transaction_change_30d || 0), borderColor: '#f59e0b', borderDash: [5, 5], tension: 0.3, pointRadius: 4 },
                 ]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { grid: { display: false } }, y: { title: { display: true, text: '% Change' } } } }
@@ -553,7 +602,7 @@ function setupAnalysisSearch() {
 async function runAnalysis(cid) {
     if (!cid) return;
     const container = document.getElementById('analysisContent');
-    container.innerHTML = '<div class="modal-loading"><i class="fa-solid fa-spinner fa-spin"></i><p>Analyzing customer...</p></div>';
+    container.innerHTML = '<div class="modal-loading"><i class="fa-solid fa-spinner fa-spin"></i><p>Analyzing customer account...</p></div>';
 
     try {
         const res = await fetch(`/api/customer/${cid}/retention_analysis`);
@@ -573,58 +622,114 @@ function renderAnalysis(data, container) {
     const cluster = data.cluster_profile;
     const initials = p.customer_name ? p.customer_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'CU';
     const badgeClass = p.risk_level === 'High' ? 'badge-high' : p.risk_level === 'Medium' ? 'badge-med' : 'badge-low';
-    const probColor = p.risk_level === 'High' ? '#ef4444' : p.risk_level === 'Medium' ? '#f59e0b' : '#10b981';
+
+    const reasonDisplay = p.primary_reason 
+        ? `<span style="color:#f59e0b;font-weight:700">${p.primary_reason.replace(/_/g, ' ')}</span>`
+        : `<span style="color:#10b981;font-weight:600"><i class="fa-solid fa-shield-check"></i> Low Risk (Healthy Account)</span>`;
+
+    const actionDisplay = p.recommended_action 
+        ? `<span style="color:#6366f1;font-weight:700">${p.recommended_action.replace(/_/g, ' ')}</span>`
+        : `<span style="color:#6366f1;font-weight:700">MONITOR</span>`;
+
+    const evidenceHtml = evidence.length 
+        ? `<div class="evidence-section"><div class="evidence-section-title">Diagnostic Evidence</div><div class="evidence-pill-grid">${evidence.map(e => `<span class="evidence-pill">${e.evidence_text}</span>`).join('')}</div></div>`
+        : `<div class="evidence-section"><div class="evidence-section-title">Account Diagnosis</div><div style="font-size:0.8rem;color:#10b981;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-circle-check"></i> Behavioral activity is within healthy thresholds. Standard monitoring active.</div></div>`;
+
+    const sortedHistory = [...history].sort((a, b) => a.snapshot_date.localeCompare(b.snapshot_date));
 
     container.innerHTML = `
-        <div class="analysis-hero">
-            <div class="analysis-avatar">${initials}</div>
-            <div class="analysis-hero-info">
-                <h2>${p.customer_name} <span style="font-size:0.85rem;opacity:0.7;font-weight:400">(${p.customer_id})</span></h2>
-                <div class="analysis-hero-badges">
-                    <span class="hero-badge"><i class="fa-solid fa-briefcase"></i> ${(p.customer_segment || '').toUpperCase()}</span>
-                    <span class="hero-badge"><i class="fa-solid fa-clock"></i> ${p.tenure_months}mo</span>
-                    <span class="hero-badge"><i class="fa-solid fa-coins"></i> ₹${(p.customer_yearly_value || 0).toLocaleString()}</span>
-                    <span class="hero-badge"><i class="fa-solid fa-cubes"></i> ${p.products_count || 0} Products</span>
-                    ${p.cluster_label ? `<span class="hero-badge"><i class="fa-solid fa-object-group"></i> Cluster: ${p.cluster_label}</span>` : ''}
+        <div class="profile-hero">
+            <div class="profile-hero-left">
+                <div class="profile-avatar">${initials}</div>
+                <div class="profile-info">
+                    <h2>${p.customer_name} <span>(${p.customer_id})</span></h2>
+                    <div class="profile-chips">
+                        <span class="profile-chip"><i class="fa-solid fa-briefcase"></i> ${(p.customer_segment || '').toUpperCase()}</span>
+                        <span class="profile-chip"><i class="fa-solid fa-clock"></i> ${p.tenure_months}mo tenure</span>
+                        <span class="profile-chip"><i class="fa-solid fa-coins"></i> ₹${(p.customer_yearly_value || 0).toLocaleString()}</span>
+                        <span class="profile-chip"><i class="fa-solid fa-cubes"></i> ${p.products_count || 0} Products</span>
+                        ${p.cluster_label ? `<span class="profile-chip"><i class="fa-solid fa-object-group"></i> ${p.cluster_label}</span>` : ''}
+                    </div>
                 </div>
             </div>
-            <div class="analysis-hero-risk">
-                <span class="badge ${badgeClass}" style="font-size:0.85rem;padding:6px 16px">${p.risk_level}</span>
-                <div class="risk-pct" style="color:${probColor}">${(p.churn_probability || 0).toFixed(1)}%</div>
-                <div style="font-size:0.72rem;opacity:0.7">Risk Score: ${(p.risk_score || 0).toFixed(1)}/100</div>
+            <div class="profile-hero-metrics">
+                <div class="hero-metric-box">
+                    <span class="badge ${badgeClass}" style="font-size:0.8rem;padding:4px 14px">${p.risk_level} Risk</span>
+                    <div class="hero-churn-val">${(p.churn_probability || 0).toFixed(1)}%</div>
+                    <span class="hero-score-sub">Risk Score: ${(p.risk_score || 0).toFixed(1)} / 100</span>
+                </div>
             </div>
         </div>
 
-        <div class="analysis-grid">
-            <div class="analysis-card">
-                <div class="analysis-card-title"><i class="fa-solid fa-chart-line"></i>Model 1 v2 — Churn Risk Factors</div>
-                ${factors.map(f => `<div class="shap-row"><div><div class="shap-name">#${f.factor_rank} ${f.factor_name.replace(/_/g, ' ')}</div><div class="shap-msg">${f.factor_message}</div></div><span class="shap-impact">+${(f.contribution || 0).toFixed(3)}</span></div>`).join('')}
+        <div class="profile-grid-2">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <div class="profile-card-title"><i class="fa-solid fa-chart-line"></i>Key Risk Drivers (XGBoost SHAP)</div>
+                </div>
+                <div class="driver-list">
+                    ${factors.map((f, idx) => `
+                        <div class="driver-item">
+                            <div class="driver-item-header">
+                                <span class="driver-name"><span style="color:var(--blue);font-weight:700;margin-right:4px">#${idx+1}</span> ${f.display_label || f.factor_name.replace(/_/g, ' ')}</span>
+                                <span class="driver-contrib">+${(f.contribution || 0).toFixed(3)}</span>
+                            </div>
+                            <div class="driver-desc">${f.factor_message}</div>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
-            <div class="analysis-card">
-                <div class="analysis-card-title"><i class="fa-solid fa-headset"></i>Model 2 (Devang) — Retention Analysis</div>
-                <div style="margin-bottom:8px"><strong>Primary Reason:</strong> <span style="color:#f59e0b;font-weight:700">${p.primary_reason ? p.primary_reason.replace(/_/g, ' ') : 'N/A'}</span></div>
-                ${p.secondary_reasons ? `<div style="margin-bottom:8px;font-size:0.82rem"><strong>Secondary:</strong> ${p.secondary_reasons.replace(/,/g, ', ').replace(/_/g, ' ')}</div>` : ''}
-                <div style="margin-bottom:8px"><strong>Action:</strong> <span style="color:#6366f1;font-weight:700">${p.recommended_action ? p.recommended_action.replace(/_/g, ' ') : 'MONITOR'}</span></div>
-                <div style="margin-bottom:12px"><strong>Urgency:</strong> <span class="urgency-tag urgency-${(p.urgency || 'medium').toLowerCase()}">${p.urgency || 'MEDIUM'}</span></div>
-                <div class="reasoning-box">"${p.reasoning_summary || 'Standard retention profile.'}"</div>
-                ${evidence.length ? `<div style="margin-top:12px"><strong style="font-size:0.72rem;color:#64748b;text-transform:uppercase">Evidence</strong><div class="evidence-tags" style="margin-top:6px">${evidence.map(e => `<span class="evidence-tag">${e.evidence_text}</span>`).join('')}</div></div>` : ''}
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <div class="profile-card-title"><i class="fa-solid fa-headset"></i>Retention Playbook (AI Strategy)</div>
+                    <span class="urgency-tag urgency-${(p.urgency || 'low').toLowerCase()}">${p.urgency || 'LOW'} PRIORITY</span>
+                </div>
+                <div class="playbook-row">
+                    <span class="playbook-label">Diagnosis:</span>
+                    <span class="playbook-val">${reasonDisplay}</span>
+                </div>
+                ${p.secondary_reasons ? `<div class="playbook-row"><span class="playbook-label">Secondary:</span><span class="playbook-val" style="font-size:0.8rem;color:var(--text-secondary)">${p.secondary_reasons.replace(/,/g, ', ').replace(/_/g, ' ')}</span></div>` : ''}
+                <div class="playbook-row">
+                    <span class="playbook-label">Next Action:</span>
+                    <span class="playbook-val">${actionDisplay}</span>
+                </div>
+                <div class="playbook-reasoning">"${p.reasoning_summary || 'Customer exhibits stable engagement metrics with low churn probability.'}"</div>
+                ${evidenceHtml}
             </div>
         </div>
 
-        ${cluster ? `<div class="analysis-card" style="margin-top:20px">
-            <div class="analysis-card-title"><i class="fa-solid fa-object-group"></i>Cluster Context — ${cluster.cluster_label} (${cluster.customer_count.toLocaleString()} customers)</div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:8px">
-                <div><span style="font-size:0.72rem;color:#64748b">Avg Churn</span><div style="font-size:1.1rem;font-weight:700">${cluster.avg_churn_probability.toFixed(1)}%</div></div>
-                <div><span style="font-size:0.72rem;color:#64748b">Avg Balance Δ</span><div style="font-size:1.1rem;font-weight:700">${cluster.avg_balance_change_30d.toFixed(1)}%</div></div>
-                <div><span style="font-size:0.72rem;color:#64748b">Avg Txn Δ</span><div style="font-size:1.1rem;font-weight:700">${cluster.avg_transaction_change_30d.toFixed(1)}%</div></div>
-                <div><span style="font-size:0.72rem;color:#64748b">Dominant Reason</span><div style="font-size:0.85rem;font-weight:700">${cluster.dominant_primary_reason.replace(/_/g, ' ')}</div></div>
-                <div><span style="font-size:0.72rem;color:#64748b">High Risk</span><div style="font-size:1.1rem;font-weight:700;color:#ef4444">${cluster.high_risk_count.toLocaleString()}</div></div>
-                <div><span style="font-size:0.72rem;color:#64748b">Medium Risk</span><div style="font-size:1.1rem;font-weight:700;color:#f59e0b">${cluster.medium_risk_count.toLocaleString()}</div></div>
+        ${cluster ? `
+        <div class="profile-card" style="margin-top:24px">
+            <div class="profile-card-header">
+                <div class="profile-card-title"><i class="fa-solid fa-object-group"></i>Cohort Benchmark — ${cluster.cluster_label} (${cluster.customer_count.toLocaleString()} customers)</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:4px">
+                <div class="cluster-stat"><div class="cluster-stat-val">${cluster.avg_churn_probability.toFixed(1)}%</div><div class="cluster-stat-label">Cohort Avg Churn</div></div>
+                <div class="cluster-stat"><div class="cluster-stat-val">${cluster.avg_balance_change_30d.toFixed(1)}%</div><div class="cluster-stat-label">Cohort Avg Balance Δ</div></div>
+                <div class="cluster-stat"><div class="cluster-stat-val">${cluster.avg_transaction_change_30d.toFixed(1)}%</div><div class="cluster-stat-label">Cohort Avg Txn Δ</div></div>
+                <div class="cluster-stat"><div class="cluster-stat-val" style="font-size:0.95rem;font-weight:700">${cluster.dominant_primary_reason.replace(/_/g, ' ')}</div><div class="cluster-stat-label">Dominant Friction</div></div>
             </div>
         </div>` : ''}
 
-        <div style="margin-top:20px"><div class="analysis-card-title" style="margin-bottom:12px"><i class="fa-solid fa-timeline text-slate"></i>6-Month Behavioral Trajectory</div>
-        <div class="history-chart-wrap"><canvas id="analysisHistChart"></canvas></div></div>
+        <div class="trajectory-panel">
+            <div class="trajectory-header">
+                <div class="profile-card-title"><i class="fa-solid fa-timeline"></i>6-Month Account Trajectory</div>
+            </div>
+            <div class="trajectory-chart-wrap"><canvas id="analysisHistChart"></canvas></div>
+            <div class="monthly-strip">
+                ${sortedHistory.map(h => {
+                    const balColor = (h.balance_change_30d || 0) < 0 ? 'var(--risk-high)' : 'var(--risk-low)';
+                    const txnColor = (h.transaction_change_30d || 0) < 0 ? 'var(--risk-high)' : 'var(--risk-low)';
+                    return `
+                    <div class="month-card">
+                        <div class="month-card-title">${h.snapshot_date.substring(0, 7)}</div>
+                        <div class="month-card-stat"><span>Balance Δ</span><span style="color:${balColor}">${(h.balance_change_30d || 0).toFixed(1)}%</span></div>
+                        <div class="month-card-stat"><span>Txn Δ</span><span style="color:${txnColor}">${(h.transaction_change_30d || 0).toFixed(1)}%</span></div>
+                        <div class="month-card-stat"><span>Complaints</span><span>${h.complaints_30d || 0}</span></div>
+                        ${h.complaint_text ? `<div class="month-card-note" title="${h.complaint_text}">"${h.complaint_text}"</div>` : ''}
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
     `;
 
     // Render chart
@@ -632,15 +737,14 @@ function renderAnalysis(data, container) {
         const ctx = getCtx('analysisHistChart');
         if (!ctx) return;
         destroyChart('analysisHist');
-        const sorted = [...history].sort((a, b) => a.snapshot_date.localeCompare(b.snapshot_date));
         charts.analysisHist = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: sorted.map(h => h.snapshot_date.substring(0, 7)),
+                labels: sortedHistory.map(h => h.snapshot_date.substring(0, 7)),
                 datasets: [
-                    { label: 'Balance Δ', data: sorted.map(h => h.balance_change_30d || 0), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.3 },
-                    { label: 'Txn Δ', data: sorted.map(h => h.transaction_change_30d || 0), borderColor: '#f59e0b', borderDash: [5, 5], tension: 0.3 },
-                    { label: 'Complaints', data: sorted.map(h => h.complaints_30d || 0), borderColor: '#ef4444', tension: 0.3, yAxisID: 'y1' },
+                    { label: 'Balance Δ %', data: sortedHistory.map(h => h.balance_change_30d || 0), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', fill: true, tension: 0.3, pointRadius: 4 },
+                    { label: 'Txn Δ %', data: sortedHistory.map(h => h.transaction_change_30d || 0), borderColor: '#f59e0b', borderDash: [5, 5], tension: 0.3, pointRadius: 4 },
+                    { label: 'Complaints', data: sortedHistory.map(h => h.complaints_30d || 0), borderColor: '#ef4444', tension: 0.3, yAxisID: 'y1', pointRadius: 4 },
                 ]
             },
             options: {
@@ -948,5 +1052,12 @@ async function exportCSV() {
 // ---------------------------------------------------------------------------
 function setText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
 function pct(val, total) { return total > 0 ? `${((val / total) * 100).toFixed(1)}%` : '0%'; }
-function getCtx(id) { const el = document.getElementById(id); return el ? el.getContext('2d') : null; }
-function destroyChart(key) { if (charts[key]) { charts[key].destroy(); charts[key] = null; } }
+function getCtx(id) {
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js is not loaded yet.');
+        return null;
+    }
+    const el = document.getElementById(id);
+    return el ? el.getContext('2d') : null;
+}
+function destroyChart(key) { if (charts[key]) { try { charts[key].destroy(); } catch(e){} charts[key] = null; } }
