@@ -1,0 +1,18 @@
+# Virtual environment and cache files
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Local scripts / ML models not required for dashboard serving
+clustering_logic_kriti/
+devangs_fine_tuned/
+docs/
+frontend_sanika/
+logs/
+model_1/
+model_1_v2/
+model_2/
+pre_processing/
+test/
+Modelfile

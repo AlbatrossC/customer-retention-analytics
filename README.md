@@ -98,14 +98,15 @@ uv venv
 
 ### Step 3: Install Dependencies
 
+For running the **Dashboard / Web App & Vercel deployment** (lightweight):
 ```powershell
 uv pip install -r requirements.txt
 ```
 
-> If you *only* want to run the dashboard (no model training), you can do just:
-> ```powershell
-> uv pip install flask
-> ```
+For **full ML pipeline & model training** (includes XGBoost, SHAP, LightGBM, FastAPI):
+```powershell
+uv pip install -r requirements-ml.txt
+```
 
 ### Step 4: Launch the Dashboard
 
@@ -121,6 +122,17 @@ The dashboard has 5 sections:
 - **Individual Analysis** — Deep 360° view of any single customer
 - **Cluster Analysis** — Customers grouped by churn reason patterns
 - **Visualizations** — Monthly behavioral trends, segment comparisons, risk factor analysis
+
+---
+
+## Deploying to Vercel
+
+The project includes `vercel.json` and `.vercelignore` to deploy the Flask dashboard & precomputed SQLite database as a serverless web app on Vercel:
+
+1. Push the repository to GitHub.
+2. In the [Vercel Dashboard](https://vercel.com), click **Add New...** $\rightarrow$ **Project** and import your repository.
+3. Keep default settings (`Other` framework preset, root `./`) and click **Deploy**.
+4. Vercel will install `requirements.txt` and serve the dashboard globally.
 
 ---
 
