@@ -8,14 +8,27 @@ try:
     app.json.sort_keys = False
 except AttributeError:
     pass
-DB_PATH = os.path.join(os.path.dirname(__file__), 'database', 'customer_retention.db')
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database', 'customer_retention.db')
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
+    target_path = DB_PATH
+    if not os.path.exists(target_path):
+        cwd_path = os.path.join(os.getcwd(), 'database', 'customer_retention.db')
+        if os.path.exists(cwd_path):
+            target_path = cwd_path
+        else:
+            raise FileNotFoundError(f"Database not found at {DB_PATH} or {cwd_path}")
+    
+    try:
+        # SQLite read-only mode required on Vercel's read-only lambda filesystem
+        conn = sqlite3.connect(f"file:{os.path.abspath(target_path)}?mode=ro", uri=True)
+    except Exception:
+        conn = sqlite3.connect(target_path)
+        
     conn.row_factory = sqlite3.Row
     return conn
 
