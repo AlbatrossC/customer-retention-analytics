@@ -1,4 +1,5 @@
 import os
+import shutil
 import sqlite3
 from flask import Flask, render_template, jsonify, request
 
@@ -8,27 +9,37 @@ try:
     app.json.sort_keys = False
 except AttributeError:
     pass
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database', 'customer_retention.db')
+
+SRC_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database', 'customer_retention.db')
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def get_db():
-    target_path = DB_PATH
-    if not os.path.exists(target_path):
-        cwd_path = os.path.join(os.getcwd(), 'database', 'customer_retention.db')
-        if os.path.exists(cwd_path):
-            target_path = cwd_path
-        else:
-            raise FileNotFoundError(f"Database not found at {DB_PATH} or {cwd_path}")
+def get_db_path():
+    # In Vercel / AWS Lambda (/var/task), the filesystem is read-only.
+    # SQLite requires write permissions in the db directory for locking/temporary journals.
+    # We copy the db to /tmp on cold start once.
+    if os.environ.get('VERCEL') or os.path.exists('/var/task'):
+        tmp_db = '/tmp/customer_retention.db'
+        if not os.path.exists(tmp_db):
+            src = SRC_DB_PATH
+            if not os.path.exists(src):
+                alt_src = os.path.join(os.getcwd(), 'database', 'customer_retention.db')
+                if os.path.exists(alt_src):
+                    src = alt_src
+                else:
+                    raise FileNotFoundError(f"Source DB not found at {src} or {alt_src}")
+            shutil.copyfile(src, tmp_db)
+        return tmp_db
     
-    try:
-        # SQLite read-only mode required on Vercel's read-only lambda filesystem
-        conn = sqlite3.connect(f"file:{os.path.abspath(target_path)}?mode=ro", uri=True)
-    except Exception:
-        conn = sqlite3.connect(target_path)
-        
+    # Local development
+    if os.path.exists(SRC_DB_PATH):
+        return SRC_DB_PATH
+    return os.path.join(os.getcwd(), 'database', 'customer_retention.db')
+
+def get_db():
+    conn = sqlite3.connect(get_db_path())
     conn.row_factory = sqlite3.Row
     return conn
 
