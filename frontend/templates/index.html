@@ -34,12 +34,8 @@
                     <span>Customer Directory</span>
                 </a>
                 <a class="nav-item" href="/individual-analysis" data-tab="analysis" id="nav-analysis">
-                    <i class="fa-solid fa-user-magnifying-glass"></i>
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
                     <span>Individual Analysis</span>
-                </a>
-                <a class="nav-item" href="/cluster-analysis" data-tab="clusters" id="nav-clusters">
-                    <i class="fa-solid fa-object-group"></i>
-                    <span>Cluster Analysis</span>
                 </a>
                 <a class="nav-item" href="/visualizations" data-tab="visualizations" id="nav-visualizations">
                     <i class="fa-solid fa-chart-pie"></i>
@@ -110,33 +106,13 @@
                     </div>
                 </div>
 
-                <!-- Capital Banner -->
-                <div class="capital-banner">
-                    <div class="capital-item">
-                        <div class="capital-icon bg-rose-subtle"><i class="fa-solid fa-hand-holding-dollar text-rose"></i></div>
-                        <div><span class="capital-label">Revenue at Risk</span><div class="capital-value text-rose" id="kpi-rev-risk">₹0M</div></div>
-                    </div>
-                    <div class="capital-divider"></div>
-                    <div class="capital-item">
-                        <div class="capital-icon bg-slate-subtle"><i class="fa-solid fa-vault text-slate"></i></div>
-                        <div><span class="capital-label">Total Portfolio Value</span><div class="capital-value" id="kpi-portfolio">₹0M</div></div>
-                    </div>
-                    <div class="capital-divider"></div>
-                    <div class="capital-item capital-progress">
-                        <div class="capital-progress-header">
-                            <span class="capital-label">Risk Exposure</span><strong class="text-rose" id="kpi-risk-ratio">0%</strong>
-                        </div>
-                        <div class="progress-bg"><div class="progress-fill bg-rose" id="kpi-progress-bar" style="width:0%"></div></div>
-                    </div>
-                </div>
-
                 <!-- AI Analysis Coverage Banner -->
                 <div class="ai-coverage-banner" id="aiCoverageBanner">
                     <div class="ai-coverage-header">
                         <div class="ai-coverage-icon"><i class="fa-solid fa-robot"></i></div>
                         <div>
-                            <div class="ai-coverage-title">AI Retention Analysis Coverage (Model 2 — Devang's Fine-Tuned LLM)</div>
-                            <div class="ai-coverage-sub"><span id="ai-total-analyzed">3,803</span> of <span id="ai-total-customers">10,000</span> accounts have AI-diagnosed friction signals &amp; recommended retention actions</div>
+                            <div class="ai-coverage-title">AI Retention Analysis Coverage (Model 2 — Fine-Tuned LLM)</div>
+                            <div class="ai-coverage-sub"><strong class="ai-highlight-stat" id="ai-total-analyzed">3,803</strong> of <strong class="ai-highlight-stat" id="ai-total-customers">10,000</strong> accounts have AI-diagnosed friction signals &amp; recommended retention actions</div>
                         </div>
                     </div>
                     <div class="ai-coverage-bars">
@@ -144,21 +120,21 @@
                             <div class="ai-tier-label"><span class="ai-tier-dot dot-high"></span> High Risk</div>
                             <div class="ai-tier-bar-wrap">
                                 <div class="ai-tier-bar-bg"><div class="ai-tier-bar-fill bg-red" id="ai-bar-high" style="width:100%"></div></div>
-                                <span class="ai-tier-stat" id="ai-stat-high">2,142 / 2,142 (100%)</span>
+                                <span class="ai-tier-stat" id="ai-stat-high"><strong>2,142</strong> / 2,142 <span class="ai-tier-pct">(100%)</span></span>
                             </div>
                         </div>
                         <div class="ai-coverage-tier">
                             <div class="ai-tier-label"><span class="ai-tier-dot dot-med"></span> Medium Risk</div>
                             <div class="ai-tier-bar-wrap">
                                 <div class="ai-tier-bar-bg"><div class="ai-tier-bar-fill bg-amber" id="ai-bar-med" style="width:100%"></div></div>
-                                <span class="ai-tier-stat" id="ai-stat-med">973 / 973 (100%)</span>
+                                <span class="ai-tier-stat" id="ai-stat-med"><strong>973</strong> / 973 <span class="ai-tier-pct">(100%)</span></span>
                             </div>
                         </div>
                         <div class="ai-coverage-tier">
                             <div class="ai-tier-label"><span class="ai-tier-dot dot-low"></span> Low Risk</div>
                             <div class="ai-tier-bar-wrap">
                                 <div class="ai-tier-bar-bg"><div class="ai-tier-bar-fill bg-green" id="ai-bar-low" style="width:10%"></div></div>
-                                <span class="ai-tier-stat" id="ai-stat-low">688 / 6,885 (10.0%)</span>
+                                <span class="ai-tier-stat" id="ai-stat-low"><strong>688</strong> / 6,885 <span class="ai-tier-pct">(10.0%)</span></span>
                             </div>
                         </div>
                     </div>
@@ -188,7 +164,7 @@
                 </div>
 
                 <!-- Charts Row 2 -->
-                <div class="grid-3">
+                <div class="grid-2">
                     <div class="panel">
                         <div class="panel-header"><i class="fa-solid fa-list-check text-blue"></i><div><h3>Next Recommended Action</h3><p class="panel-desc">Prioritized retention workflows & interventions</p></div></div>
                         <div class="panel-body"><div class="chart-wrap-std"><canvas id="actionsChart"></canvas></div></div>
@@ -196,10 +172,6 @@
                     <div class="panel">
                         <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart text-amber"></i><div><h3>Primary Root Causes</h3><p class="panel-desc">AI-diagnosed customer friction & pain points</p></div></div>
                         <div class="panel-body"><div class="chart-wrap-std"><canvas id="reasonsChart"></canvas></div></div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-layer-group text-green"></i><div><h3>Product De-adoption Impact</h3><p class="panel-desc">Products dropped (90D) vs. churn risk escalation</p></div></div>
-                        <div class="panel-body"><div class="chart-wrap-std"><canvas id="productDepthChart"></canvas></div></div>
                     </div>
                 </div>
 
@@ -473,7 +445,7 @@
             <!-- ============================================================ -->
             <div class="tab-panel" id="tab-analysis">
                 <div class="panel">
-                    <div class="panel-header"><i class="fa-solid fa-user-magnifying-glass text-blue"></i><div><h3>Individual Retention Analysis</h3><p class="panel-desc">Enter a customer ID to view detailed retention analysis</p></div></div>
+                    <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart text-blue"></i><div><h3>Individual Retention Analysis</h3><p class="panel-desc">Enter a customer ID to view detailed retention analysis</p></div></div>
                     <div class="panel-body">
                         <div class="analysis-search-wrap">
                             <div class="analysis-search-box">
@@ -484,7 +456,7 @@
                         </div>
                         <div id="analysisContent">
                             <div class="empty-state">
-                                <i class="fa-solid fa-user-magnifying-glass"></i>
+                                <i class="fa-solid fa-magnifying-glass-chart"></i>
                                 <p>Enter a customer ID above to view their complete retention analysis</p>
                             </div>
                         </div>
@@ -631,7 +603,7 @@
                 </div>
                 <div class="grid-2">
                     <div class="panel">
-                        <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart text-rose"></i><div><h3>Primary Reasons Distribution</h3><p class="panel-desc">Model 2 (Devang) diagnosed friction points</p></div></div>
+                        <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart text-rose"></i><div><h3>Primary Reasons Distribution</h3><p class="panel-desc">Model 2 AI-diagnosed friction points</p></div></div>
                         <div class="panel-body"><div class="chart-wrap-tall"><canvas id="vizReasonsChart"></canvas></div></div>
                     </div>
                     <div class="panel">

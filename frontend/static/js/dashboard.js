@@ -223,6 +223,84 @@ window.filterBySegment = function(seg) {
     loadCustomers();
 };
 
+// Inline Chart.js plugin to draw count + Risk Tier labels OUTSIDE the doughnut/pie
+// with thin leader lines connecting each label to its slice.
+const doughnutSliceLabelsPlugin = {
+    id: 'doughnutSliceLabels',
+    afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        const dataset = chart.data.datasets[0];
+        const meta = chart.getDatasetMeta(0);
+        if (!meta || !meta.data || !meta.data.length) return;
+        const total = dataset.data.reduce((a, b) => a + (Number(b) || 0), 0);
+        if (!total) return;
+
+        const sliceColors = dataset.backgroundColor || [];
+        const tierNames = ['High Risk Customers', 'Medium Risk Customers', 'Low Risk Customers'];
+
+        meta.data.forEach((element, index) => {
+            const value = dataset.data[index];
+            if (!value || value <= 0) return;
+
+            const { startAngle, endAngle, outerRadius, x: cx, y: cy } = element;
+            const angleSpan = endAngle - startAngle;
+            if (angleSpan < 0.1) return; // skip tiny slices
+
+            const midAngle = (startAngle + endAngle) / 2;
+
+            // Point on the outer edge of the slice
+            const edgeX = cx + Math.cos(midAngle) * outerRadius;
+            const edgeY = cy + Math.sin(midAngle) * outerRadius;
+
+            // Elbow point — pushed out from the edge
+            const elbowLen = 12;
+            const elbowX = cx + Math.cos(midAngle) * (outerRadius + elbowLen);
+            const elbowY = cy + Math.sin(midAngle) * (outerRadius + elbowLen);
+
+            // Horizontal tail — extends left or right from the elbow
+            const tailLen = 14;
+            const goRight = Math.cos(midAngle) >= 0;
+            const tailX = elbowX + (goRight ? tailLen : -tailLen);
+            const tailY = elbowY;
+
+            // --- Draw the leader line ---
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(edgeX, edgeY);
+            ctx.lineTo(elbowX, elbowY);
+            ctx.lineTo(tailX, tailY);
+            ctx.strokeStyle = sliceColors[index] || '#94a3b8';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Small anchor dot on the slice edge
+            ctx.beginPath();
+            ctx.arc(edgeX, edgeY, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = sliceColors[index] || '#94a3b8';
+            ctx.fill();
+
+            // --- Draw the text label ---
+            ctx.textBaseline = 'bottom';
+            ctx.textAlign = goRight ? 'left' : 'right';
+            const textX = tailX + (goRight ? 4 : -4);
+
+            // Count (bold, crisp dark text)
+            ctx.font = '700 13px "Plus Jakarta Sans", "Inter", sans-serif';
+            ctx.fillStyle = '#0f172a';
+            ctx.fillText(value.toLocaleString(), textX, tailY - 1);
+
+            // Risk Tier label instead of % (e.g. High Risk, Medium Risk, Low Risk Customers)
+            const tierLabel = tierNames[index] || (chart.data.labels && chart.data.labels[index]) || 'Customers';
+            ctx.font = '700 10.5px "Plus Jakarta Sans", "Inter", sans-serif';
+            ctx.fillStyle = sliceColors[index] || '#64748b';
+            ctx.textBaseline = 'top';
+            ctx.fillText(tierLabel, textX, tailY + 1);
+
+            ctx.restore();
+        });
+    }
+};
+
 async function loadDashboard() {
     try {
         const res = await fetch('/api/dashboard_stats');
@@ -239,7 +317,6 @@ async function loadDashboard() {
         try { renderTopFactors(data); } catch (e) { console.error('Error in renderTopFactors:', e); }
         try { renderActionsChart(data); } catch (e) { console.error('Error in renderActionsChart:', e); }
         try { renderReasonsChart(data); } catch (e) { console.error('Error in renderReasonsChart:', e); }
-        try { renderProductDepthChart(data); } catch (e) { console.error('Error in renderProductDepthChart:', e); }
         try { renderSegments(data); } catch (e) { console.error('Error in renderSegments:', e); }
         try { renderMonthlyTrends(data); } catch (e) { console.error('Error in renderMonthlyTrends:', e); }
     } catch (err) {
@@ -265,16 +342,6 @@ function renderKPIs(d) {
     setText('tc-high', high.toLocaleString());
     setText('tc-med', med.toLocaleString());
     setText('tc-low', low.toLocaleString());
-
-    const revRisk = d.revenue_at_risk || 0;
-    const totalVal = d.total_portfolio_value || 0;
-    const ratio = totalVal > 0 ? ((revRisk / totalVal) * 100).toFixed(1) : '0.0';
-
-    setText('kpi-rev-risk', `₹${(revRisk / 1e6).toFixed(2)}M`);
-    setText('kpi-portfolio', `₹${(totalVal / 1e6).toFixed(2)}M`);
-    setText('kpi-risk-ratio', `${ratio}%`);
-    const bar = document.getElementById('kpi-progress-bar');
-    if (bar) bar.style.width = `${Math.min(100, parseFloat(ratio))}%`;
 }
 
 function renderAICoverage(d) {
@@ -297,7 +364,9 @@ function renderAICoverage(d) {
         const bar = document.getElementById(tier.barId);
         const stat = document.getElementById(tier.statId);
         if (bar) bar.style.width = `${pct}%`;
-        if (stat) stat.textContent = `${data.analyzed.toLocaleString()} / ${data.total.toLocaleString()} (${pct}%)`;
+        if (stat) {
+            stat.innerHTML = `<strong>${data.analyzed.toLocaleString()}</strong> / ${data.total.toLocaleString()} <span class="ai-tier-pct">(${pct}%)</span>`;
+        }
     }
 }
 
@@ -328,10 +397,19 @@ function renderRiskChart(d) {
                 spacing: 3
             }]
         },
+        plugins: [doughnutSliceLabelsPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '74%',
+            layout: {
+                padding: {
+                    top: 14,
+                    bottom: 14,
+                    left: 80,
+                    right: 80
+                }
+            },
+            cutout: '68%',
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -577,70 +655,7 @@ function renderReasonsChart(d) {
     });
 }
 
-function renderProductDepthChart(d) {
-    const ctx = getCtx('productDepthChart');
-    if (!ctx) return;
-    destroyChart('productDepth');
-    const stats = d.product_depth_stats || [];
-    
-    // Labels, churn probabilities, and affected account counts
-    const labels = stats.map(s => s.bracket);
-    const churnData = stats.map(s => s.avg_churn_prob);
-    const colors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
-    const hoverColors = ['#059669', '#d97706', '#ea580c', '#dc2626'];
 
-    charts.productDepth = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Avg Churn Risk %',
-                data: churnData,
-                backgroundColor: colors.slice(0, stats.length),
-                hoverBackgroundColor: hoverColors.slice(0, stats.length),
-                borderRadius: 6,
-                barThickness: 32
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    padding: 10,
-                    cornerRadius: 8,
-                    callbacks: {
-                        title: (items) => `Products Dropped: ${stats[items[0].dataIndex]?.bracket}`,
-                        label: (ctx) => {
-                            const s = stats[ctx.dataIndex];
-                            return [
-                                ` Avg Churn Risk: ${s.avg_churn_prob}%`,
-                                ` Total Customers: ${s.total_customers.toLocaleString()}`,
-                                ` High Risk Accounts: ${s.high_risk_count.toLocaleString()} (${s.high_risk_pct}%)`
-                            ];
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 11, weight: '600' } }
-                },
-                y: {
-                    title: { display: true, text: 'Avg Churn Risk %', font: { size: 11, weight: '600' } },
-                    grid: { color: 'rgba(0, 0, 0, 0.04)' },
-                    ticks: {
-                        callback: val => `${val}%`
-                    },
-                    suggestedMax: 45
-                }
-            }
-        }
-    });
-}
 
 function renderSegments(d) {
     const grid = document.getElementById('segmentGrid');
@@ -1034,6 +1049,34 @@ function renderModal(data, history) {
         : `<div class="evidence-section"><div class="evidence-section-title">Account Diagnosis</div><div style="font-size:0.8rem;color:#10b981;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-circle-check"></i> Behavioral activity is within healthy thresholds. Standard monitoring active.</div></div>`;
 
     const sortedHistory = [...history].sort((a, b) => a.snapshot_date.localeCompare(b.snapshot_date));
+    const complaints = (data.complaints && data.complaints.length > 0)
+        ? data.complaints
+        : (history.filter(h => h.complaint_text && h.complaint_text.trim() !== ''));
+
+    let complaintsHtml = '';
+    if (complaints.length > 0) {
+        complaintsHtml = `
+            <div class="profile-card complaint-card" style="margin-top:20px;">
+                <div class="profile-card-header">
+                    <div class="profile-card-title"><i class="fa-solid fa-triangle-exclamation text-rose"></i>Customer Complaints</div>
+                    <span class="badge badge-high" style="font-size:0.75rem;padding:3px 10px;">${complaints.length} Logged</span>
+                </div>
+                <div class="complaint-list">
+                    ${complaints.map(c => `
+                        <div class="complaint-entry">
+                            <div class="complaint-entry-header">
+                                <span class="complaint-date"><i class="fa-regular fa-calendar"></i> Snapshot Date: ${c.snapshot_date}</span>
+                                ${(c.unresolved_complaints > 0 || c.complaints_30d > 0)
+                                    ? '<span class="complaint-tag-unresolved"><i class="fa-solid fa-circle-exclamation"></i> Unresolved Complaint</span>'
+                                    : '<span class="complaint-tag-note"><i class="fa-solid fa-comment"></i> Customer Feedback</span>'}
+                            </div>
+                            <div class="complaint-quote">"${c.complaint_text}"</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
 
     content.innerHTML = `
         <div class="profile-hero">
@@ -1094,7 +1137,9 @@ function renderModal(data, history) {
                 </div>
             </div>
 
-            <div class="trajectory-panel">
+            ${complaintsHtml}
+
+            <div class="trajectory-panel" style="margin-top:20px;">
                 <div class="trajectory-header">
                     <div class="profile-card-title"><i class="fa-solid fa-timeline"></i>6-Month Account Trajectory</div>
                 </div>
@@ -1183,6 +1228,34 @@ function renderAnalysis(data, container) {
         : `<div class="evidence-section"><div class="evidence-section-title">Account Diagnosis</div><div style="font-size:0.8rem;color:#10b981;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-circle-check"></i> Behavioral activity is within healthy thresholds. Standard monitoring active.</div></div>`;
 
     const sortedHistory = [...history].sort((a, b) => a.snapshot_date.localeCompare(b.snapshot_date));
+    const complaints = (data.complaints && data.complaints.length > 0)
+        ? data.complaints
+        : (history.filter(h => h.complaint_text && h.complaint_text.trim() !== ''));
+
+    let complaintsHtml = '';
+    if (complaints.length > 0) {
+        complaintsHtml = `
+            <div class="profile-card complaint-card" style="margin-top:20px;">
+                <div class="profile-card-header">
+                    <div class="profile-card-title"><i class="fa-solid fa-triangle-exclamation text-rose"></i>Customer Complaints</div>
+                    <span class="badge badge-high" style="font-size:0.75rem;padding:3px 10px;">${complaints.length} Logged</span>
+                </div>
+                <div class="complaint-list">
+                    ${complaints.map(c => `
+                        <div class="complaint-entry">
+                            <div class="complaint-entry-header">
+                                <span class="complaint-date"><i class="fa-regular fa-calendar"></i> Snapshot Date: ${c.snapshot_date}</span>
+                                ${(c.unresolved_complaints > 0 || c.complaints_30d > 0)
+                                    ? '<span class="complaint-tag-unresolved"><i class="fa-solid fa-circle-exclamation"></i> Unresolved Complaint</span>'
+                                    : '<span class="complaint-tag-note"><i class="fa-solid fa-comment"></i> Customer Feedback</span>'}
+                            </div>
+                            <div class="complaint-quote">"${c.complaint_text}"</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
 
     container.innerHTML = `
         <div class="profile-hero">
@@ -1244,8 +1317,10 @@ function renderAnalysis(data, container) {
             </div>
         </div>
 
+        ${complaintsHtml}
+
         ${cluster ? `
-        <div class="profile-card" style="margin-top:24px">
+        <div class="profile-card" style="margin-top:20px">
             <div class="profile-card-header">
                 <div class="profile-card-title"><i class="fa-solid fa-object-group"></i>Cohort Benchmark — ${cluster.cluster_label} (${cluster.customer_count.toLocaleString()} customers)</div>
             </div>
@@ -1257,7 +1332,7 @@ function renderAnalysis(data, container) {
             </div>
         </div>` : ''}
 
-        <div class="trajectory-panel">
+        <div class="trajectory-panel" style="margin-top:20px;">
             <div class="trajectory-header">
                 <div class="profile-card-title"><i class="fa-solid fa-timeline"></i>6-Month Account Trajectory</div>
             </div>
@@ -1809,7 +1884,20 @@ async function loadVisualizations() {
                 labels: ['High Risk', 'Medium Risk', 'Healthy'],
                 datasets: [{ data: [dist.High || 0, dist.Medium || 0, dist.Low || 0], backgroundColor: ['#ef4444', '#f59e0b', '#10b981'] }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            plugins: [doughnutSliceLabelsPlugin],
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 14,
+                        bottom: 14,
+                        left: 80,
+                        right: 80
+                    }
+                },
+                plugins: { legend: { position: 'bottom' } }
+            }
         });
     }
 

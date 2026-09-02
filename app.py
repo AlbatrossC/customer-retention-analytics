@@ -225,36 +225,6 @@ def dashboard_stats():
         'high_risk_pct': round((r['high_cnt'] / r['total']) * 100, 1) if r['total'] else 0,
     } for r in seg_rows]
 
-    # Product de-adoption impact (Products dropped in 90D vs Churn surge)
-    prod_drop_rows = conn.execute('''
-        SELECT 
-            CASE 
-                WHEN s.products_dropped_90d = 0 THEN '0 Dropped'
-                WHEN s.products_dropped_90d = 1 THEN '1 Dropped'
-                WHEN s.products_dropped_90d = 2 THEN '2 Dropped'
-                ELSE '3+ Dropped'
-            END as bracket,
-            COUNT(DISTINCT c.customer_id) as total,
-            SUM(CASE WHEN m.risk_level='High' THEN 1 ELSE 0 END) as high_cnt,
-            AVG(m.churn_probability) as avg_cp
-        FROM customers c 
-        JOIN model1_predictions m ON c.customer_id = m.customer_id
-        JOIN (
-            SELECT customer_id, products_dropped_90d 
-            FROM customer_snapshots 
-            WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM customer_snapshots)
-        ) s ON c.customer_id = s.customer_id
-        GROUP BY bracket 
-        ORDER BY MIN(s.products_dropped_90d)
-    ''').fetchall()
-    product_depth = [{
-        'bracket': r['bracket'],
-        'total_customers': r['total'],
-        'high_risk_count': r['high_cnt'],
-        'avg_churn_prob': round(r['avg_cp'] or 0, 1),
-        'high_risk_pct': round((r['high_cnt'] / r['total']) * 100, 1) if r['total'] else 0
-    } for r in prod_drop_rows]
-
     # Monthly trends from real snapshots
     trend_rows = conn.execute('''
         SELECT snapshot_date, AVG(balance_change_30d) as avg_bal,
@@ -302,7 +272,6 @@ def dashboard_stats():
         'recommended_actions': actions_totals,
         'actions_matrix': actions_matrix,
         'segment_clusters': segments,
-        'product_depth_stats': product_depth,
         'monthly_trends': monthly_trends,
         'model2_coverage': m2_coverage,
         'total_analyzed': total_analyzed,
@@ -431,6 +400,13 @@ def customer_detail(customer_id):
         FROM model2_evidence WHERE customer_id = ? ORDER BY evidence_rank
     ''', (customer_id,)).fetchall()
 
+    complaints = conn.execute('''
+        SELECT snapshot_date, complaints_30d, unresolved_complaints, complaint_text
+        FROM customer_snapshots
+        WHERE customer_id = ? AND complaint_text IS NOT NULL AND TRIM(complaint_text) != ''
+        ORDER BY snapshot_date DESC
+    ''', (customer_id,)).fetchall()
+
     conn.close()
 
     p_dict = dict(profile)
@@ -451,6 +427,7 @@ def customer_detail(customer_id):
         'profile': p_dict,
         'risk_factors': factors_list,
         'evidence': [dict(r) for r in evidence],
+        'complaints': [dict(r) for r in complaints],
     })
 
 
@@ -524,6 +501,13 @@ def customer_retention_analysis(customer_id):
         if cluster_profile:
             cluster_profile = dict(cluster_profile)
 
+    complaints = conn.execute('''
+        SELECT snapshot_date, complaints_30d, unresolved_complaints, complaint_text
+        FROM customer_snapshots
+        WHERE customer_id = ? AND complaint_text IS NOT NULL AND TRIM(complaint_text) != ''
+        ORDER BY snapshot_date DESC
+    ''', (customer_id,)).fetchall()
+
     conn.close()
 
     factors_list = []
@@ -537,6 +521,7 @@ def customer_retention_analysis(customer_id):
         'risk_factors': factors_list,
         'evidence': [dict(r) for r in evidence],
         'history': [dict(r) for r in history],
+        'complaints': [dict(r) for r in complaints],
         'cluster_profile': cluster_profile,
     })
 
